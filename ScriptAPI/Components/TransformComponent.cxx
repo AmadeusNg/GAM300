@@ -106,18 +106,18 @@ namespace ScriptAPI
 
 	// ROTATION ==============================================================================
 	// Private
-	Vector3 TransformComponent::Rotation::get()
+	float TransformComponent::Rotation::get()
 	{
 		// May wanna change to a function
 		if (!TDS::GetTransform(entityID))
 		{
 			// throw error instead (not sure how)
-			return Vector3(0.f, 0.f, 0.f);
+			return 0.0f;
 		}
 
-		return Vector3(TDS::GetTransform(entityID)->GetRotation().x, TDS::GetTransform(entityID)->GetRotation().y, TDS::GetTransform(entityID)->GetRotation().z);
+		return TDS::GetTransform(entityID)->GetRotation();
 	}
-	void TransformComponent::Rotation::set(Vector3 value)
+	void TransformComponent::Rotation::set(float value)
 	{
 		// May wanna change to a function
 		if (!TDS::GetTransform(entityID))
@@ -126,38 +126,18 @@ namespace ScriptAPI
 			return;
 		}
 
-		TDS::GetTransform(entityID)->SetRotation(value.X, value.Y, value.Z);
+		TDS::GetTransform(entityID)->SetRotation(value);
 	}
 
 	// Public
-	Vector3 TransformComponent::GetRotation()
+	float TransformComponent::GetRotation()
 	{
 		return Rotation;
 	}
-
-	void TransformComponent::SetRotation(Vector3 value)
+	void TransformComponent::SetRotation(float value)
 	{
 		Rotation = value;
 	}
-
-	void TransformComponent::SetRotationX(float valueX)
-	{
-		Vector3 oldRotation = Rotation;
-		Rotation = Vector3(valueX, oldRotation.Y, oldRotation.Z);
-	}
-
-	void TransformComponent::SetRotationY(float valueY)
-	{
-		Vector3 oldRotation = Rotation;
-		Rotation = Vector3(oldRotation.X, valueY, oldRotation.Z);
-	}
-
-	void TransformComponent::SetRotationZ(float valueZ)
-	{
-		Vector3 oldRotation = Rotation;
-		Rotation = Vector3(oldRotation.X, oldRotation.Y, valueZ);
-	}
-
 
 	// CONSTRUCTOR ===========================================================================
 	TransformComponent::TransformComponent(TDS::EntityID ID) : entityID (ID)
