@@ -15,7 +15,6 @@ namespace TDS
 	}
 	VulkanPipeline::~VulkanPipeline()
 	{
-		ShutDown();
 	}
 	bool VulkanPipeline::Create(PipelineCreateEntry& createEntry)
 	{
@@ -309,8 +308,11 @@ namespace TDS
 			vkDestroyPipeline(device, pipeline.second, 0);
 		}
 		m_Pipelines.clear();
-		vkDestroyPipelineLayout(device, m_PipelineLayout, 0);
-
+		if (m_PipelineLayout)
+		{
+			vkDestroyPipelineLayout(device, m_PipelineLayout, 0);
+			m_PipelineLayout = nullptr;
+		}
 		FreeDescriptors();
 		vkDestroyDescriptorPool(device, m_DescriptorPool, 0);
 

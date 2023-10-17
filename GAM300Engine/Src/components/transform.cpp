@@ -17,7 +17,7 @@ namespace TDS
 	****************************************************************************/
 	Transform::Transform() : mPosition	(Vec3(0.0f, 0.0f, 0.0f)), 
 							 mScale		(Vec3(1.0f, 1.0f, 0.0f)),
-							 mRotation	(0.0f)
+							 mRotation	(Vec3(0.0f, 0.f,0.0f))
 	{ }
 
 	/*!*************************************************************************
@@ -60,8 +60,12 @@ namespace TDS
 		writer->Key("scaleZ");
 		writer->Double(mScale.z);
 
-		writer->Key("rotation");
-		writer->Double(mRotation);
+		writer->Key("rotationX");
+		writer->Double(mRotation.x);
+		writer->Key("rotationY");
+		writer->Double(mRotation.y);
+		writer->Key("rotationZ");
+		writer->Double(mRotation.z);
 
 		return true;
 	}

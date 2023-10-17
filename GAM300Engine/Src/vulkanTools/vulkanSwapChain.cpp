@@ -35,7 +35,7 @@ namespace TDS
 
 	VulkanSwapChain::~VulkanSwapChain()
 	{
-		ShutDown();
+		/*ShutDown();*/
 	}
 
 	void VulkanSwapChain::init() {
@@ -359,7 +359,10 @@ namespace TDS
 	{
 		for (auto IV : m_vSwapChainImageViews) {
 			if (IV)
+			{
 				vkDestroyImageView(m_Instance.getVkLogicalDevice(), IV, nullptr);
+				IV = nullptr;
+			}
 		}
 		m_vSwapChainImageViews.clear();
 
@@ -381,11 +384,11 @@ namespace TDS
 				//vkDestroyImage(m_Instance.getVkLogicalDevice(), m_vDepthImages[i], nullptr);
 				m_vDepthImages[i] = nullptr;
 			}
-
+			
 			//Use VMA
 			/*vkFreeMemory(m_Instance.getVkLogicalDevice(), m_vDepthImageMemory[i], nullptr);*/
 		}
-
+		m_vDepthImages.clear();
 		for (auto Fb : m_vSwapChainFramebuffers) {
 			if (Fb)
 			{
@@ -393,9 +396,12 @@ namespace TDS
 				Fb = nullptr;
 			}
 		}
-
+		m_vSwapChainFramebuffers.clear();
 		if (m_RenderPass)
+		{
 			vkDestroyRenderPass(m_Instance.getVkLogicalDevice(), m_RenderPass, nullptr);
+			m_RenderPass = nullptr;
+		}
 
 
 		for (size_t i{ 0 }; i < MAX_FRAMES_IN_FLIGHT; ++i) {

@@ -17,9 +17,20 @@ namespace TDS
 	/*!*************************************************************************
 	 * Loading of texture using TinyDDS
 	 ***************************************************************************/
+
+	enum class CUBEFACE 
+	{
+		LEFT, 
+		RIGHT,
+		UP,
+		DOWN,
+		FRONT, 
+		BACK
+	};
 	struct TextureData
 	{
 		tinyddsloader::DDSFile			m_TextureLoaded;
+		std::unordered_map<CUBEFACE, const tinyddsloader::DDSFile::ImageData*> m_CubeMapTexture;
 		bool DLL_API LoadTexture(std::string_view path);
 
 	};
@@ -53,7 +64,9 @@ namespace TDS
 		size_t DLL_API					ComputeImageSize();
 		size_t DLL_API					GetBlockByteSize();
 		size_t DLL_API					GetByteSize();
+		void DLL_API					LoadCubeMapTexture();
 		std::shared_ptr<VulkanTexture>	m_VulkanTexture;
+	
 		TextureData						m_Data;
 		TextureInfo						m_TextureInfo;
 	};

@@ -21,8 +21,7 @@ namespace TDS
 	}
 	GraphicsAllocator::~GraphicsAllocator()
 	{
-		if (m_VulkanAllocator)
-			vmaDestroyAllocator(m_VulkanAllocator);
+		ShutDown();
 	}
 	void GraphicsAllocator::Init(VulkanInstance& instance)
 	{
@@ -43,6 +42,15 @@ namespace TDS
 	void GraphicsAllocator::FreeMemory(VmaAllocation allocation)
 	{
 		vmaFreeMemory(GraphicsAllocator::GetInstance().GetAllocator(), allocation);
+	}
+
+	void GraphicsAllocator::ShutDown()
+	{
+		if (m_VulkanAllocator)
+		{
+			vmaDestroyAllocator(m_VulkanAllocator);
+			m_VulkanAllocator = nullptr;
+		}
 	}
 
 

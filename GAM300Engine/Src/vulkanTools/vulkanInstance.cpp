@@ -627,7 +627,7 @@ namespace TDS
 
 
 		//vkDestroyCommandPool(m_logicalDevice, m_CommandPool, nullptr);// command pool will free command buffers for us.
-		ShutDown();
+		//ShutDown();
 	}
 	/*
 

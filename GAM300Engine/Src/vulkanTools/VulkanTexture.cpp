@@ -834,6 +834,7 @@ namespace TDS
 	{
 		m_DefaultTexture->Destroy();
 		m_DefaultCubeTexture->Destroy();
+		m_DefaultStorage->Destroy();
 	}
 
 	DefaultTextures& DefaultTextures::GetInstance()

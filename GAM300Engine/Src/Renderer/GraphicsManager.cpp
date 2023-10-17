@@ -86,6 +86,7 @@ namespace TDS
 		DefaultTextures::GetInstance().DestroyDefaultTextures();
 		m_SwapchainRenderer->ShutDown();
 		m_CommandManager->Shutdown();
+		GraphicsAllocator::GetInstance().ShutDown();
 		m_MainVkContext->ShutDown();
 	}
 	void GraphicsManager::ResizeFrameBuffer(std::uint32_t width, std::uint32_t height)

@@ -128,9 +128,10 @@ namespace TDS
 			vmaDestroyImage(GraphicsAllocator::GetInstance().GetAllocator(), image, allocation);
 		}
 
+		void ShutDown();
 	private:
 		VkDeviceSize m_TotalAllocatedBytes;
-		VmaAllocator m_VulkanAllocator;
+		VmaAllocator m_VulkanAllocator = nullptr;
 
 	};
 }

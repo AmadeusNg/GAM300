@@ -24,7 +24,7 @@ namespace TDS {
 	//Renderer class destructor
 	Renderer::~Renderer()
 	{
-		ShutDown();
+		//ShutDown();
 	}
 
 	void Renderer::ShutDown()

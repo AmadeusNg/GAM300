@@ -162,7 +162,7 @@ namespace TDS
 			auto transformComponent = dynamic_cast<Transform*>(componentBase);
 			transformComponent->SetPosition(ImguiVec3Input("Position", transformComponent->GetPosition()));
 			transformComponent->SetScale(ImguiVec3Input("Scale", transformComponent->GetScale()));
-			transformComponent->SetRotation(ImguiFloatInput("Rotation", transformComponent->GetRotation()));
+			transformComponent->SetRotation(ImguiVec3Input("Rotation", transformComponent->GetRotation()));
 		}
 		else if (componentName == "AI")
 		{

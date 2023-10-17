@@ -20,8 +20,11 @@ namespace ScriptAPI
 		void SetScaleY(float valueY);
 		void SetScaleZ(float valueZ);
 
-		float GetRotation();
-		void SetRotation(float value);
+		Vector3 GetRotation();
+		void SetRotation(Vector3 value);
+		void SetRotationX(float valueX);
+		void SetRotationY(float valueY);
+		void SetRotationZ(float valueZ);
 
 	internal:
 		TransformComponent(TDS::EntityID ID);
@@ -37,10 +40,10 @@ namespace ScriptAPI
 			Vector3 get();
 			void set(Vector3 value);
 		}
-		property float Rotation
+		property Vector3 Rotation
 		{
-			float get();
-			void set(float value);
+			Vector3 get();
+			void set(Vector3 value);
 		}
 
 		TDS::EntityID entityID;

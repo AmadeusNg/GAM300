@@ -298,4 +298,23 @@ namespace TDS
 		}
 	}
 
+	void DLL_API Texture::LoadCubeMapTexture()
+	{
+		if (!m_Data.m_TextureLoaded.IsCubemap())
+			return;
+
+		
+
+		for (uint32_t i = 0; i < 6; i++) 
+		{
+			const tinyddsloader::DDSFile::ImageData* faceData = m_Data.m_TextureLoaded.GetImageData(0, i);
+
+			if (faceData != nullptr)
+				m_Data.m_CubeMapTexture[static_cast<CUBEFACE>(i)] = faceData;
+		
+		}
+
+
+	}
+
 }

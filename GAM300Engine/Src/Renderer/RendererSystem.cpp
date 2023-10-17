@@ -15,7 +15,7 @@ namespace TDS
 	float RendererSystem::lightPosX = 0.f;
 	void RendererSystem::OnInit()
 	{
-		Renderer3D::getInstance()->models = Model::createModelFromFile(GraphicsManager::getInstance().getVkInstance(), "Test.bin");
+		Renderer3D::getInstance()->models = nullptr;
 	
 	}
 	void RendererSystem::OnUpdate(const float dt, const std::vector<EntityID>& entities, Transform* _TransformComponent, GraphicsComponent* _Graphics)
@@ -66,7 +66,7 @@ namespace TDS
 					Renderer3D::getPipeline()->UpdateUBO(&ubo, sizeof(GlobalUBO), 0, frame);
 					Renderer3D::getPipeline()->BindDescriptor(frame);
 					Renderer3D::getPipeline()->SubmitPushConstant(&pushData, sizeof(PushConstantData), SHADER_FLAG::VERTEX);
-					Renderer3D::getInstance()->models->bind(commandBuffer);
+					/*Renderer3D::getInstance()->models->bind(commandBuffer);*/
 					Renderer3D::getInstance()->models->draw(commandBuffer);
 
 					
