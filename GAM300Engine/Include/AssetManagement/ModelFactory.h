@@ -16,6 +16,8 @@
 #include <iostream>
 
 #define MODEL_PATH "../assets/models/"
+#define MAX_PRELOAD_MODELS 5
+
 namespace TDS
 {
 	/*!*************************************************************************
@@ -30,7 +32,7 @@ namespace TDS
 		std::vector<std::uint64_t> m_LoadedModelsGUID;
 
 
-	
+
 		/*!*************************************************************************
 		 * Deserialize the model from the file.
 		 ***************************************************************************/
@@ -44,40 +46,40 @@ namespace TDS
 			}
 
 			auto deserializeVec3 = [](std::ifstream& in, Vec3& vec)
-				{
-					in.read(reinterpret_cast<char*>(&vec.x), sizeof(vec.x));
-					in.read(reinterpret_cast<char*>(&vec.y), sizeof(vec.y));
-					in.read(reinterpret_cast<char*>(&vec.z), sizeof(vec.z));
-				};
+			{
+				in.read(reinterpret_cast<char*>(&vec.x), sizeof(vec.x));
+				in.read(reinterpret_cast<char*>(&vec.y), sizeof(vec.y));
+				in.read(reinterpret_cast<char*>(&vec.z), sizeof(vec.z));
+			};
 
 			auto deserializeVec2 = [](std::ifstream& in, Vec2& vec)
-				{
-					in.read(reinterpret_cast<char*>(&vec.x), sizeof(vec.x));
-					in.read(reinterpret_cast<char*>(&vec.y), sizeof(vec.y));
-				};
+			{
+				in.read(reinterpret_cast<char*>(&vec.x), sizeof(vec.x));
+				in.read(reinterpret_cast<char*>(&vec.y), sizeof(vec.y));
+			};
 
 			auto deserializeMesh = [](std::ifstream& in, GeomCompiled::Mesh& mesh)
-				{
-					in.read(reinterpret_cast<char*>(&mesh.m_Name), sizeof(mesh.m_Name));
-				};
+			{
+				in.read(reinterpret_cast<char*>(&mesh.m_Name), sizeof(mesh.m_Name));
+			};
 
 			auto deserializeSubMesh = [](std::ifstream& in, GeomCompiled::SubMesh& subMesh)
-				{
-					in.read(reinterpret_cast<char*>(&subMesh.m_nFaces), sizeof(subMesh.m_nFaces));
-					in.read(reinterpret_cast<char*>(&subMesh.m_iIndices), sizeof(subMesh.m_iIndices));
-					in.read(reinterpret_cast<char*>(&subMesh.m_iVertices), sizeof(subMesh.m_iVertices));
-					in.read(reinterpret_cast<char*>(&subMesh.m_nVertices), sizeof(subMesh.m_nVertices));
-					in.read(reinterpret_cast<char*>(&subMesh.m_iMaterial), sizeof(subMesh.m_iMaterial));
-				};
+			{
+				in.read(reinterpret_cast<char*>(&subMesh.m_nFaces), sizeof(subMesh.m_nFaces));
+				in.read(reinterpret_cast<char*>(&subMesh.m_iIndices), sizeof(subMesh.m_iIndices));
+				in.read(reinterpret_cast<char*>(&subMesh.m_iVertices), sizeof(subMesh.m_iVertices));
+				in.read(reinterpret_cast<char*>(&subMesh.m_nVertices), sizeof(subMesh.m_nVertices));
+				in.read(reinterpret_cast<char*>(&subMesh.m_iMaterial), sizeof(subMesh.m_iMaterial));
+			};
 
 			auto deserializeExtraVertices = [&](std::ifstream& in, GeomCompiled::ExtraVertices& extraVertices)
-				{
-					deserializeVec2(in, extraVertices.m_UV);
-					deserializeVec3(in, extraVertices.m_Normal);
-					deserializeVec3(in, extraVertices.m_Tanget);
-					deserializeVec3(in, extraVertices.m_Bitangent);
-					in.read(reinterpret_cast<char*>(&extraVertices.m_Colour), sizeof(extraVertices.m_Colour));
-				};
+			{
+				deserializeVec2(in, extraVertices.m_UV);
+				deserializeVec3(in, extraVertices.m_Normal);
+				deserializeVec3(in, extraVertices.m_Tanget);
+				deserializeVec3(in, extraVertices.m_Bitangent);
+				in.read(reinterpret_cast<char*>(&extraVertices.m_Colour), sizeof(extraVertices.m_Colour));
+			};
 
 			uint32_t meshSize;
 			inFile.read(reinterpret_cast<char*>(&meshSize), sizeof(meshSize));
@@ -121,7 +123,7 @@ namespace TDS
 		/*!*************************************************************************
 		 * Preload the model from the file.
 		 ***************************************************************************/
-		DLL_API void Preload(ResourceManager& resourceMgr)
+		void Preload(ResourceManager& resourceMgr)
 		{
 			m_LoadedModelsGUID.reserve(20);
 			std::filesystem::path dir = MODEL_PATH;
@@ -131,10 +133,15 @@ namespace TDS
 				std::cout << "Invalid directory" << std::endl;
 				return;
 			}
-
+			std::uint32_t numLoadedModels = 0;
 			for (const auto& entry : std::filesystem::directory_iterator(dir))
 			{
+				if (numLoadedModels >= MAX_PRELOAD_MODELS)
+					break;
+
+
 				const std::filesystem::path& path = entry.path();
+
 				if (path.extension() == ".bin")
 				{
 					GeomCompiled newGeom{};
@@ -156,7 +163,7 @@ namespace TDS
 					m_ModelMap[fileName] = static_cast<int>(m_LoadedModelsGUID.size());
 					m_LoadedModelsGUID.emplace_back(modelInstance.m_GUID.GetUniqueID());
 
-
+					++numLoadedModels;
 
 
 				}

@@ -1,6 +1,7 @@
 #pragma once
 #include "FactoryBase.h"
 #include "../GraphicsResource/TextureInfo.h"
+#define MAX_NUM_PRELOAD_TEXTURE 10
 #define TEXTURE_PATH "../assets/textures/"
 namespace TDS
 {
@@ -20,6 +21,7 @@ namespace TDS
 		}
 		void Preload(ResourceManager& resourceMgr)
 		{
+			std::uint32_t NumOfLoadedTexture = 0;
 			std::filesystem::path dir = TEXTURE_PATH;
 
 			if (!std::filesystem::exists(dir) || !std::filesystem::is_directory(dir))
@@ -30,6 +32,8 @@ namespace TDS
 
 			for (const auto& entry : std::filesystem::directory_iterator(dir))
 			{
+				if (NumOfLoadedTexture >= MAX_NUM_PRELOAD_TEXTURE)
+					break;
 				const std::filesystem::path& path = entry.path();
 				if (path.extension() == ".dds")
 				{
@@ -49,6 +53,7 @@ namespace TDS
 					newTexture->LoadTexture(path.string());
 					m_LoadedTexture[fileName] = m_LoadedTextureGUID.size();
 					m_LoadedTextureGUID.emplace_back(TextureInstance.m_GUID.GetUniqueID());
+					++NumOfLoadedTexture;
 				}
 			}
 		}

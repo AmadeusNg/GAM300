@@ -119,16 +119,22 @@ namespace TDS
 		template <>
 		static void FreeBuffer<VkBuffer>(VkBuffer& buffer, VmaAllocation allocation)
 		{
+			VmaAllocationInfo allocationinfo{};
+			vmaGetAllocationInfo(GraphicsAllocator::GetInstance().m_VulkanAllocator, allocation, &allocationinfo);
+			GraphicsAllocator::GetInstance().m_TotalAllocatedBytes -= allocationinfo.size;
 			vmaDestroyBuffer(GraphicsAllocator::GetInstance().GetAllocator(), buffer, allocation);
 		}
 
 		template <>
 		static void FreeBuffer<VkImage>(VkImage& image, VmaAllocation allocation)
 		{
+			VmaAllocationInfo allocationinfo{};
+			vmaGetAllocationInfo(GraphicsAllocator::GetInstance().m_VulkanAllocator, allocation, &allocationinfo);
+			GraphicsAllocator::GetInstance().m_TotalAllocatedBytes -= allocationinfo.size;
 			vmaDestroyImage(GraphicsAllocator::GetInstance().GetAllocator(), image, allocation);
 		}
+		void DLL_API ShutDown();
 
-		void ShutDown();
 	private:
 		VkDeviceSize m_TotalAllocatedBytes;
 		VmaAllocator m_VulkanAllocator = nullptr;

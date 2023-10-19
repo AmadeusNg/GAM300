@@ -36,7 +36,7 @@ namespace TDS
 		bufferInfo.usage = bufferUsage;
 		bufferInfo.sharingMode = VkSharingMode::VK_SHARING_MODE_EXCLUSIVE;
 
-	
+
 		m_Allocation = GraphicsAllocator::Allocate(&bufferInfo, (VmaMemoryUsage)VmaUsage, m_Buffer);
 		m_BufferSize = size;
 		if (data)
@@ -119,7 +119,7 @@ namespace TDS
 		{
 			CreateBuffer(size, flags, VMA_MEMORY_USAGE_CPU_TO_GPU, data);
 		}
-		
+
 
 	}
 	void VMABuffer::UpdateVertexData(void* data, size_t size, std::uint32_t offset)

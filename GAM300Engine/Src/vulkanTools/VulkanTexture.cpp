@@ -12,61 +12,8 @@ namespace TDS
 	}
 	VulkanTexture::~VulkanTexture()
 	{
+		Destroy();
 	}
-
-	/*void VulkanTexture::CreateTextureDirect(std::uint32_t size, TextureInfo& textureInfo, void* data)
-	{
-		VulkanInstance& instance = GraphicsManager::getInstance().getVkInstance();
-		CommandManager& cmdMgr = GraphicsManager::getInstance().getCommandManager();
-		CreateImageParams params{};
-		params.m_Format = textureInfo.m_Format;
-		params.m_NumOfArrayLayers = 1U;
-		params.m_tiling = VK_IMAGE_TILING_OPTIMAL;
-		params.m_usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
-		m_ImageHdl = CreateVulkanImage(textureInfo.m_ExtentDimen, 1, VK_SAMPLE_COUNT_1_BIT, params, m_Allocation);
-
-		VMABuffer stagingBuffer = VMABuffer::CreateStagingBuffer(size, instance, data);
-
-		CommandBufferInfo cmdInfo{};
-		cmdMgr.CreateSingleUseCommandBuffer(cmdInfo);
-		ImageMemoryLayoutInput layoutInput{};
-		layoutInput.m_Image = m_ImageHdl;
-		layoutInput.m_srcAccessFlags = 0;
-		layoutInput.m_dstAccessFlags = VK_ACCESS_TRANSFER_WRITE_BIT;
-		layoutInput.m_srcStageFlags = VK_PIPELINE_STAGE_TRANSFER_BIT;
-		layoutInput.m_dstStageFlags = VK_PIPELINE_STAGE_TRANSFER_BIT;
-		layoutInput.m_NewLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-		layoutInput.m_oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-		layoutInput.m_subResourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-		layoutInput.m_subResourceRange.levelCount = 1;
-		layoutInput.m_subResourceRange.layerCount = 1;
-		SetImageMemoryBarrier(cmdInfo.m_CommandBuffer.m_CmdBuffer, layoutInput);
-
-		VkBufferImageCopy bufferCopyRegion = {};
-		bufferCopyRegion.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-		bufferCopyRegion.imageSubresource.mipLevel = 0;
-		bufferCopyRegion.imageSubresource.baseArrayLayer = 0;
-		bufferCopyRegion.imageSubresource.layerCount = 1;
-		bufferCopyRegion.imageExtent.width = textureInfo.m_ExtentDimen.width;
-		bufferCopyRegion.imageExtent.height = textureInfo.m_ExtentDimen.height;
-		bufferCopyRegion.imageExtent.depth = 1;
-
-		vkCmdCopyBufferToImage(cmdInfo.m_CommandBuffer.m_CmdBuffer, stagingBuffer.GetBuffer(), m_ImageHdl, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &bufferCopyRegion);
-
-		layoutInput.m_srcAccessFlags = VK_ACCESS_TRANSFER_WRITE_BIT;
-		layoutInput.m_dstAccessFlags = VK_ACCESS_TRANSFER_READ_BIT;
-		layoutInput.m_srcStageFlags = VK_PIPELINE_STAGE_TRANSFER_BIT;
-		layoutInput.m_dstStageFlags = VK_PIPELINE_STAGE_TRANSFER_BIT;
-		layoutInput.m_NewLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-		layoutInput.m_oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-		SetImageMemoryBarrier(cmdInfo.m_CommandBuffer.m_CmdBuffer, layoutInput);
-		cmdMgr.EndExecution(cmdInfo);
-
-		m_ImageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-		CreateSampler(textureInfo);
-		CreateImageView(textureInfo.m_Format);
-		stagingBuffer.DestroyBuffer();
-	}*/
 
 	void VulkanTexture::CreateTexture(TextureInfo& textureinfo)
 	{
@@ -351,7 +298,7 @@ namespace TDS
 
 		texture->m_DescriptorImageInfo.sampler = texture->m_Sampler;
 		texture->m_DescriptorImageInfo.imageView = texture->m_BaseImageView;
-		
+
 		return texture;
 	}
 	void VulkanTexture::CreateCubeMapTexture(TextureInfo& textureAssetData, TextureData& textureData)
@@ -695,7 +642,11 @@ namespace TDS
 
 	void VulkanTexture::Destroy()
 	{
+
 		VkDevice deviceRef = GraphicsManager::getInstance().getVkInstance().getVkLogicalDevice();
+		if (deviceRef == nullptr)
+			return;
+
 		if (m_BaseImageView)
 			vkDestroyImageView(deviceRef, m_BaseImageView, 0);
 

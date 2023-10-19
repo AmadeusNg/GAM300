@@ -19,9 +19,9 @@ namespace TDS
 		std::shared_ptr<CommandManager>			m_CommandManager;
 		std::shared_ptr<DirectFrameBuffer>		m_MainFrameBuffer;
 		std::vector<RenderLayer*>				m_RenderLayer;
-		TDSCamera*								m_Camera = nullptr;
+		TDSCamera* m_Camera = nullptr;
 		VkCommandBuffer							currentCommand = nullptr;
-		WindowsWin*								m_pWindow		= nullptr;
+		WindowsWin* m_pWindow = nullptr;
 	public:
 		inline static std::shared_ptr<GraphicsManager> m_Instance;
 		GraphicsManager();
@@ -34,14 +34,14 @@ namespace TDS
 		void								ShutDown();
 		void								ResizeFrameBuffer(std::uint32_t width, std::uint32_t height);
 		void								setCamera(TDSCamera& camera);
-		TDSCamera&							GetCamera();
+		TDSCamera& GetCamera();
 		std::shared_ptr<DirectFrameBuffer>	GetMainFrameBuffer();
-		
-		VkCommandBuffer&					getCommandBuffer();
-		Renderer&							GetSwapchainRenderer();
-		VulkanInstance&						getVkInstance();
-		CommandManager&						getCommandManager();
-		static GraphicsManager&				getInstance();
+
+		VkCommandBuffer& getCommandBuffer();
+		Renderer& GetSwapchainRenderer();
+		VulkanInstance& getVkInstance();
+		CommandManager& getCommandManager();
+		static GraphicsManager& getInstance();
 	};
 
 

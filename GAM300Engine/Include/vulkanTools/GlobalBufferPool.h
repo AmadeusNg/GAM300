@@ -21,9 +21,9 @@ namespace TDS
 			return m_Instance;
 		}
 		DLL_API std::shared_ptr<UBO>											GetBuffer(std::uint32_t binding);
-		DLL_API std::vector<std::shared_ptr<UBO>>*								GetBufferContainer(std::uint32_t binding);
+		DLL_API std::vector<std::shared_ptr<UBO>>* GetBufferContainer(std::uint32_t binding);
 		void DLL_API															AddToGlobalPool(size_t size, std::uint32_t binding, VkBufferUsageFlags usage,
-																				std::string_view BufferName, void* data = nullptr);
+			std::string_view BufferName, void* data = nullptr);
 		//void DLL_API															AddToGlobalPoolByName(std::string_view BufferName, void* data = nullptr);
 		DLL_API bool															BindingExist(std::uint32_t binding);
 		DLL_API bool															BindingExist(std::string_view name);

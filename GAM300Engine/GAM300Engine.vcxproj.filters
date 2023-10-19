@@ -179,7 +179,6 @@
     <ClInclude Include="Src\Renderer\Material.h" />
     <ClInclude Include="Include\Rendering\Material.h" />
     <ClInclude Include="Include\Rendering\ModelElement.h" />
-    <ClInclude Include="Include\Rendering\PointLightRenderer.h" />
     <ClInclude Include="Include\Rendering\RenderDataManager.h" />
     <ClInclude Include="Include\Rendering\Renderer3D.h" />
     <ClInclude Include="Include\Rendering\RendererSystem.h" />

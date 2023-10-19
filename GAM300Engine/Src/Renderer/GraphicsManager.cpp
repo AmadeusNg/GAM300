@@ -10,6 +10,7 @@
 #include "vulkanTools/GlobalBufferPool.h"
 #include "Rendering/RenderLayer.h"
 #include "Rendering/Renderer3D.h"
+#include "Rendering/RenderDataManager.h"
 namespace TDS
 {
 	GraphicsManager::GraphicsManager()
@@ -23,26 +24,25 @@ namespace TDS
 		m_pWindow = window;
 		m_MainVkContext = std::make_shared<VulkanInstance>(*m_pWindow);
 		m_CommandManager = std::make_shared<CommandManager>();
-		ShaderLoader::GetInstance()->DeserializeShaderReflection("../assets/shaders/AllShaders.bin");
+		ShaderLoader::GetInstance()->DeserializeShaderReflection(REFLECTED_BIN);
 		GraphicsAllocator::GetInstance().Init(*m_MainVkContext);
 		m_CommandManager->Init();
 		m_SwapchainRenderer = std::make_shared<Renderer>(*m_pWindow, *m_MainVkContext);
 		DefaultTextures::GetInstance().Init();
-	
 		Renderer3D::Init();
 		FrameBufferEntryInfo entry{};
 		entry.m_AreaDimension = { m_pWindow->getWidth(), m_pWindow->getHeight() };
 		entry.m_AttachmentRequirememnts.push_back(AttachmentSetting(m_SwapchainRenderer->getSwapchain().GetSwapChainImageFormat()));
 
 		m_MainFrameBuffer = std::make_shared<DirectFrameBuffer>(entry);
-		
+
 		for (auto& renderLayer : m_RenderLayer)
 		{
 			renderLayer->Setup(m_pWindow);
 			renderLayer->Init();
 		}
 
-		
+
 	}
 	void GraphicsManager::StartFrame()
 	{
@@ -51,7 +51,7 @@ namespace TDS
 			renderLayer->StartFrame();
 		}
 		currentCommand = m_SwapchainRenderer->BeginFrame();
-		
+
 	}
 
 	void GraphicsManager::AddRenderLayer(RenderLayer* layer)
@@ -72,7 +72,7 @@ namespace TDS
 	}
 	void GraphicsManager::ShutDown()
 	{
-		
+
 		vkDeviceWaitIdle(m_MainVkContext->getVkLogicalDevice());
 
 		for (auto& renderlayer : m_RenderLayer)
@@ -86,7 +86,9 @@ namespace TDS
 		DefaultTextures::GetInstance().DestroyDefaultTextures();
 		m_SwapchainRenderer->ShutDown();
 		m_CommandManager->Shutdown();
+		RendererDataManager::Destroy();
 		GraphicsAllocator::GetInstance().ShutDown();
+
 		m_MainVkContext->ShutDown();
 	}
 	void GraphicsManager::ResizeFrameBuffer(std::uint32_t width, std::uint32_t height)

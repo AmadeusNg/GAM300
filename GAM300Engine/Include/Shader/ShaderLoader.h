@@ -1,6 +1,8 @@
 #pragma once
 #include "ShaderData.h"
 #include "dotnet/ImportExport.h"
+#define SHADER_DIRECTORY "../assets/shaders/"
+#define REFLECTED_BIN "../assets/shaders/AllShaders.bin"
 namespace TDS
 {
 

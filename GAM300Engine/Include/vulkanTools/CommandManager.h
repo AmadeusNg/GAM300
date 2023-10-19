@@ -8,7 +8,7 @@ namespace TDS
 	{
 		GRAPHICS = 0,
 		COMPUTE,
-		TRANSFER//Not used now because we can afford to have transfer on graphics family
+		TRANSFER
 	};
 	enum class EXECUTE_TYPE
 	{

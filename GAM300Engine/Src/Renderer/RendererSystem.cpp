@@ -15,8 +15,7 @@ namespace TDS
 	float RendererSystem::lightPosX = 0.f;
 	void RendererSystem::OnInit()
 	{
-		Renderer3D::getInstance()->models = nullptr;
-	
+
 	}
 	void RendererSystem::OnUpdate(const float dt, const std::vector<EntityID>& entities, Transform* _TransformComponent, GraphicsComponent* _Graphics)
 	{
@@ -37,7 +36,7 @@ namespace TDS
 			{
 				if (Renderer3D::getPipeline()->GetCreateEntry().m_EnableDoubleBuffering)
 				{
-					
+
 					GlobalUBO ubo = RendererDataManager::GetUBO(_Graphics->GetAsset().m_GUID.GetUniqueID());
 					ModelElement elem = RendererDataManager::GetModelElement(_Graphics->GetAsset().m_GUID.GetUniqueID(), _Graphics->GetAsset().m_Reference);
 					PushConstantData pushData{};
@@ -56,25 +55,27 @@ namespace TDS
 					pushData.NormalMat = temp;
 
 					ubo.m_View = GraphicsManager::getInstance().GetCamera().GetViewMatrix();
-					ubo.m_vPointLights[0].m_Position= Vec4(lightPosX, 1.f, 0.f, 0.2f);
+					ubo.m_vPointLights[0].m_Position = Vec4(lightPosX, 0.5f, 0.f, 0.2f);
 					ubo.m_vPointLights[0].m_Color = Vec4(1.f, 1.f, 1.f, 1.f);
 					ubo.m_Projection = Mat4::Perspective(GraphicsManager::getInstance().GetCamera().m_Fov * Mathf::Deg2Rad,
 						GraphicsManager::getInstance().GetSwapchainRenderer().getAspectRatio(), 0.1f, 10.f);
 					ubo.m_Projection.m[1][1] *= -1;
-					
+
 					Renderer3D::getPipeline()->BindPipeline();
 					Renderer3D::getPipeline()->UpdateUBO(&ubo, sizeof(GlobalUBO), 0, frame);
 					Renderer3D::getPipeline()->BindDescriptor(frame);
 					Renderer3D::getPipeline()->SubmitPushConstant(&pushData, sizeof(PushConstantData), SHADER_FLAG::VERTEX);
-					/*Renderer3D::getInstance()->models->bind(commandBuffer);*/
-					Renderer3D::getInstance()->models->draw(commandBuffer);
+					/*Renderer3D::getInstance()->models->bind(commandBuffer);
+					Renderer3D::getInstance()->models->draw(commandBuffer);*/
+					Renderer3D::getPipeline()->BindVertexBuffer(*elem.m_VertexBuffer);
+					Renderer3D::getPipeline()->BindIndexBuffer(*elem.m_IndexBuffer);
+					Renderer3D::getPipeline()->DrawIndexed(*elem.m_VertexBuffer, *elem.m_IndexBuffer, frame);
 
-					
-					
-					
-					
 
-					
+
+
+
+
 
 				}
 
@@ -82,7 +83,7 @@ namespace TDS
 			}
 		}
 		//GraphicsManager::getInstance().GetSwapchainRenderer().EndSwapChainRenderPass(commandBuffer);
-		
+
 
 	/*	OnRender(entities, &_transform, _Graphics)*/
 		/*SubmitModels(entities, &_transform, _Graphics);*/
@@ -96,8 +97,8 @@ namespace TDS
 	}
 	void RendererSystem::SubmitModels(const std::vector<EntityID>& entities, Transform* _transform, GraphicsComponent* _Graphics)
 	{
-		
-		
+
+
 	}
 	void RendererSystem::SubmitTextures()
 	{

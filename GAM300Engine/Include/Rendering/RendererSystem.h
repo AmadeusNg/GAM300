@@ -8,7 +8,7 @@ namespace TDS
 	class Transform;
 	class Model;
 	class GraphicsComponent;
-	
+
 	class DLL_API RendererSystem
 	{
 	public:

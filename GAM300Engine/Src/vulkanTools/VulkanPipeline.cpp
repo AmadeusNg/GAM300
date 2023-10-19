@@ -24,7 +24,7 @@ namespace TDS
 			return false;
 		}
 		m_PipelineEntry = createEntry;
-		
+
 
 		for (auto Shader : m_PipelineEntry.m_ShaderInputs.m_Shaders)
 		{
@@ -61,7 +61,7 @@ namespace TDS
 		pipelineLayoutCI.pSetLayouts = &m_PipelineDescriptor.m_DescSetLayout;
 		pipelineLayoutCI.pushConstantRangeCount = static_cast<uint32_t>(m_ShaderLoadedData.m_VkPushConstantRanges.size());
 		pipelineLayoutCI.pPushConstantRanges = m_ShaderLoadedData.m_VkPushConstantRanges.data();
-		
+
 
 		VK_ASSERT(vkCreatePipelineLayout(mgr.getVkInstance().getVkLogicalDevice(), &pipelineLayoutCI, nullptr, &m_PipelineLayout), "Failed to create pipeline layout!\n");
 
@@ -99,7 +99,7 @@ namespace TDS
 				m_PipelineEntry.m_FBTarget[GraphicsManager::getInstance().GetSwapchainRenderer().getFrameIndex()]->
 				getFBEntryInfo().m_AttachmentRequirememnts.size());
 
-			
+
 		}
 		else
 		{
@@ -127,7 +127,7 @@ namespace TDS
 		viewportState.viewportCount = 1;
 		viewportState.scissorCount = 1;
 
-		VkPipelineDynamicStateCreateInfo dynamicState = {};
+
 		std::vector<VkDynamicState> dynamicStateEnables;
 
 		dynamicStateEnables.push_back(VK_DYNAMIC_STATE_VIEWPORT);
@@ -135,7 +135,8 @@ namespace TDS
 		if (m_PipelineEntry.m_PipelineConfig.m_EnableDepthBiased)
 			dynamicStateEnables.push_back(VK_DYNAMIC_STATE_DEPTH_BIAS);
 
-		dynamicState.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+
+		VkPipelineDynamicStateCreateInfo dynamicState = { VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO };
 		dynamicState.pDynamicStates = dynamicStateEnables.data();
 		dynamicState.dynamicStateCount = static_cast<uint32_t>(dynamicStateEnables.size());
 
@@ -149,6 +150,7 @@ namespace TDS
 		depthStencilState.minDepthBounds = m_PipelineEntry.m_PipelineConfig.m_MinDepth;
 		depthStencilState.maxDepthBounds = m_PipelineEntry.m_PipelineConfig.m_MaxDepth;
 
+		//Set multisampling state, lemme know if you guys are doing multi samlping from your frame buffer and I will set this accordingly.
 		VkPipelineMultisampleStateCreateInfo multisampleState = { VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO };
 		multisampleState.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
 
@@ -162,42 +164,42 @@ namespace TDS
 		//}
 
 		std::uint32_t numInputVertex = std::uint32_t(m_PipelineEntry.m_ShaderInputs.m_InputVertex.size());
-		std::vector<VkVertexInputBindingDescription> inputBindings(numInputVertex);
-		std::vector<VkVertexInputAttributeDescription> InputAttributes;
+		m_inputBindings.resize(numInputVertex);
+
 
 		std::uint32_t location = 0;
 		std::uint32_t bindingIndex = 0;
 
 		for (; bindingIndex < numInputVertex; ++bindingIndex)
 		{
-			inputBindings[bindingIndex].binding = bindingIndex;
-			inputBindings[bindingIndex].stride = m_PipelineEntry.m_ShaderInputs.m_InputVertex[bindingIndex].m_Stride;
-			inputBindings[bindingIndex].inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+			m_inputBindings[bindingIndex].binding = bindingIndex;
+			m_inputBindings[bindingIndex].stride = m_PipelineEntry.m_ShaderInputs.m_InputVertex[bindingIndex].m_Stride;
+			m_inputBindings[bindingIndex].inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 			if (m_PipelineEntry.m_ShaderInputs.m_InputVertex[bindingIndex].m_InstanceInput)
-				inputBindings[bindingIndex].inputRate = VK_VERTEX_INPUT_RATE_INSTANCE;
+				m_inputBindings[bindingIndex].inputRate = VK_VERTEX_INPUT_RATE_INSTANCE;
 
 			for (auto& elem : m_PipelineEntry.m_ShaderInputs.m_InputVertex[bindingIndex].m_Layout.m_MemberElements)
 			{
 				if (elem.m_DataType == VAR_TYPE::MAT4 || elem.m_DataType == VAR_TYPE::MAT3)
 				{
-					std::uint32_t Prevoffset = (location == 0) ? 0 : InputAttributes[location - 1].offset;
-					GenerateMatrixInputAttribute(InputAttributes, Prevoffset, location, bindingIndex, elem);
+					std::uint32_t Prevoffset = (location == 0) ? 0 : m_InputAttributes[location - 1].offset;
+					GenerateMatrixInputAttribute(m_InputAttributes, Prevoffset, location, bindingIndex, elem);
 				}
 				else
-					InputAttributes.push_back(GenerateVectorInputAttribute(location, bindingIndex, elem));
+					m_InputAttributes.push_back(GenerateVectorInputAttribute(location, bindingIndex, elem));
 			}
 		}
 		VkPipelineVertexInputStateCreateInfo vertexInputStateInfo = { VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO };
 
 
-		vertexInputStateInfo.vertexBindingDescriptionCount = std::uint32_t(inputBindings.size());
-		vertexInputStateInfo.pVertexBindingDescriptions = inputBindings.data();
-		vertexInputStateInfo.vertexAttributeDescriptionCount = std::uint32_t(InputAttributes.size());
-		vertexInputStateInfo.pVertexAttributeDescriptions = InputAttributes.data();
+		vertexInputStateInfo.vertexBindingDescriptionCount = std::uint32_t(m_inputBindings.size());
+		vertexInputStateInfo.pVertexBindingDescriptions = m_inputBindings.data();
+		vertexInputStateInfo.vertexAttributeDescriptionCount = std::uint32_t(m_InputAttributes.size());
+		vertexInputStateInfo.pVertexAttributeDescriptions = m_InputAttributes.data();
 
 
 		VkGraphicsPipelineCreateInfo graphicspipelineCreateInfo = { VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO };
-		
+
 
 		graphicspipelineCreateInfo.layout = m_PipelineLayout;
 		graphicspipelineCreateInfo.renderPass = m_RenderTarget;
@@ -226,12 +228,14 @@ namespace TDS
 		m_PipelineEntry.m_PipelineName += "_pipeline.cached";
 		SavePipelineCache(m_PipelineEntry.m_PipelineName, drawMode);
 
+		m_InputAttributes.clear();
+		m_inputBindings.clear();
 
 	}
 	void VulkanPipeline::SetClearColor(iColor clearColor)
 	{
 		m_PipelineEntry.m_FBTarget[m_CurrentFBIndex]->SetClearColor(clearColor);
-		
+
 		VkClearRect clearRect = {};
 		clearRect.layerCount = 1;
 		clearRect.baseArrayLayer = 0;
@@ -243,9 +247,9 @@ namespace TDS
 	void VulkanPipeline::StartRenderPass()
 	{
 		const VkFramebuffer framebuffer = m_CurrentFBAttachmentIndex == 0 ? m_PipelineEntry.m_FBTarget[m_CurrentFBIndex]->GetCurrentFrameBuffer() : m_PipelineEntry.m_FBTarget[m_CurrentFBIndex]->GetFrameBuffer(m_CurrentFBAttachmentIndex);
-		
+
 		VkExtent2D extent = m_PipelineEntry.m_FBTarget[m_CurrentFBIndex]->getFBEntryInfo().m_AreaDimension;
-		VkRenderPassBeginInfo renderPassBegin = {VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO};
+		VkRenderPassBeginInfo renderPassBegin = { VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO };
 		renderPassBegin.renderPass = m_PipelineEntry.m_FBTarget[m_CurrentFBIndex]->GetRenderPass();
 		renderPassBegin.framebuffer = framebuffer;
 		renderPassBegin.renderArea.offset.x = 0;
@@ -279,7 +283,7 @@ namespace TDS
 		scissor.offset.x = 0;
 		scissor.offset.y = 0;
 		vkCmdSetScissor(m_CommandBuffer, 0, 1, &scissor);
-		
+
 
 	}
 	void VulkanPipeline::EndRenderPass()
@@ -294,7 +298,7 @@ namespace TDS
 
 	}
 
-	
+
 	void VulkanPipeline::ShutDown()
 	{
 		VkDevice device = GraphicsManager::getInstance().getVkInstance().getVkLogicalDevice();
@@ -314,8 +318,11 @@ namespace TDS
 			m_PipelineLayout = nullptr;
 		}
 		FreeDescriptors();
-		vkDestroyDescriptorPool(device, m_DescriptorPool, 0);
-
+		if (m_DescriptorPool)
+		{
+			vkDestroyDescriptorPool(device, m_DescriptorPool, 0);
+			m_DescriptorPool = 0;
+		}
 		m_RenderTarget = nullptr;
 
 	}
@@ -445,56 +452,34 @@ namespace TDS
 
 
 	}
-	void VulkanPipeline::Draw(VMABuffer& vertexBuffer, std::uint32_t instance, std::uint32_t frameIndex)
+	void VulkanPipeline::Draw(VMABuffer& vertexBuffer, std::uint32_t frameIndex)
 	{
-		//BindPipeline(m_CurrentPrimitiveMode);
+		vkCmdBindDescriptorSets(m_CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_PipelineLayout, 0, 1, &m_PipelineDescriptor.m_DescriptorSets[frameIndex], 0, nullptr);
+		vkCmdDraw(m_CommandBuffer, vertexBuffer.getDataCount(), 1, 0, 0);
+	}
+	void VulkanPipeline::DrawIndexed(VMABuffer& vertexBuffer, VMABuffer& indexBuffer, std::uint32_t frameIndex)
+	{
+		vkCmdBindDescriptorSets(m_CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_PipelineLayout, 0, 1, &m_PipelineDescriptor.m_DescriptorSets[frameIndex], 0, nullptr);
+		vkCmdDrawIndexed(m_CommandBuffer, indexBuffer.getDataCount(), 1, 0, 0, 1);
+	}
 
-		//VkDeviceSize offsets[1] = { 0 };
-		//vkCmdBindVertexBuffers(m_CommandBuffer, 0, 1, &vertexBuffer.GetBuffer(), offsets);
+	void VulkanPipeline::DrawInstanced(VMABuffer& vertexBuffer, std::uint32_t instance, std::uint32_t frameIndex)
+	{
 
-	
-		const auto& descriptorSets = m_PipelineDescriptor.m_DescriptorSets[frameIndex];
-		vkCmdBindDescriptorSets(m_CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_PipelineLayout, 0, 1, &descriptorSets, 0, nullptr);
-
+		vkCmdBindDescriptorSets(m_CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_PipelineLayout, 0, 1, &m_PipelineDescriptor.m_DescriptorSets[frameIndex], 0, nullptr);
 		vkCmdDraw(m_CommandBuffer, vertexBuffer.getDataCount(), instance, 0, 0);
-		
-
 	}
-	void VulkanPipeline::DrawIndexed(VMABuffer& vertexBuffer, VMABuffer& indexBuffer, std::uint32_t instance, std::uint32_t frameIndex)
+
+	void VulkanPipeline::DrawInstancedIndexed(VMABuffer& vertexBuffer, VMABuffer& indexBuffer, std::uint32_t instance, std::uint32_t frameIndex)
 	{
-		//BindPipeline(m_CurrentPrimitiveMode);
-
-		//VkDeviceSize offsets[1] = { 0 };
-		//vkCmdBindVertexBuffers(m_CommandBuffer, 0, 1, &vertexBuffer.GetBuffer(), offsets);
-
-		//vkCmdBindIndexBuffer(m_CommandBuffer, indexBuffer.GetBuffer(), 0, VK_INDEX_TYPE_UINT32);
-
-	
-		const auto& descriptorSets = m_PipelineDescriptor.m_DescriptorSets[frameIndex];
-		vkCmdBindDescriptorSets(m_CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_PipelineLayout, 0, 1, &descriptorSets, 0, nullptr);
+		vkCmdBindDescriptorSets(m_CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_PipelineLayout, 0, 1, &m_PipelineDescriptor.m_DescriptorSets[frameIndex], 0, nullptr);
 		vkCmdDrawIndexed(m_CommandBuffer, indexBuffer.getDataCount(), instance, 0, 0, 1);
-		
-
-
 	}
 
-	void VulkanPipeline::DrawLoadedIndexed(std::uint32_t guid, std::uint32_t instance, std::uint32_t frameIndex)
-	{
-		auto vertexBuffer = m_ModelBuffers.find(guid);
-		if (vertexBuffer == m_ModelBuffers.end())
-			return; //Need a find a way to slot buffers in here when doesnt exist.
-
-		BindPipeline(m_CurrentPrimitiveMode);
-		BindVertexBuffer(*vertexBuffer->second.first);
-		BindIndexBuffer(*vertexBuffer->second.second);
-
-		const auto& descriptorSets = m_PipelineDescriptor.m_DescriptorSets[frameIndex];
-		vkCmdBindDescriptorSets(m_CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_PipelineLayout, 0, 1, &descriptorSets, 0, nullptr);
-		vkCmdDrawIndexed(m_CommandBuffer, vertexBuffer->second.second->getDataCount(), instance, 0, 0, 1);
-	}
 	void VulkanPipeline::SubmitPushConstant(void* data, size_t size, SHADER_FLAG shaderStage)
 	{
-		VkShaderStageFlags stage = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
+		/*VkShaderStageFlags stage = ShaderFlagsToVkStage(shaderStage);*/
+		VkShaderStageFlags stage = VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT | VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT;
 		vkCmdPushConstants(m_CommandBuffer, m_PipelineLayout, stage, 0, std::uint32_t(size), data);
 	}
 	void VulkanPipeline::UpdateUBO(void* data, size_t size, std::uint32_t binding, std::uint32_t frameIndex, std::uint32_t offset)
@@ -575,7 +560,7 @@ namespace TDS
 	}
 	void VulkanPipeline::BindVertexBuffer(VMABuffer& vertexBuffer)
 	{
-	
+
 		VkDeviceSize offsets[1] = { 0 };
 		vkCmdBindVertexBuffers(m_CommandBuffer, 0, 1, &vertexBuffer.GetBuffer(), offsets);
 
@@ -656,14 +641,14 @@ namespace TDS
 	{
 		if (GlobalBufferPool::GetInstance()->BindingExist(bufferName))
 			return GlobalBufferPool::GetInstance()->GetBinding(bufferName.data());
-		
+
 
 		auto itr = m_PipelineDescriptor.m_LocalBufferNames.find(bufferName.data());
 		if (itr != m_PipelineDescriptor.m_LocalBufferNames.end())
 			return itr->second;
-		
 
-		
+
+
 	}
 	void VulkanPipeline::SetCommandBuffer(VkCommandBuffer& buffer)
 	{
@@ -672,9 +657,11 @@ namespace TDS
 	void VulkanPipeline::FreeDescriptors()
 	{
 		VkDevice device = GraphicsManager::getInstance().getVkInstance().getVkLogicalDevice();
+
 		if (m_PipelineDescriptor.m_DescSetLayout)
 		{
 			vkDestroyDescriptorSetLayout(device, m_PipelineDescriptor.m_DescSetLayout, nullptr);
+			m_PipelineDescriptor.m_DescSetLayout = nullptr;
 		}
 		m_PipelineDescriptor.m_UpdateBufferFrames.clear();
 	}
@@ -727,9 +714,7 @@ namespace TDS
 			}
 
 		}
-		VkDescriptorSetLayoutCreateInfo layoutInfo = {};
-
-		layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+		VkDescriptorSetLayoutCreateInfo layoutInfo = { VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO };
 		layoutInfo.bindingCount = static_cast<uint32_t>(layouts.size());
 		layoutInfo.pBindings = layouts.data();
 		VkDevice device = GraphicsManager::getInstance().getVkInstance().getVkLogicalDevice();
@@ -847,7 +832,7 @@ namespace TDS
 						descriptor.m_WriteSetFrames[uniform.second.m_BindingPoint] = writeSet;
 						vkUpdateDescriptorSets(instance.getVkLogicalDevice(), 1, &writeSet, 0, nullptr);
 					}
-				
+
 				}
 
 

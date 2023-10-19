@@ -13,6 +13,11 @@ namespace TDS
 	void RendererDataManager::BeginSubmit()
 	{
 	}
+	void RendererDataManager::Destroy()
+	{
+		GetInstance()->m_ModelToRender.clear();
+		GetInstance()->m_UBO.clear();
+	}
 	ModelElement& RendererDataManager::GetModelElement(std::uint32_t guid, AssetModel* model)
 	{
 		RendererDataManager& inst = *GetInstance();
@@ -21,7 +26,7 @@ namespace TDS
 		{
 			inst.m_ModelToRender[guid].m_VertexBuffer = std::make_shared<VMABuffer>();
 			inst.m_ModelToRender[guid].m_IndexBuffer = std::make_shared<VMABuffer>();
-			inst.m_ModelToRender[guid].m_VertexBuffer->CreateVertexBuffer(model->GetVertexData().size(), true, model->GetVertexData().data());
+			inst.m_ModelToRender[guid].m_VertexBuffer->CreateVertexBuffer(model->GetVertexData().size() * sizeof(VertexData), true, model->GetVertexData().data());
 			inst.m_ModelToRender[guid].m_IndexBuffer->CreateIndexBuffer(model->GetIndexData().size(), true, model->GetIndexData().data());
 			inst.m_ModelToRender[guid].m_VertexBuffer->SetDataCnt(std::uint32_t(model->GetVertexData().size()));
 			inst.m_ModelToRender[guid].m_IndexBuffer->SetDataCnt(std::uint32_t(model->GetIndexData().size()));

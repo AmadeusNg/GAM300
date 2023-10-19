@@ -117,12 +117,15 @@ namespace TDS
     }
     void Application::Initialize()
     {
-        ShaderReflector::GetInstance()->Init("../assets/shaders/", "../assets/shaders/AllShaders.bin");
+        ShaderReflector::GetInstance()->Init(SHADER_DIRECTORY, REFLECTED_BIN);
         GraphicsManager::getInstance().Init(&m_window);
+
+
         m_AssetManager.Init();
         m_AssetManager.PreloadAssets();
         SceneManager::GetInstance()->Init();
         ecs.initializeSystems(1);
+
         Run();
     }
 
@@ -181,7 +184,6 @@ namespace TDS
             {
                 ecs.runSystems(1, DeltaTime);
             }
-
             imguiHelper::Draw(commandBuffer);
             GraphicsManager::getInstance().GetSwapchainRenderer().EndSwapChainRenderPass(commandBuffer);
             GraphicsManager::getInstance().EndFrame();
@@ -201,7 +203,13 @@ namespace TDS
         }
         stopScriptEngine();
         /*vkDeviceWaitIdle(m_pVKInst.get()->getVkLogicalDevice());*/
+
         vkDeviceWaitIdle(GraphicsManager::getInstance().getVkInstance().getVkLogicalDevice());
+        if (m_ImGuiDescPool)
+        {
+            vkDestroyDescriptorPool(GraphicsManager::getInstance().getVkInstance().getVkLogicalDevice(), m_ImGuiDescPool, 0);
+            m_ImGuiDescPool = nullptr;
+        }
         imguiHelper::Exit();
         ecs.destroy();
         GraphicsManager::getInstance().ShutDown();

@@ -10,7 +10,6 @@ namespace TDS
 	}
 	CommandManager::~CommandManager()
 	{
-		Shutdown();
 	}
 	void CommandManager::Shutdown()
 	{
@@ -26,7 +25,6 @@ namespace TDS
 	{
 		for (auto& pool : m_CommandPools)
 		{
-			//DestroyPool(pool);
 			ResetCommandBuffers(pool, true);
 			DestroyPool(pool);
 		}
@@ -121,21 +119,16 @@ namespace TDS
 		submitInfo.pCommandBuffers = &info.m_CommandBuffer.m_CmdBuffer;
 		if (info.m_PoolType == POOLTYPE::GRAPHICS)
 		{
-			//m_Mutex->unlock();
-
 			VK_ASSERT(vkQueueSubmit(instance.getGraphicsQueue(), 1, &submitInfo, info.m_Fence), "");
 			VK_ASSERT(vkWaitForFences(instance.getVkLogicalDevice(), 1, &info.m_Fence, VK_TRUE, UINT64_MAX), "");
 			vkDestroyFence(instance.getVkLogicalDevice(), info.m_Fence, nullptr);
 
-			//m_Mutex->lock();
 		}
 		else if (info.m_PoolType == POOLTYPE::COMPUTE)
 		{
-			//Should not be temp fence, computation might be consistent
 			VK_ASSERT(vkResetFences(instance.getVkLogicalDevice(), 1, &info.m_Fence), "");
 			VK_ASSERT(vkQueueSubmit(instance.getGraphicsQueue(), 1, &submitInfo, info.m_Fence), "");
 			VK_ASSERT(vkWaitForFences(instance.getVkLogicalDevice(), 1, &info.m_Fence, VK_TRUE, UINT64_MAX), "");
-			/*vkDestroyFence(instance.getVkLogicalDevice(), info.m_Fence, nullptr);*/
 		}
 		DestroyCommandBuffer(info.m_CommandBuffer.m_CmdBuffer, info.m_CommandBuffer.m_CommandPool);
 		if (info.m_GenerateNewPool)
