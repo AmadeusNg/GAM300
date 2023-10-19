@@ -55,8 +55,9 @@ namespace TDS
 					pushData.NormalMat = temp;
 
 					ubo.m_View = GraphicsManager::getInstance().GetCamera().GetViewMatrix();
-					ubo.m_vPointLights[0].m_Position = Vec4(lightPosX, 0.5f, 0.f, 0.2f);
-					ubo.m_vPointLights[0].m_Color = Vec4(1.f, 1.f, 1.f, 1.f);
+					GraphicsManager::getInstance().m_PointLightRenderer->update(ubo, &_Graphics[i]);
+					//ubo.m_vPointLights[0].m_Position = Vec4(lightPosX, 0.5f, 0.f, 0.2f);
+					//ubo.m_vPointLights[0].m_Color = Vec4(1.f, 1.f, 1.f, 1.f);
 					ubo.m_Projection = Mat4::Perspective(GraphicsManager::getInstance().GetCamera().m_Fov * Mathf::Deg2Rad,
 						GraphicsManager::getInstance().GetSwapchainRenderer().getAspectRatio(), 0.1f, 10.f);
 					ubo.m_Projection.m[1][1] *= -1;

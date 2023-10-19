@@ -17,7 +17,7 @@ public class Test : Script
 
     public override void Update()
     {
-        Console.WriteLine("Aye Lmao");
+        //Console.WriteLine("Aye Lmao");
         TransformComponent tf = GetTransformComponent();
         tf.SetPositionX(3.0f);
     }

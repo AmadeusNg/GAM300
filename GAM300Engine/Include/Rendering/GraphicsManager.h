@@ -3,6 +3,7 @@
 #include "dotnet/ImportExport.h"
 #include "vulkan/vulkan.h"
 #include "camera/camera.h"
+#include "vulkanTools/PointLightSystem.h"
 namespace TDS
 {
 	class WindowsWin;
@@ -42,6 +43,7 @@ namespace TDS
 		VulkanInstance& getVkInstance();
 		CommandManager& getCommandManager();
 		static GraphicsManager& getInstance();
+		std::unique_ptr<PointLightSystem> m_PointLightRenderer;
 	};
 
 

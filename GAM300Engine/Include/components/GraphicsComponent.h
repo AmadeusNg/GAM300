@@ -1,6 +1,7 @@
 #pragma once
 #include "ecs/ecs.h"
 #include "ResourceManagement/ResourceManager.h"
+#include "vulkanTools/VulkanPipeline.h"
 namespace TDS
 {
 	class AssetModel;
@@ -31,6 +32,10 @@ namespace TDS
 		{
 			return m_TextureReference;
 		}
+		struct PointLightComponent {
+			float lightintensity{ 1.f };
+		};
+		std::unique_ptr<VulkanPipeline> Pointlight{ nullptr };
 	private:
 		SingleTypeReference<AssetModel> m_AssetReference;
 		SingleTypeReference<Texture>	m_TextureReference;

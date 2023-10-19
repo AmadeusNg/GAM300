@@ -17,6 +17,8 @@
 #include "FrameInfo.h"
 #include "TDSMath.h"
 #include "dotnet/ImportExport.h"
+#include "vulkanTools/VulkanPipeline.h"
+#include "components/GraphicsComponent.h"
 
 
 #include <memory>
@@ -33,9 +35,9 @@ namespace TDS {
 		DLL_API PointLightSystem& operator=(const PointLightSystem&) = delete;
 		
 		//update system with the position of the active point lights 
-		DLL_API void update(FrameInfo& frameInfo, GlobalUBO& UBO);
+		DLL_API void update(GlobalUBO& UBO, GraphicsComponent* Obj);
 		//render the active point lights
-		DLL_API void render(FrameInfo& frameInfo);
+		DLL_API void render();
 	private:
 		//create pipeline layout for pointlights
 		void createPipelineLayout(VkDescriptorSetLayout globalsetlayout);
@@ -43,8 +45,8 @@ namespace TDS {
 		void createPipeline(VkRenderPass renderpass);
 
 		VulkanInstance&					m_Instance;
-
-		std::unique_ptr<Pipeline>		m_Pipeline;
+		std::unique_ptr<VulkanPipeline> m_Pipeline;
+		//std::unique_ptr<Pipeline>		m_Pipeline;
 		VkPipelineLayout				m_pipelineLayout;
 	};
 

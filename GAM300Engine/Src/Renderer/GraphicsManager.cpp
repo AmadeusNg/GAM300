@@ -34,6 +34,7 @@ namespace TDS
 		entry.m_AreaDimension = { m_pWindow->getWidth(), m_pWindow->getHeight() };
 		entry.m_AttachmentRequirememnts.push_back(AttachmentSetting(m_SwapchainRenderer->getSwapchain().GetSwapChainImageFormat()));
 
+		//m_PointLightRenderer = std::make_unique<PointLightSystem>(m_MainVkContext, GetSwapchainRenderer().getSwapChainRenderPass());
 		m_MainFrameBuffer = std::make_shared<DirectFrameBuffer>(entry);
 
 		for (auto& renderLayer : m_RenderLayer)
