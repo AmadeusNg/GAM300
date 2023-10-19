@@ -308,6 +308,7 @@ namespace TDS
         Record dummyRecord;
         dummyRecord.archetype = nullptr;
         dummyRecord.index = 0;
+        dummyRecord.is_Enabled = true;
         mEntityArchetypeMap[entityId] = dummyRecord;
     }
 
@@ -878,6 +879,16 @@ namespace TDS
             entityIDs.emplace_back(i.first);
         }
         return entityIDs;
+    }
+
+    inline bool ECS::getEnabledEntity(const EntityID& entityId)
+    {
+        return mEntityArchetypeMap[entityId].is_Enabled;
+    }
+
+    inline void ECS::toggleEnabledEntity(const EntityID& entityId)
+    {
+        mEntityArchetypeMap[entityId].is_Enabled = !mEntityArchetypeMap[entityId].is_Enabled;
     }
 
     //inline std::unique_ptr<ECS>& getECS()

@@ -7,11 +7,6 @@ using namespace System::Runtime::InteropServices;
 
 namespace ScriptAPI
 {
-
-	void EngineInterface::HelloWorld()
-	{
-		System::Console::WriteLine("Hello Managed World!");
-	}
     /*!*************************************************************************
     * Loads the managed script dll and adds the scriptlist to all active entities
     ***************************************************************************/
@@ -19,6 +14,7 @@ namespace ScriptAPI
 	{
         using namespace System::IO;
         loadContext = gcnew System::Runtime::Loader::AssemblyLoadContext(nullptr, true);
+
         // Load assembly
         FileStream^ managedLibFile = File::Open
         (
@@ -32,13 +28,6 @@ namespace ScriptAPI
         /*System::Reflection::Assembly::LoadFrom("ManagedScripts.dll");*/
 
 		scripts = gcnew System::Collections::Generic::SortedList<TDS::EntityID,ScriptList^>();
-
-        HelloWorld();
-
-        //for (int i = 0; i < 5/*TDS::ecs.numberOfLiveEntities*/; ++i)
-        //{
-        //    scripts->Add(i, gcnew ScriptList());
-        //}
         
         for (auto i : TDS::ecs.getEntities())
         {
@@ -94,6 +83,76 @@ namespace ScriptAPI
     }
 
     /*!*************************************************************************
+    * Calls all script Awake function
+    ***************************************************************************/
+    void EngineInterface::ExecuteAwake()
+    {
+        for each (auto i in TDS::ecs.getEntities())
+        {
+            for each (Script ^ script in scripts[i])
+            {
+                SAFE_NATIVE_CALL_BEGIN
+                    script->Awake();
+                SAFE_NATIVE_CALL_END
+            }
+        }
+    }
+    /*!*************************************************************************
+    * Calls all script OnEnable function
+    ***************************************************************************/
+    void EngineInterface::ExecuteOnEnable()
+    {
+        for each (auto i in TDS::ecs.getEntities())
+        {
+            for each (Script ^ script in scripts[i])
+            {
+                SAFE_NATIVE_CALL_BEGIN
+                    script->OnEnable();
+                SAFE_NATIVE_CALL_END
+            }
+        }
+    }
+
+    bool EngineInterface::ToggleScriptViaName(TDS::EntityID entityId, System::String^ scriptName)
+    {
+        SAFE_NATIVE_CALL_BEGIN
+            if (entityId == TDS::NULLENTITY)
+                return false;
+
+        // Remove any whitespaces
+        scriptName = scriptName->Trim();
+
+        // Look for the correct script
+        System::Type^ scriptType = nullptr;
+        for each (System::Type ^ type in scriptTypeList)
+        {
+            if (type->FullName == scriptName || type->Name == scriptName)
+            {
+                scriptType = type;
+                break;
+            }
+        }
+
+        // Failed to get any script
+        if (scriptType == nullptr)
+        {
+            return false;
+        }
+
+        for each (Script ^ script in scripts[entityId])
+        {
+            if (script->GetType() == scriptType)
+            {
+                script->ToggleScript();
+            }
+        }
+        return true;
+        SAFE_NATIVE_CALL_END
+
+        return false;
+    }
+
+    /*!*************************************************************************
     * Calls all script start function
     ***************************************************************************/
     void EngineInterface::ExecuteStart()
@@ -119,14 +178,49 @@ namespace ScriptAPI
             for each (Script^ script in scripts[i])
             {
                 SAFE_NATIVE_CALL_BEGIN
-                    script->Update();
+                    if (script->isScriptEnabled())
+                    {
+                        script->Update();
+                    }
                 SAFE_NATIVE_CALL_END
             }
         }
     }
 
     /*!*************************************************************************
-    * Calls all script exit function
+    * Calls the late update function for scripts
+    ***************************************************************************/
+    void EngineInterface::ExecuteLateUpdate()
+    {
+        for each (auto i in TDS::ecs.getEntities())
+        {
+            for each (Script ^ script in scripts[i])
+            {
+                SAFE_NATIVE_CALL_BEGIN
+                    script->LateUpdate();
+                SAFE_NATIVE_CALL_END
+            }
+        }
+    }
+
+    /*!*************************************************************************
+    * Calls the OnDisable function for scripts
+    ***************************************************************************/
+    void EngineInterface::ExecuteOnDisable()
+    {
+        for each (auto i in TDS::ecs.getEntities())
+        {
+            for each (Script ^ script in scripts[i])
+            {
+                SAFE_NATIVE_CALL_BEGIN
+                    script->OnDisable();
+                SAFE_NATIVE_CALL_END
+            }
+        }
+    }
+
+    /*!*************************************************************************
+    * Calls all script OnDestroy function
     ***************************************************************************/
     void EngineInterface::ExecuteOnDestroy()
     {

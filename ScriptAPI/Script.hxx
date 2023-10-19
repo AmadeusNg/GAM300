@@ -18,8 +18,12 @@ namespace ScriptAPI
     public ref class Script abstract
     {
     public:
+        void virtual Awake() {};
+        void virtual OnEnable() {};
         void virtual Start() {};
         void virtual Update() {};
+        void virtual LateUpdate() {};
+        void virtual OnDisable() {};
         void virtual OnDestroy() {};
 
         TransformComponent GetTransformComponent();
@@ -27,7 +31,11 @@ namespace ScriptAPI
 
     internal:
         void SetEntityID(TDS::EntityID ID);
+        void ToggleScript();
+        bool isScriptEnabled();
     private:
+        //entityID and is_Enabled set at SetEntityID
         TDS::EntityID entityID;
+        bool is_Enabled;
     };
 }

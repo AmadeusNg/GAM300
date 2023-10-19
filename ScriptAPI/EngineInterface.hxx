@@ -17,7 +17,6 @@ namespace ScriptAPI
 	public ref class EngineInterface
 	{
 	public:
-		static void HelloWorld();
 		/*!*************************************************************************
 		* Initializes the scriptlist for all active entities
 		***************************************************************************/
@@ -27,6 +26,18 @@ namespace ScriptAPI
 		***************************************************************************/
 		static bool AddScriptViaName(TDS::EntityID entityId, System::String^ scriptName);
 		/*!*************************************************************************
+		* Calls all script awake function
+		***************************************************************************/
+		static void ExecuteAwake();
+		/*!*************************************************************************
+		* Calls all script OnEnable function
+		***************************************************************************/
+		static void ExecuteOnEnable();
+		/*!*************************************************************************
+		* Calls all script OnEnable function with EntityID
+		***************************************************************************/
+		static bool ToggleScriptViaName(TDS::EntityID entityId, System::String^ scriptName);
+		/*!*************************************************************************
 		* Calls all script start function
 		***************************************************************************/
 		static void ExecuteStart();
@@ -35,10 +46,20 @@ namespace ScriptAPI
 		***************************************************************************/
 		static void ExecuteUpdate();
 		/*!*************************************************************************
-		* Calls all script exit function
+		* Calls all script LateUpdate function
+		***************************************************************************/
+		static void ExecuteLateUpdate();
+		/*!*************************************************************************
+		* Calls all script OnDisable function
+		***************************************************************************/
+		static void ExecuteOnDisable();
+		/*!*************************************************************************
+		* Calls all script OnDestroy function
 		***************************************************************************/
 		static void ExecuteOnDestroy();
-
+		/*!*************************************************************************
+		* Reloads the script assembly
+		***************************************************************************/
 		static void Reload();
 
 	private:

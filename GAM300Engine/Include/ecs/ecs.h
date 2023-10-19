@@ -178,7 +178,7 @@ namespace TDS
         virtual void                        moveData(unsigned char* source, unsigned char* destination) const override;
 
         // Returns the size of the whole component
-        virtual std::uint32_t                 getSize() const override;
+        virtual std::uint32_t               getSize() const override;
 
         // Returns the unique ID of the component
         static ComponentTypeID              getTypeID();
@@ -200,6 +200,7 @@ namespace TDS
         {
             Archetype* archetype;
             std::uint32_t                   index;
+            bool                            is_Enabled;
         };
 
         // TYPEDEFS
@@ -318,6 +319,10 @@ namespace TDS
         // Getting all registered entities
         std::vector<EntityID>        getEntities();
 
+        bool                         getEnabledEntity(const EntityID& entityId);
+
+        void                         toggleEnabledEntity(const EntityID& entityId);
+
     private:
         // Unique pointer to ECS
         //static std::unique_ptr<ECS>  m_instance;
@@ -358,7 +363,7 @@ namespace TDS
         C*                                  add(C&& c);
 
         // Get ID of the entity
-        EntityID                            getID() const;
+        EntityID                            getID() const;                           
 
     private:
         EntityID                            mID;
