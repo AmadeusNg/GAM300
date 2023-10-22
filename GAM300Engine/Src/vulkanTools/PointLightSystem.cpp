@@ -18,24 +18,19 @@ namespace TDS {
 		float	m_radius;
 	};
 
-	PointLightSystem::PointLightSystem(VulkanInstance& Instance, VkRenderPass renderpass, VkDescriptorSetLayout globalsetlayout) : m_Instance(Instance) {
+	PointLightSystem::PointLightSystem(VulkanInstance& Instance) : m_Instance(Instance) {
 		/*createPipelineLayout(globalsetlayout);
 		createPipeline(renderpass);*/
+		m_pointlightcount = 0;
 		PipelineCreateEntry PipelineEntry;
 		PipelineEntry.m_NumDescriptorSets = 1;
 		PipelineEntry.m_ShaderInputs.m_Shaders.insert(std::make_pair(SHADER_FLAG::VERTEX, "../assets/shaderspointlightvert.spv"));
 		PipelineEntry.m_ShaderInputs.m_Shaders.insert(std::make_pair(SHADER_FLAG::FRAGMENT, "../assets/shaderspointlightfrag.spv"));
-		VertexLayout layout{
-			VertexBufferElement(VAR_TYPE::VEC3, "vPosition"),
-			VertexBufferElement(VAR_TYPE::VEC3, "vColor"),
-			VertexBufferElement(VAR_TYPE::VEC2, "inTexCoord"),
-			VertexBufferElement(VAR_TYPE::VEC4, "vNormals")
-		};
 		m_Pipeline->Create(PipelineEntry);
 	}
 
 	PointLightSystem::~PointLightSystem() {
-		vkDestroyPipelineLayout(m_Instance.getVkLogicalDevice(), m_pipelineLayout, nullptr);
+		//vkDestroyPipelineLayout(m_Instance.getVkLogicalDevice(), m_pipelineLayout, nullptr);
 	}
 
 	void PointLightSystem::createPipelineLayout(VkDescriptorSetLayout globalsetlayout) {
@@ -69,20 +64,25 @@ namespace TDS {
 		m_Pipeline = std::make_unique<Pipeline>(m_Instance, "pointlightvert.spv", "pointlightfrag.spv", pipelineConfig);*/
 	}
 
-	void PointLightSystem::update(GlobalUBO& ubo, GraphicsComponent* Obj) {
-		
+	void PointLightSystem::update(GlobalUBO& ubo, GraphicsComponent* Gp, Transform* Transform) {
 		//by right loop through all gameobj for pointlight components
-		ubo.m_vPointLights[0].m_Position = Vec4(0.f, 2.f, 0.f, 1.f);
-		ubo.m_vPointLights[0].m_Color = Vec4(1.f, 1.f, 1.f, 1.f);//white light with intensity at w
+		if (m_pointlightcount >= Max_Lights) {
+			//assert that theres too many pointlights than allowed 
+			return;
+		}
+		ubo.m_vPointLights[m_pointlightcount].m_Position = Transform->GetPosition();
+		ubo.m_vPointLights[m_pointlightcount].m_Color = Vec4(1.f, 1.f, 1.f, 1.f);//white light with intensity at w
+		++m_pointlightcount;
 	}
 
-	void PointLightSystem::render() {
+	void PointLightSystem::render(GlobalUBO &ubo, GraphicsComponent* Gp, Transform* Trans) {
 		m_Pipeline->BindPipeline();
 		PointLightPushConstants pushdata;
-		pushdata.m_Position = Vec4(0.f, 2.f, 0.f, 1.f);
+		pushdata.m_Position = Trans->GetPosition();
 		pushdata.m_Color = Vec4(1.f, 1.f, 1.f, 1.f);
-		pushdata.m_radius = 1.f;
+		pushdata.m_radius = Trans->GetScale().x;
 		m_Pipeline->SubmitPushConstant(&pushdata, sizeof(PointLightPushConstants), SHADER_FLAG::FRAGMENT);
+		vkCmdDraw(m_Pipeline->GetCommandBuffer(), 6, 1, 0, 0);
 		//m_Pipeline->bind(frameinfo.commandBuffer);
 		//vkCmdBindDescriptorSets(frameinfo.commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipelineLayout, 0, 1, &frameinfo.globalDescriptorSet, 0, nullptr);
 

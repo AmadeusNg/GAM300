@@ -35,7 +35,7 @@ namespace TDS
 		struct PointLightComponent {
 			float lightintensity{ 1.f };
 		};
-		std::unique_ptr<VulkanPipeline> Pointlight{ nullptr };
+		bool Pointlight{ false };
 	private:
 		SingleTypeReference<AssetModel> m_AssetReference;
 		SingleTypeReference<Texture>	m_TextureReference;

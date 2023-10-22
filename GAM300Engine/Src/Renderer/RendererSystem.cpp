@@ -55,24 +55,24 @@ namespace TDS
 					pushData.NormalMat = temp;
 
 					ubo.m_View = GraphicsManager::getInstance().GetCamera().GetViewMatrix();
-					GraphicsManager::getInstance().m_PointLightRenderer->update(ubo, &_Graphics[i]);
+					GraphicsManager::getInstance().m_PointLightRenderer->update(ubo, &_Graphics[i], &_TransformComponent[i]);
 					//ubo.m_vPointLights[0].m_Position = Vec4(lightPosX, 0.5f, 0.f, 0.2f);
 					//ubo.m_vPointLights[0].m_Color = Vec4(1.f, 1.f, 1.f, 1.f);
 					ubo.m_Projection = Mat4::Perspective(GraphicsManager::getInstance().GetCamera().m_Fov * Mathf::Deg2Rad,
 						GraphicsManager::getInstance().GetSwapchainRenderer().getAspectRatio(), 0.1f, 10.f);
 					ubo.m_Projection.m[1][1] *= -1;
 
+
 					Renderer3D::getPipeline()->BindPipeline();
-					Renderer3D::getPipeline()->UpdateUBO(&ubo, sizeof(GlobalUBO), 0, frame);
 					Renderer3D::getPipeline()->BindDescriptor(frame);
+					Renderer3D::getPipeline()->UpdateUBO(&ubo, sizeof(GlobalUBO), 0, frame);
 					Renderer3D::getPipeline()->SubmitPushConstant(&pushData, sizeof(PushConstantData), SHADER_FLAG::VERTEX);
 					/*Renderer3D::getInstance()->models->bind(commandBuffer);
 					Renderer3D::getInstance()->models->draw(commandBuffer);*/
 					Renderer3D::getPipeline()->BindVertexBuffer(*elem.m_VertexBuffer);
 					Renderer3D::getPipeline()->BindIndexBuffer(*elem.m_IndexBuffer);
 					Renderer3D::getPipeline()->DrawIndexed(*elem.m_VertexBuffer, *elem.m_IndexBuffer, frame);
-
-
+					GraphicsManager::getInstance().m_PointLightRenderer->render(ubo, &_Graphics[i], &_TransformComponent[i]);
 
 
 

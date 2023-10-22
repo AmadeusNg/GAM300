@@ -19,6 +19,7 @@
 #include "dotnet/ImportExport.h"
 #include "vulkanTools/VulkanPipeline.h"
 #include "components/GraphicsComponent.h"
+#include "components/transform.h"
 
 
 #include <memory>
@@ -27,7 +28,7 @@ namespace TDS {
 	class PointLightSystem {
 	public:
 		//Constructor and destructor
-		DLL_API PointLightSystem(VulkanInstance& Instance, VkRenderPass renderpass, VkDescriptorSetLayout globalSetLayout);
+		DLL_API PointLightSystem(VulkanInstance& Instance);
 		DLL_API ~PointLightSystem();
 
 		//no copy constructor
@@ -35,9 +36,9 @@ namespace TDS {
 		DLL_API PointLightSystem& operator=(const PointLightSystem&) = delete;
 		
 		//update system with the position of the active point lights 
-		DLL_API void update(GlobalUBO& UBO, GraphicsComponent* Obj);
+		DLL_API void update(GlobalUBO& UBO, GraphicsComponent* Gp, Transform* Trans);
 		//render the active point lights
-		DLL_API void render();
+		DLL_API void render(GlobalUBO& UBO, GraphicsComponent* Gp, Transform* Trans);
 	private:
 		//create pipeline layout for pointlights
 		void createPipelineLayout(VkDescriptorSetLayout globalsetlayout);
@@ -48,6 +49,7 @@ namespace TDS {
 		std::unique_ptr<VulkanPipeline> m_Pipeline;
 		//std::unique_ptr<Pipeline>		m_Pipeline;
 		VkPipelineLayout				m_pipelineLayout;
+		int								m_pointlightcount;
 	};
 
 

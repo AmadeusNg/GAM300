@@ -117,8 +117,9 @@ namespace TDS
 		bool									IsBlendEnabled();
 		std::uint32_t							GetBufferBinding(std::string_view bufferName);
 		std::uint32_t							GetTextureBinding(std::string_view textureBinding);
-		VulkanPipelineDescriptor& GetPipelineDescriptor();
-		PipelineCreateEntry& GetCreateEntry();
+		VulkanPipelineDescriptor&				GetPipelineDescriptor();
+		PipelineCreateEntry&					GetCreateEntry();
+		VkCommandBuffer&						GetCommandBuffer();
 
 		void									SetFlipViewport(bool condition);
 		bool									IsFlipViewport() const;
