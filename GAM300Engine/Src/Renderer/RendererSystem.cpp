@@ -26,6 +26,7 @@ namespace TDS
 		for (size_t i = 0; i < entities.size(); ++i)
 		{
 			Renderer3D::getPipeline()->SetCommandBuffer(commandBuffer);
+			GraphicsManager::getInstance().m_PointLightRenderer->GetPipeline().SetCommandBuffer(commandBuffer);
 			_Graphics[i].GetAsset().m_GUID = *assetManager->GetModelFactory().m_LoadedModelsGUID.begin();
 			_Graphics[i].GetAsset().m_Identifier.CreateTypeIDByName(assetManager->GetModelFactory().m_ModelMap.begin()->first);
 			_Graphics[i].GetAsset().m_Identifier.GetTypeName<AssetModel>();
@@ -72,6 +73,8 @@ namespace TDS
 					Renderer3D::getPipeline()->BindVertexBuffer(*elem.m_VertexBuffer);
 					Renderer3D::getPipeline()->BindIndexBuffer(*elem.m_IndexBuffer);
 					Renderer3D::getPipeline()->DrawIndexed(*elem.m_VertexBuffer, *elem.m_IndexBuffer, frame);
+					GraphicsManager::getInstance().m_PointLightRenderer->GetPipeline().BindDescriptor(frame);
+					GraphicsManager::getInstance().m_PointLightRenderer->GetPipeline().UpdateUBO(&ubo, sizeof(GlobalUBO), 0, frame);
 					GraphicsManager::getInstance().m_PointLightRenderer->render(ubo, &_Graphics[i], &_TransformComponent[i]);
 
 

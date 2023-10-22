@@ -4,6 +4,7 @@ namespace TDS
 {
     void ShaderLoader::DeserializeShaderReflection(const std::string_view path)
     {
+        std::cout << std::filesystem::current_path() << std::endl;
         std::ifstream file(path.data(), std::ios::binary);
         if (!file.is_open())
         {
@@ -93,6 +94,7 @@ namespace TDS
     void ShaderLoader::LoadShader(std::vector<std::uint32_t>& SPIRV, const std::string_view path)
     {
         std::ifstream in(path.data(), std::ios::in | std::ios::binary);
+        //std::cout << std::filesystem::current_path() << std::endl;
         if (in.is_open())
         {
             in.seekg(0, std::ios::end);

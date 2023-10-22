@@ -10,6 +10,7 @@
 ****************************************************************************
 ***/
 #include "vulkanTools/PointLightSystem.h"
+#include "Shader/ShaderLoader.h"
 
 namespace TDS {
 	struct PointLightPushConstants {
@@ -24,8 +25,9 @@ namespace TDS {
 		m_pointlightcount = 0;
 		PipelineCreateEntry PipelineEntry;
 		PipelineEntry.m_NumDescriptorSets = 1;
-		PipelineEntry.m_ShaderInputs.m_Shaders.insert(std::make_pair(SHADER_FLAG::VERTEX, "../assets/shaderspointlightvert.spv"));
-		PipelineEntry.m_ShaderInputs.m_Shaders.insert(std::make_pair(SHADER_FLAG::FRAGMENT, "../assets/shaderspointlightfrag.spv"));
+		PipelineEntry.m_ShaderInputs.m_Shaders.insert(std::make_pair(SHADER_FLAG::VERTEX, "../assets/shaders/pointlightvert.spv"));
+		PipelineEntry.m_ShaderInputs.m_Shaders.insert(std::make_pair(SHADER_FLAG::FRAGMENT, "../assets/shaders/pointlightfrag.spv"));
+		m_Pipeline = std::make_unique<VulkanPipeline>();
 		m_Pipeline->Create(PipelineEntry);
 	}
 
@@ -75,8 +77,9 @@ namespace TDS {
 		++m_pointlightcount;
 	}
 
-	void PointLightSystem::render(GlobalUBO &ubo, GraphicsComponent* Gp, Transform* Trans) {
+	void PointLightSystem::render(GlobalUBO& ubo, GraphicsComponent* Gp, Transform* Trans) {
 		m_Pipeline->BindPipeline();
+		ShaderMetaData reflectedMeta = ShaderLoader::GetInstance()->getReflectedLookUp();
 		PointLightPushConstants pushdata;
 		pushdata.m_Position = Trans->GetPosition();
 		pushdata.m_Color = Vec4(1.f, 1.f, 1.f, 1.f);
@@ -94,5 +97,9 @@ namespace TDS {
 
 		//vkCmdPushConstants(frameinfo.commandBuffer, m_pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(PointLightPushConstants), &pushdata);
 		////vkCmdDraw(frameinfo.commandBuffer, 6, 1, 0, 0);
+	}
+
+	VulkanPipeline& PointLightSystem::GetPipeline() {
+		return *m_Pipeline;
 	}
 }

@@ -39,6 +39,8 @@ namespace TDS {
 		DLL_API void update(GlobalUBO& UBO, GraphicsComponent* Gp, Transform* Trans);
 		//render the active point lights
 		DLL_API void render(GlobalUBO& UBO, GraphicsComponent* Gp, Transform* Trans);
+		
+		DLL_API VulkanPipeline& GetPipeline();
 	private:
 		//create pipeline layout for pointlights
 		void createPipelineLayout(VkDescriptorSetLayout globalsetlayout);
