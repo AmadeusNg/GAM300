@@ -15,7 +15,7 @@
 #include <vulkan/vulkan.h>
 
 namespace TDS {
-#define Max_Lights 10
+#define Max_Lights 10 //CHANGE THIS IN POINTLIGHTVERT/FRAG SHADERS
 	struct PointLight {
 		Vec4 m_Position;
 		Vec4 m_Color;

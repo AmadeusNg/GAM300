@@ -67,14 +67,18 @@ namespace TDS {
 	}
 
 	void PointLightSystem::update(GlobalUBO& ubo, GraphicsComponent* Gp, Transform* Transform) {
-		//by right loop through all gameobj for pointlight components
+		//if entity is not a pointlight, return
+		if (!Gp->GetPointLightBool())return;
+		//if 
 		if (m_pointlightcount >= Max_Lights) {
 			//assert that theres too many pointlights than allowed 
 			return;
 		}
-		ubo.m_vPointLights[m_pointlightcount].m_Position = Transform->GetPosition();
-		ubo.m_vPointLights[m_pointlightcount].m_Color = Vec4(1.f, 1.f, 1.f, 1.f);//white light with intensity at w
-		++m_pointlightcount;
+		//set POINTLIGHT ID then increment
+		if (Gp->GetPointLightID() == -1)
+			Gp->SetPointLightID(m_pointlightcount++);
+		ubo.m_vPointLights[Gp->GetPointLightID()].m_Position = Transform->GetPosition();
+		ubo.m_vPointLights[Gp->GetPointLightID()].m_Color = Vec4(1.f, 1.f, 1.f, 1.f);//white light with intensity at w
 	}
 
 	void PointLightSystem::render(GlobalUBO& ubo, GraphicsComponent* Gp, Transform* Trans) {

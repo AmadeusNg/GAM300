@@ -69,6 +69,8 @@ namespace TDS
 			return ecs.getComponent<Transform>(entityID);
 		else if (componentName == "Win Data")
 			return ecs.getComponent<WinData>(entityID);
+		else if (componentName == "Graphics Component")
+			return ecs.getComponent<GraphicsComponent>(entityID);
 		else
 			return nullptr;
 	}
@@ -98,5 +100,7 @@ namespace TDS
 			ecs.removeComponent<Transform>(entityID);
 		else if (componentName == "Win Data")
 			ecs.removeComponent<WinData>(entityID);
+		else if (componentName == "Graphics Component")
+			ecs.removeComponent<GraphicsComponent>(entityID);
 	}
 }

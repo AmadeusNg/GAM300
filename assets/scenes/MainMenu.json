@@ -1,9 +1,9 @@
 {
     "Archetype Sizes": {
         "1110000000": {
-            "0": 192,
-            "1": 160,
-            "2": 1056
+            "0": 48,
+            "1": 40,
+            "2": 256
         }
     },
     "Entity Data": {
@@ -14,54 +14,6 @@
             },
             "Transform": {
                 "positionX": 3.0,
-                "positionY": 0.0,
-                "positionZ": 0.0,
-                "scaleX": 1.0,
-                "scaleY": 1.0,
-                "scaleZ": 0.0,
-                "rotation": 0.0
-            },
-            "Graphics Component": {}
-        },
-        "1": {
-            "ArchetypeID": "1110000000",
-            "Name Tag": {
-                "name": "New Entity"
-            },
-            "Transform": {
-                "positionX": 0.0,
-                "positionY": 0.0,
-                "positionZ": 0.0,
-                "scaleX": 1.0,
-                "scaleY": 1.0,
-                "scaleZ": 0.0,
-                "rotation": 0.0
-            },
-            "Graphics Component": {}
-        },
-        "2": {
-            "ArchetypeID": "1110000000",
-            "Name Tag": {
-                "name": "New Entity"
-            },
-            "Transform": {
-                "positionX": 0.0,
-                "positionY": 0.0,
-                "positionZ": 0.0,
-                "scaleX": 1.0,
-                "scaleY": 1.0,
-                "scaleZ": 0.0,
-                "rotation": 0.0
-            },
-            "Graphics Component": {}
-        },
-        "3": {
-            "ArchetypeID": "1110000000",
-            "Name Tag": {
-                "name": "New Entity"
-            },
-            "Transform": {
-                "positionX": 0.0,
                 "positionY": 0.0,
                 "positionZ": 0.0,
                 "scaleX": 1.0,

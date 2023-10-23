@@ -63,22 +63,22 @@ namespace TDS
 						GraphicsManager::getInstance().GetSwapchainRenderer().getAspectRatio(), 0.1f, 10.f);
 					ubo.m_Projection.m[1][1] *= -1;
 
-
-					Renderer3D::getPipeline()->BindPipeline();
-					Renderer3D::getPipeline()->BindDescriptor(frame);
-					Renderer3D::getPipeline()->UpdateUBO(&ubo, sizeof(GlobalUBO), 0, frame);
-					Renderer3D::getPipeline()->SubmitPushConstant(&pushData, sizeof(PushConstantData), SHADER_FLAG::VERTEX);
-					/*Renderer3D::getInstance()->models->bind(commandBuffer);
-					Renderer3D::getInstance()->models->draw(commandBuffer);*/
-					Renderer3D::getPipeline()->BindVertexBuffer(*elem.m_VertexBuffer);
-					Renderer3D::getPipeline()->BindIndexBuffer(*elem.m_IndexBuffer);
-					Renderer3D::getPipeline()->DrawIndexed(*elem.m_VertexBuffer, *elem.m_IndexBuffer, frame);
-					GraphicsManager::getInstance().m_PointLightRenderer->GetPipeline().BindDescriptor(frame);
-					GraphicsManager::getInstance().m_PointLightRenderer->GetPipeline().UpdateUBO(&ubo, sizeof(GlobalUBO), 0, frame);
-					GraphicsManager::getInstance().m_PointLightRenderer->render(ubo, &_Graphics[i], &_TransformComponent[i]);
-
-
-
+					if (_Graphics->GetPointLightBool()) {
+						GraphicsManager::getInstance().m_PointLightRenderer->GetPipeline().BindDescriptor(frame);
+						GraphicsManager::getInstance().m_PointLightRenderer->GetPipeline().UpdateUBO(&ubo, sizeof(GlobalUBO), 0, frame);
+						GraphicsManager::getInstance().m_PointLightRenderer->render(ubo, &_Graphics[i], &_TransformComponent[i]);
+					}
+					else {
+						Renderer3D::getPipeline()->BindPipeline();
+						Renderer3D::getPipeline()->BindDescriptor(frame);
+						Renderer3D::getPipeline()->UpdateUBO(&ubo, sizeof(GlobalUBO), 0, frame);
+						Renderer3D::getPipeline()->SubmitPushConstant(&pushData, sizeof(PushConstantData), SHADER_FLAG::VERTEX);
+						/*Renderer3D::getInstance()->models->bind(commandBuffer);
+						Renderer3D::getInstance()->models->draw(commandBuffer);*/
+						Renderer3D::getPipeline()->BindVertexBuffer(*elem.m_VertexBuffer);
+						Renderer3D::getPipeline()->BindIndexBuffer(*elem.m_IndexBuffer);
+						Renderer3D::getPipeline()->DrawIndexed(*elem.m_VertexBuffer, *elem.m_IndexBuffer, frame);
+					}
 
 
 				}

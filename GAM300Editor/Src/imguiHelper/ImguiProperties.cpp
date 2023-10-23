@@ -164,6 +164,11 @@ namespace TDS
 			transformComponent->SetScale(ImguiVec3Input("Scale", transformComponent->GetScale()));
 			transformComponent->SetRotation(ImguiFloatInput("Rotation", transformComponent->GetRotation()));
 		}
+		else if (componentName == "Graphics Component")
+		{
+			auto GPComponent = dynamic_cast<GraphicsComponent*>(componentBase);
+			GPComponent->TogglePointLightBool(ImguiBoolInput("Pointlight", GPComponent->GetPointLightBool()));
+		}
 		else if (componentName == "AI")
 		{
 			//auto aiComponent = dynamic_cast<AI*>(componentBase);
