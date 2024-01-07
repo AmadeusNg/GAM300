@@ -31,7 +31,7 @@ namespace TDS
 		static void CollisionSystemUpdate(const float dt, const std::vector<EntityID>& entities, Transform* _transform, GraphicsComponent* _graphics);
 		
 		// Center at 0,0,0, length = 1
-		static std::vector<float> cubeVertices;
+		static std::vector<Vec3> cubeVertices;
 		static std::vector<unsigned int> cubeIndices;
 		// Center at 0,0,0, radius = 1
 		static std::vector<float> sphereVertices;

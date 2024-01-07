@@ -13,7 +13,7 @@
 namespace TDS
 {
 	// Static variables
-	std::vector<float>				CollisionSystem::cubeVertices;
+	std::vector<Vec3>				CollisionSystem::cubeVertices;
 	std::vector<unsigned int>		CollisionSystem::cubeIndices;
 	std::vector<float>				CollisionSystem::sphereVertices;
 	std::vector<unsigned int>		CollisionSystem::sphereIndices;
@@ -140,16 +140,16 @@ namespace TDS
 		cubeVertices =
 		{
 			// Front face
-			-0.5, -0.5,  0.5, // Bottom-left
-			 0.5, -0.5,  0.5, // Bottom-right
-			 0.5,  0.5,  0.5, // Top-right
-			-0.5,  0.5,  0.5, // Top-left
+			Vec3( - 0.5, -0.5,  0.5), // Bottom-left
+			Vec3( 0.5, -0.5,  0.5), // Bottom-right
+			Vec3( 0.5,  0.5,  0.5), // Top-right
+			Vec3(-0.5,  0.5,  0.5), // Top-left
 
 			// Back face
-			-0.5, -0.5, -0.5, // Bottom-left
-			 0.5, -0.5, -0.5, // Bottom-right
-			 0.5,  0.5, -0.5, // Top-right
-			-0.5,  0.5, -0.5  // Top-left
+			Vec3(-0.5, -0.5, -0.5), // Bottom-left
+			Vec3( 0.5, -0.5, -0.5), // Bottom-right
+			Vec3( 0.5,  0.5, -0.5), // Top-right
+			Vec3(-0.5,  0.5, -0.5)  // Top-left
 		};
 
 		cubeIndices =
