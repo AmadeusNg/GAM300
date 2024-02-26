@@ -5,7 +5,7 @@ namespace TDS {
 
 
 	ParticleSystem::ParticleSystem(VulkanInstance& Instance) : m_Instance(Instance) {
-
+		Init();
 	}
 
 	ParticleSystem::~ParticleSystem() {
@@ -13,14 +13,56 @@ namespace TDS {
 	}
 
 	void ParticleSystem::Init() {
+		//create vulkan stuff to create
+		m_ComputePipeline = std::make_shared<VulkanPipeline>();
+		
+		PipelineCreateEntry ParticleComputeEntry;
+		ParticleComputeEntry.m_NumDescriptorSets = 1;
+		ParticleComputeEntry.m_PipelineConfig.m_DstClrBlend = VK_BLEND_FACTOR_ZERO;
+		ParticleComputeEntry.m_PipelineConfig.m_SrcClrBlend = VK_BLEND_FACTOR_ZERO;
+		ParticleComputeEntry.m_PipelineConfig.m_DstAlphaBlend = VK_BLEND_FACTOR_ZERO;
+		ParticleComputeEntry.m_PipelineConfig.m_SrcAlphaBlend = VK_BLEND_FACTOR_ZERO;
+		ParticleComputeEntry.m_ShaderInputs.m_Shaders.insert(std::make_pair(SHADER_FLAG::COMPUTE_SHADER, "../assets/shaders/ParticleCompute.spv"));
+		
 
+
+		m_ComputeBuffer = std::make_shared<VMABuffer>();
+		m_ComputeBuffer->CreateBuffer(sizeof(TDS::Particle)* m_AllActiveParticles.size(), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, VMA_MEMORY_USAGE_GPU_TO_CPU, &m_AllActiveParticles);
+
+
+		m_RenderPipeline = std::make_shared<VulkanPipeline>();
+
+		PipelineCreateEntry ParticleRenderEntry;
+		ParticleRenderEntry.m_NumDescriptorSets = 1;
+		ParticleRenderEntry.m_PipelineConfig.m_DstClrBlend = VK_BLEND_FACTOR_ZERO;
+		ParticleRenderEntry.m_PipelineConfig.m_SrcClrBlend = VK_BLEND_FACTOR_ZERO;
+		ParticleRenderEntry.m_PipelineConfig.m_DstAlphaBlend = VK_BLEND_FACTOR_ZERO;
+		ParticleRenderEntry.m_PipelineConfig.m_SrcAlphaBlend = VK_BLEND_FACTOR_ZERO;
+		ParticleRenderEntry.m_ShaderInputs.m_Shaders.insert(std::make_pair(SHADER_FLAG::VERTEX, "../assets/shaders/ParticleVert.spv"));
+		ParticleRenderEntry.m_ShaderInputs.m_Shaders.insert(std::make_pair(SHADER_FLAG::FRAGMENT, "../assets/shaders/ParticleFrag.spv"));
+
+		m_IndexBuffer = std::make_shared<VMABuffer>();
+		m_VertexBuffer = std::make_shared<VMABuffer>();
+
+	
+		
 	}
 
-	void ParticleSystem::UpdateAll(float deltatime, std::vector<EntityID>& Entities, Particle_Component* Particles, Transform* Xform) {
+	void ParticleSystem::UpdateSystem(float deltatime, std::vector<EntityID>& Entities, Particle_Component* Particles, Transform* Xform) {
+		//send stuff into compute shader and do calculations?
+		
+		//update data for all emitters in the scene before calculations
 		for (size_t i{ 0 }; i < Entities.size(); ++i) {
-			UpdateEmitter(deltatime, Entities[i], &Particles[i]);
+			//get all the particle entities and shvoe into a single vector
+			//UpdateEmitter(deltatime, Entities[i], &Particles[i]);
 		}
 	}
+
+	void ParticleSystem::Render() {
+		//send data into vertex and fragment shader to render into scene
+
+	}
+
 
 	void ParticleSystem::UpdateEmitter(float deltatime,EntityID ID, Particle_Component* Emitter) {
 		std::uint32_t currentparticlecount = Emitter->GetCurrentParticleCount();

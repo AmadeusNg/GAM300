@@ -18,13 +18,13 @@ namespace TDS {
 		float Lifetime{ 10.f };
 		float Age{ 0.f };
 		ParticleMesh type{ CUBE };
-		bool isActive;
+		bool isActive{ true };
 	};
 
 	class Particle_Component : public IComponent {
 	public:
 		//idk what to do with this function
-
+		void resetParticle();
 		std::uint32_t GetCurrentParticleCount() { return m_vParticles.size(); }
 		std::uint32_t GetDesiredParticleCount() { return m_particlecount; }
 		float GetDecayRate() { return m_decayrate; }
@@ -33,6 +33,7 @@ namespace TDS {
 	private:
 		std::vector<Particle> m_vParticles;
 		std::uint32_t m_particlecount;
+		Vec3 spawnOffset{ 0.f,0.f,0.f };
 		float m_decayrate{ 0.1f };
 		bool m_isEmiiting{ false };
 	};

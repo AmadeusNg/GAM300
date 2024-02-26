@@ -20,8 +20,7 @@ namespace TDS {
 		ParticleSystem& operator=(const ParticleSystem&) = delete;
 
 		void Init();
-		//Update data of all particles in the scene
-		void UpdateAll(float deltatime, std::vector<EntityID>& Entities, Particle_Component* Particles, Transform* Xform);
+		void UpdateSystem(float deltatime, std::vector<EntityID>& Entities, Particle_Component* Particles, Transform* Xform);
 		//Spawn/Draws all particles from all entities
 		void Render();
 
@@ -31,11 +30,18 @@ namespace TDS {
 		void AddParticlestoEmitter(Particle_Component* Emitter, std::uint32_t particleamount, EntityID id);
 		VulkanPipeline& GetPipeline();
 	private:
-		VulkanInstance& m_Instance;
-		std::unique_ptr<VulkanPipeline> m_Pipeline;
 		VkBuffer ParticleBuffer;
-		
 		uint32_t m_MaxParticles;
+
+		std::vector<Particle> m_AllActiveParticles;
+
+		//for compute
+		std::shared_ptr<VulkanPipeline> m_ComputePipeline;
+		std::shared_ptr<VMABuffer> m_ComputeBuffer;
+		//for rendering
+		std::shared_ptr<VulkanPipeline> m_RenderPipeline;
+		std::shared_ptr<VMABuffer> m_IndexBuffer;
+		std::shared_ptr<VMABuffer> m_VertexBuffer;
 	};
 
 	
