@@ -1,0 +1,54 @@
+#version 450
+
+// Assuming Particle structure is available in the shader
+struct Particle {
+    vec3 Position;
+    vec3 Velocity;
+    vec3 Acceleration;
+    vec3 Size;
+    vec3 Color;
+    float Lifetime;
+    float Age;
+    int type; // Assuming ParticleMesh type is an integer
+    bool isActive;
+};
+
+layout(set = 0, binding = 0, std430) buffer Particles {
+    Particle particles[];
+};
+
+layout(set = 0, binding = 1) buffer EmitterData {
+    uint currentParticleCount;
+    uint desiredParticleCount;
+    float deltaTime;
+    float decayRate;
+};
+
+layout(push_constant) uniform Push{
+    float deltaTime;
+}
+
+void main() {
+    uint id = gl_GlobalInvocationID.x;
+
+    // Particle update loop
+    Particle particle = particles[id];
+
+    if (particle.isActive) {
+        particle.Age += EmitterData.deltaTime;
+
+        if (particle.Age >= particle.Lifetime) {
+            // Particle reached the end of its lifetime
+            particle.Age = 0.0;
+            particle.isActive = false;
+        } else {
+            // Update particle properties
+            particle.Velocity += particle.Acceleration * EmitterData.deltaTime;
+            particle.Acceleration *= exp(-EmitterData.decayRate * EmitterData.deltaTime);
+            particle.Position += particle.Velocity * EmitterData.deltaTime;
+        }
+
+        // Write the updated particle back to the buffer
+        particles[id] = particle;
+    }
+}

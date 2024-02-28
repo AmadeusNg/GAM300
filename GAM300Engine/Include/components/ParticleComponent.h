@@ -7,7 +7,8 @@ namespace TDS {
 	enum ParticleMesh {
 		CUBE = 0,
 		SPHERE,
-		CAPSULE
+		CAPSULE,
+		MAX_MESHES
 	};
 	struct Particle {
 		Vec3 Position;

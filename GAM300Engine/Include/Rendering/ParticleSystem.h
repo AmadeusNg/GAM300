@@ -6,27 +6,34 @@
 #include "components/ParticleComponent.h"
 #include "dotnet/ImportExport.h"
 #include "components/transform.h"
+#include "renderPass.h"
 
 namespace TDS {
-	
 
+	
 	class ParticleSystem {
 	public:
-		
-		ParticleSystem(VulkanInstance& Instance);
+		struct InputRenderBuffers {
+			std::shared_ptr<VMABuffer> m_VertexBuffer = nullptr;
+			std::shared_ptr<VMABuffer> m_IndexBuffer = nullptr;
+		};
+
+
+		ParticleSystem();
 		~ParticleSystem();
 
 		ParticleSystem(const ParticleSystem&) = delete;
 		ParticleSystem& operator=(const ParticleSystem&) = delete;
 
 		void Init();
-		void UpdateSystem(float deltatime, std::vector<EntityID>& Entities, Particle_Component* Particles, Transform* Xform);
+		void UpdateSystem(VkCommandBuffer commandbuffer, std::uint32_t frameindex, float deltatime, std::vector<EntityID>& Entities, Particle_Component* Particles, Transform* Xform);
 		//Spawn/Draws all particles from all entities
 		void Render();
+		void ShutDown();
 
 		//helper functions
 		//updates the all particles tied to a single entity
-		void UpdateEmitter(float deltatime,EntityID ID, Particle_Component* Emitter);
+		void UpdateEmitter(float deltatime, EntityID ID, Particle_Component* Emitter);
 		void AddParticlestoEmitter(Particle_Component* Emitter, std::uint32_t particleamount, EntityID id);
 		VulkanPipeline& GetPipeline();
 	private:
@@ -39,12 +46,14 @@ namespace TDS {
 		std::shared_ptr<VulkanPipeline> m_ComputePipeline;
 		std::shared_ptr<VMABuffer> m_ComputeBuffer;
 		//for rendering
+		RenderPass* m_RenderPass{};
+		RenderTarget* m_RenderTarget{};
+		FrameBuffer* m_FrameBuffer{};
 		std::shared_ptr<VulkanPipeline> m_RenderPipeline;
-		std::shared_ptr<VMABuffer> m_IndexBuffer;
-		std::shared_ptr<VMABuffer> m_VertexBuffer;
+		std::array<InputRenderBuffers, ParticleMesh::MAX_MESHES>  MeshRenderBuffers;
 	};
 
-	
+
 }
 
 #endif // !PARTICLESYSTEM
