@@ -1,54 +1,50 @@
 #version 450
 
-// Assuming Particle structure is available in the shader
 struct Particle {
-    vec3 Position;
+    vec3 OriginalPosition;// constant transform position of the entity, position of particle is an offset from here based on velocity and acceleration
     vec3 Velocity;
     vec3 Acceleration;
-    vec3 Size;
+    vec3 DecayRate;
+    vec3 Size;//xyz scale of the particle
     vec3 Color;
-    float Lifetime;
-    float Age;
-    int type; // Assuming ParticleMesh type is an integer
-    bool isActive;
+    float Lifetime;//how long is the particle supposed to last
+    float Age;//how long has the particle been active
+    int type; // integer indicating the particle mesh to be used
 };
 
-layout(set = 0, binding = 0, std430) buffer Particles {
-    Particle particles[];
-};
+layout(std140, binding =1 ) readonly buffer ActiveParticle{
+    Particle particle[];
+}v_ActiveParticleIn;
 
-layout(set = 0, binding = 1) buffer EmitterData {
-    uint currentParticleCount;
-    uint desiredParticleCount;
-    float deltaTime;
-    float decayRate;
-};
+//vector of matrix to be sent to vertex buffer
+layout(std140, binding =2 ) writeonly buffer ActiveParticle{
+    mat4 transformlist[];
+}v_ActiveParticleOut;
 
 layout(push_constant) uniform Push{
     float deltaTime;
-}
+}push;
+
 
 void main() {
-    uint id = gl_GlobalInvocationID.x;
-
     // Particle update loop
-    Particle particle = particles[id];
+    uint particleindex = gl_GlobalInvocationID.x;
 
-    if (particle.isActive) {
-        particle.Age += EmitterData.deltaTime;
+    //check if invocation id within the particlevectorIn
+    if (particleindex < v_ActiveParticleIn.particle.length() ){
+        Particle currentparticle = v_ActiveParticleIn.particles[particleindex];
 
-        if (particle.Age >= particle.Lifetime) {
-            // Particle reached the end of its lifetime
-            particle.Age = 0.0;
-            particle.isActive = false;
-        } else {
-            // Update particle properties
-            particle.Velocity += particle.Acceleration * EmitterData.deltaTime;
-            particle.Acceleration *= exp(-EmitterData.decayRate * EmitterData.deltaTime);
-            particle.Position += particle.Velocity * EmitterData.deltaTime;
+        currentparticle.Age += push.deltaTime;
+        vec3 newposition;
+        if (currentparticle.Age >= currentparticle.Lifetime){
+            //current particle exceeded lifetime, reset age and position
+            currentparticle.Age = 0.0;
+            newposition = currentparticle.OriginalPosition; 
+        }else{
+            vec3 accel = currentparticle.Acceleration * exp(-currentparticle.DecayRate * push.deltaTime);
+            vec3 velocity = currentparticle.Velocity + currentparticle.Acceleration * push.deltaTime;
+            newposition = velocity * deltaTime;
         }
 
-        // Write the updated particle back to the buffer
-        particles[id] = particle;
     }
 }
