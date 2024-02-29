@@ -34,7 +34,7 @@ layout(std140, binding = 3) writeonly buffer ParticleXform{
 layout(push_constant) uniform Push{
     float deltaTime; //4
     float Lifetime;//how long is the particle supposed to last
-    float SpawnTimer;//how long since the last particle was spawned
+    float SpawnTimer;//how long since the last particle was spawned(1st issue)
     float SpawnRate;//how many particles are spawned per second
     vec3 DecayRate;//how fast the particle decays
     //16
@@ -98,6 +98,7 @@ void main() {
                 //current particle exceeded lifetime, reset age and position
                 currentparticle.Age = 0.0;
                 currentparticle.position = push.EmitterPosition;
+                currentparticle.Active = false;
 
             }else{
                 //calculate the position based on acceleration and velocity using the age to determine how much time has passed from its spawn
@@ -114,19 +115,20 @@ void main() {
         }
         else{
             //particle is not active
-            //check if the particle should be activated
-            if (push.SpawnTimer >= (1.0/push.SpawnRate)){
+            //check if the particle should be activated(spawned)
+            if (push.SpawnTimer >= (1.0/push.SpawnRate)){//shift to cpu(?)
                 //activate the particle
                 currentparticle.Active = true;
                 currentparticle.Age = 0.0;
                 currentparticle.Position = push.EmitterPosition;
+                
                 v_ParticleOut.List[particleindex] = currentparticle;
                 v_ParticleXform[particleindex] = GenerateTransform(currentparticle.Size, currentparticle.Rotation, currentparticle.OriginalPosition);
                 push.SpawnTimer = 0.0;
             }
             else{
-                //particle is not active and should not be activated
-                //do nothing
+                //spawntimer < spawnrate, dont spawn, just add to timer
+                SpawnTimer += push.deltaTime;
             }
         }
     }

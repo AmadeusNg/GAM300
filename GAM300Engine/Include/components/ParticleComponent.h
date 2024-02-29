@@ -37,6 +37,8 @@ namespace TDS {
 		Vec3 spawnOffset{ 0.f,0.f,0.f };
 		float m_decayrate{ 0.1f };
 		bool m_isEmiiting{ false };
+		float spawnrate;
+		float spawntimer;
 	};
 }
 #endif
