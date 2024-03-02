@@ -14,6 +14,17 @@ namespace TDS {
 
 	void ParticleSystem::Init() {
 		//create vulkan stuff to create
+		//crreate a spawn pipeline here
+		m_EmitterPipeline = std::make_shared<VulkanPipeline>();
+		PipelineCreateEntry ParticleComputeEntry;
+		ParticleComputeEntry.m_NumDescriptorSets = 1;
+		ParticleComputeEntry.m_PipelineConfig.m_DstClrBlend = VK_BLEND_FACTOR_ZERO;
+		ParticleComputeEntry.m_PipelineConfig.m_SrcClrBlend = VK_BLEND_FACTOR_ZERO;
+		ParticleComputeEntry.m_PipelineConfig.m_DstAlphaBlend = VK_BLEND_FACTOR_ZERO;
+		ParticleComputeEntry.m_PipelineConfig.m_SrcAlphaBlend = VK_BLEND_FACTOR_ZERO;
+		ParticleComputeEntry.m_ShaderInputs.m_Shaders.insert(std::make_pair(SHADER_FLAG::COMPUTE_SHADER, "../assets/shaders/ParticleEmitter.spv"));
+
+
 		m_ComputePipeline = std::make_shared<VulkanPipeline>();
 
 		PipelineCreateEntry ParticleComputeEntry;
@@ -23,7 +34,6 @@ namespace TDS {
 		ParticleComputeEntry.m_PipelineConfig.m_DstAlphaBlend = VK_BLEND_FACTOR_ZERO;
 		ParticleComputeEntry.m_PipelineConfig.m_SrcAlphaBlend = VK_BLEND_FACTOR_ZERO;
 		ParticleComputeEntry.m_ShaderInputs.m_Shaders.insert(std::make_pair(SHADER_FLAG::COMPUTE_SHADER, "../assets/shaders/ParticleCompute.spv"));
-
 
 
 		m_ComputeBuffer = std::make_shared<VMABuffer>();
@@ -53,12 +63,9 @@ namespace TDS {
 
 	void ParticleSystem::UpdateSystem(VkCommandBuffer commandbuffer, std::uint32_t frameindex, float deltatime, std::vector<EntityID>& Entities, Particle_Component* EmitterList, Transform* Xform) {
 		//send data into compute shader for calculations
-		for (unsigned int i{ 0 }; i < Entities.size(); ++i) { //loop through entity list and send all active particles into the shader
-			for (auto& currentparticle : EmitterList[i].GetParticleVector()) { //loop through the list of particles in the emitter
-				if (currentparticle.isActive) //first pass of filtering to reduce data sent to gpu
-					m_AllActiveParticles.emplace_back(currentparticle);
-			}
-		}
+		/*
+		* loop through all entities with the particle component and run the emitter and compute code
+		*/
 
 
 		//take data from compute and prep for vertex

@@ -1,0 +1,52 @@
+#version 450 core
+
+struct Particle {
+    //transform params
+    //vec3 OriginalPosition;
+    vec3 Size;//xyz scale of the particle
+    vec3 Rotation;
+    vec3 CurrentPosition;// constant transform position of the entity, position of particle is an offset from here based on velocity and acceleration
+    
+    //movement params
+    vec3 Velocity;
+    vec3 Acceleration;
+    float Age;//how long has the particle been active
+    
+    //aesthetics params
+    vec3 Color;//rgb color of the particle
+    bool Active;//is the particle active
+};
+
+layout (std140, binding = 0) buffer Particles {
+    Particle List[];
+}Particles;
+
+layout (std140, binding = 2) buffer Freelist{
+    int count;
+    int indices[];
+}Freelist;
+
+layout (location = 1 ) uniform float DeltaTime;
+
+void ComputeParticle(inout Particle p, int index){
+    if (p.Age > 0.0){
+        p.Age -= DeltaTime;
+        p.Velocity += p.Acceleration * DeltaTime;
+        p.CurrentPosition += p.Velocity * DeltaTime;
+    
+        if (p.Age <= 0.0){
+            p.Active = false;
+            Freelist.indices[atomicAdd(Freelist.count,1)] = index;
+        }
+    }
+}
+
+layout(local_size_x =128, local_size_y = 1, local_size_z = 1) in;
+
+void main(){
+    uint index = gl_GlobalInvocationID.x;
+    if (index >= Particles.List.length()){
+        return;
+    }
+    ComputeParticle(particles.List[index], index);
+}

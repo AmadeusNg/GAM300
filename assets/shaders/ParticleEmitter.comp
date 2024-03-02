@@ -1,0 +1,81 @@
+#version 450 core
+
+struct Particle {
+    //transform params
+    //vec3 OriginalPosition;
+    vec3 Size;//xyz scale of the particle
+    vec3 Rotation;
+    vec3 CurrentPosition;// constant transform position of the entity, position of particle is an offset from here based on velocity and acceleration
+    
+    //movement params
+    vec3 Velocity;
+    vec3 Acceleration;
+    float Age;//how long has the particle been active
+    
+    //aesthetics params
+    vec3 Color;//rgb color of the particle
+    bool Active;//is the particle active
+};
+
+struct ParticleEmitter{
+    vec4 Color;
+    vec3 Spawnoffset;
+    vec3 Velocity;
+    vec3 Acceleration;
+    float Life;
+    vec3 Position;
+    vec3 Size;
+
+    float spawninterval, spawntimer;
+    uint32t maxparticles;
+    Buffer particlebuffer;
+    Buffer freelistBuffer;
+}
+
+//writing the position of the particle out into a list to vertex buffer
+layout (std140, binding = 1) writeonly restrict buffer Particle{
+    Particle List[];
+}v_ParticleOut;
+
+//buffer access with particle shader?
+layout (std140, binding = 2) coherent restrict buffer Freelist{
+    int count;
+    int indices[];
+}Freelist;
+
+layout (location = 0 ) uniform int particleamount;
+layout (location = 1 ) uniform ParticleEmitter Emitter;
+
+void MakeParticle(out Particle newparticle){
+    //constant spawn point from emitter location
+    newparticle.Age = Emitter.minLife;
+    newparticle.Velocity = Emitter.velocity;
+    newparticle.Acceleration =  Emitter.acceleration;
+    newparticle.Color = Emitter.color;
+
+    newparticle.CurrentPosition = Emitter.Position + Spawnoffset;
+    newparticle.Size = Emitter.size;
+    newparticle.Rotation = vec3(0.0,0.0,0.0);
+    newparticle.Active = true;
+}
+
+layout(local_size_x = 64, local_size_y = 1, local_size_z = 1) in;
+
+void main(){
+    uint index = gl_GlobalInvocationID;
+
+    if (index >= particleamount)
+        return;
+    
+    int freelistindex = atomicAdd(Freelist.count, -1) -1;
+    //if there are no free particles, return
+    if (freelistindex < 0){
+        atomicAdd(Freelist.count, 1);
+        return;
+    }
+
+    //get the index of the free particle
+    int particleindex = Freelist.indices[freelistindex];
+    //create a new particle
+    MakeParticle(v_ParticleOut.List[particleindex]);
+}

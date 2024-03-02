@@ -44,6 +44,7 @@ namespace TDS {
 
 		//for compute
 		std::shared_ptr<VulkanPipeline> m_ComputePipeline;
+		std::shared_ptr<VulkanPipeline> m_EmitterPipeline;
 		std::shared_ptr<VMABuffer> m_ComputeBuffer;
 		//for rendering
 		RenderPass* m_RenderPass{};
