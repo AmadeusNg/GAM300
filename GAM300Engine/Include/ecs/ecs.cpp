@@ -20,6 +20,7 @@
 #include "Physics/CollisionSystem.h"
 #include "Rendering/FontSystem.h"
 #include "AI/Pathfinder.h"
+#include "Rendering/ParticleSystem.h"
 
 namespace TDS
 {

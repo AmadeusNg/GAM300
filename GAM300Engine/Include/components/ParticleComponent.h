@@ -11,34 +11,38 @@ namespace TDS {
 		MAX_MESHES
 	};
 	struct Particle {
-		Vec3 Position;
+		Vec3 Size{ 10.f,10.f,10.f };
+		Vec3 Rotation{ 0.f,0.f,0.f };
+		Vec3 Position{ 0.f,0.f,0.f };
 		Vec3 Velocity{ 0.f,10.f,0.f };
 		Vec3 Acceleration{ 0.f, 10.f, 0.f };
-		Vec3 Size{ 10.f,10.f,10.f };
-		Vec3 Color{ 0.f,0.f,1.f };
-		float Lifetime{ 10.f };
 		float Age{ 0.f };
-		ParticleMesh type{ CUBE };
+		Vec3 Color{ 0.f,0.f,1.f };
 		bool isActive{ true };
+	};
+
+	struct ParticleEmitter {
+		Vec4 Color;
+		Vec3 Spawnoffset;
+		Vec3 Velocity;
+		Vec3 Acceleration;
+		float Life;
+		Vec3 Position;
+		Vec3 Size;
+
+		float spawninterval, spawntimer;
+		uint32_t maxparticles;
+
 	};
 
 	class Particle_Component : public IComponent {
 	public:
-		//idk what to do with this function
-		void resetParticle();
-		std::uint32_t GetCurrentParticleCount() { return m_vParticles.size(); }
-		std::uint32_t GetDesiredParticleCount() { return m_particlecount; }
-		float GetDecayRate() { return m_decayrate; }
-		bool GetEmittingState() { return m_isEmiiting; }
-		std::vector<Particle> GetParticleVector() { return m_vParticles; }
+		//getter
+		ParticleEmitter& GetEmitter() { return Emitter; }
+		ParticleMesh& GetMeshType() { return type; }
 	private:
-		std::vector<Particle> m_vParticles;
-		std::uint32_t m_particlecount;
-		Vec3 spawnOffset{ 0.f,0.f,0.f };
-		float m_decayrate{ 0.1f };
-		bool m_isEmiiting{ false };
-		float spawnrate;
-		float spawntimer;
+		ParticleEmitter Emitter;
+		ParticleMesh type{ CUBE };
 	};
 }
 #endif

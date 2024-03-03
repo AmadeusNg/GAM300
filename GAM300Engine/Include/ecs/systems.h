@@ -36,6 +36,7 @@ namespace TDS
 
 	ECSSystem<Transform, GraphicsComponent>			_RenderSystem(3);
 	ECSSystem<Transform, UISprite>					_UiSystem(3);
+	ECSSystem<Transform, Particle_Component>		_ParticleSystem(3);
 }
 
 #endif // SYSTEMS

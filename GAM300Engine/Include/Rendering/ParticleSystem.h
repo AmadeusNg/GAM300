@@ -10,7 +10,7 @@
 
 namespace TDS {
 
-	
+
 	class ParticleSystem {
 	public:
 		struct InputRenderBuffers {
@@ -26,7 +26,8 @@ namespace TDS {
 		ParticleSystem& operator=(const ParticleSystem&) = delete;
 
 		void Init();
-		void UpdateSystem(VkCommandBuffer commandbuffer, std::uint32_t frameindex, float deltatime, std::vector<EntityID>& Entities, Particle_Component* Particles, Transform* Xform);
+		//sends data into compute shader for calculations
+		void UpdateSystem(const float deltatime, const std::vector<EntityID>& Entities, Transform* Xform, Particle_Component* Particles);
 		//Spawn/Draws all particles from all entities
 		void Render();
 		void ShutDown();
@@ -35,17 +36,15 @@ namespace TDS {
 		//updates the all particles tied to a single entity
 		void UpdateEmitter(float deltatime, EntityID ID, Particle_Component* Emitter);
 		void AddParticlestoEmitter(Particle_Component* Emitter, std::uint32_t particleamount, EntityID id);
-		VulkanPipeline& GetPipeline();
 	private:
-		VkBuffer ParticleBuffer;
-		uint32_t m_MaxParticles;
-
-		std::vector<Particle> m_AllActiveParticles;
+		VkCommandBuffer m_cmdbuffer;
 
 		//for compute
 		std::shared_ptr<VulkanPipeline> m_ComputePipeline;
 		std::shared_ptr<VulkanPipeline> m_EmitterPipeline;
 		std::shared_ptr<VMABuffer> m_ComputeBuffer;
+		std::shared_ptr<VMABuffer> m_EmitterBuffer;
+
 		//for rendering
 		RenderPass* m_RenderPass{};
 		RenderTarget* m_RenderTarget{};
