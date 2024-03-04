@@ -32,7 +32,6 @@ namespace TDS {
 
 		float spawninterval, spawntimer;
 		uint32_t maxparticles;
-
 	};
 
 	class Particle_Component : public IComponent {

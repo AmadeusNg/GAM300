@@ -29,7 +29,7 @@ namespace TDS {
 		//sends data into compute shader for calculations
 		void UpdateSystem(const float deltatime, const std::vector<EntityID>& Entities, Transform* Xform, Particle_Component* Particles);
 		//Spawn/Draws all particles from all entities
-		void Render();
+		void Render(const float deltatime, const std::vector<EntityID>& Entities, Transform* Xform, Particle_Component* EmitterList);
 		void ShutDown();
 
 		//helper functions
