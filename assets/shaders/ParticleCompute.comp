@@ -22,14 +22,14 @@ layout (std140, binding = 1) buffer Particles {
 
 layout (std140, binding = 2) buffer Freelist{
     int count;
-    int indices[];
+    uint indices[];
 }v_Freelist;
 
 layout (std140, binding = 3) writeonly buffer TransformMatrix{
     mat4 List[];
 }v_TransformMatrix;
 
-layout(set = 0, binding = 1) buffer TimeBlock {
+layout(set = 0, binding = 4) buffer TimeBlock {
     float DeltaTime;
 }Time;
 
@@ -96,17 +96,17 @@ void main(){
         return;
     }
 
+    //ComputeParticle(v_Particles.List[index], index);
     Particle currentparticle = v_Particles.List[index];
     if (currentparticle.Age > 0.){
         currentparticle.Age -= Time.DeltaTime;
         currentparticle.Velocity += currentparticle.Acceleration * Time.DeltaTime;
-        currenparticle.CurrentPosition += currentparticle.Velocity * Time.DeltaTime;
+        currentparticle.CurrentPosition += currentparticle.Velocity * Time.DeltaTime;
         if (currentparticle.Age <= 0.0){
             currentparticle.Active = false;
             v_Freelist.indices[atomicAdd(v_Freelist.count,1)] = index;
         }
     }
-    //ComputeParticle(v_Particles.List[index], index);
 
     v_TransformMatrix.List[index] = GenerateTransform(v_Particles.List[index].Size, v_Particles.List[index].Rotation, v_Particles.List[index].CurrentPosition);
 }

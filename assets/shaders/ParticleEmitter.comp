@@ -17,43 +17,40 @@ struct Particle {
 };
 
 struct ParticleEmitter{
-    vec4 Color;
+    float Life;
     vec3 Spawnoffset;
     vec3 Velocity;
     vec3 Acceleration;
-    float Life;
     vec3 Position;
     vec3 Size;
-
-    float spawninterval, spawntimer;
-    uint32t maxparticles;
-    Buffer particlebuffer;
-    Buffer freelistBuffer;
-}
+    vec4 Color;
+};
 
 //writing the position of the particle out into a list to vertex buffer
-layout (std140, binding = 1) writeonly restrict buffer Particle{
+layout (std140, binding = 1) buffer ParticleBuffer {
     Particle List[];
 }v_ParticleOut;
 
 //buffer access with particle shader?
-layout (std140, binding = 2) coherent restrict buffer Freelist{
+layout (std140, binding = 2) coherent restrict buffer FreelistBuffer {
     int count;
     int indices[];
-}Freelist;
+}v_Freelist;
 
-layout (location = 0 ) uniform int particleamount;
-layout (location = 1 ) uniform ParticleEmitter Emitter;
+layout (set = 0, binding = 3 ) buffer EmitterThingy{
+    int particleamount;
+    ParticleEmitter Emitter;
+}EmitterStuff;
 
 void MakeParticle(out Particle newparticle){
     //constant spawn point from emitter location
-    newparticle.Age = Emitter.minLife;
-    newparticle.Velocity = Emitter.velocity;
-    newparticle.Acceleration =  Emitter.acceleration;
-    newparticle.Color = Emitter.color;
+    newparticle.Age = EmitterStuff.Emitter.Life;
+    newparticle.Velocity = EmitterStuff.Emitter.Velocity;
+    newparticle.Acceleration =  EmitterStuff.Emitter.Acceleration;
+    newparticle.Color = EmitterStuff.Emitter.Color.xyz;
 
-    newparticle.CurrentPosition = Emitter.Position + Spawnoffset;
-    newparticle.Size = Emitter.size;
+    newparticle.CurrentPosition = EmitterStuff.Emitter.Position + EmitterStuff.Emitter.Spawnoffset;
+    newparticle.Size = EmitterStuff.Emitter.Size;
     newparticle.Rotation = vec3(0.0,0.0,0.0);
     newparticle.Active = true;
 }
@@ -61,20 +58,20 @@ void MakeParticle(out Particle newparticle){
 layout(local_size_x = 64, local_size_y = 1, local_size_z = 1) in;
 
 void main(){
-    uint index = gl_GlobalInvocationID;
+    uint index = gl_GlobalInvocationID.x;
 
-    if (index >= particleamount)
+    if (index >= EmitterStuff.particleamount)
         return;
     
-    int freelistindex = atomicAdd(Freelist.count, -1) -1;
+    int freelistindex = atomicAdd(v_Freelist.count, -1) -1;
     //if there are no free particles, return
     if (freelistindex < 0){
-        atomicAdd(Freelist.count, 1);
+        atomicAdd(v_Freelist.count, 1);
         return;
     }
 
     //get the index of the free particle
-    int particleindex = Freelist.indices[freelistindex];
+    int particleindex = v_Freelist.indices[freelistindex];
     //create a new particle
     MakeParticle(v_ParticleOut.List[particleindex]);
 }

@@ -198,6 +198,8 @@ namespace TDS
 
 			m_DeferredPipelines[DEFERRED_STAGE::STAGE_COMPOSITION] = std::make_shared<VulkanPipeline>();
 			m_DeferredPipelines[DEFERRED_STAGE::STAGE_COMPOSITION]->Create(entry);
+
+
 		}
 
 		//For clean 3D objects in UI pass with no lighting applied

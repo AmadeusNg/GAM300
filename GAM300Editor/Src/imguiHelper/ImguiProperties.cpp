@@ -1116,6 +1116,7 @@ namespace TDS
 					{
 						addComponentByName("PointLight", selectedEntity);
 					}
+					
 					break;
 				case AddComponentStage::SCRIPTS:
 

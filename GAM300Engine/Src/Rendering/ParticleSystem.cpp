@@ -3,6 +3,7 @@
 #include "Rendering/GraphicsManager.h"
 #include "vulkanTools/Renderer.h"
 #include "AssetManagement/AssetManager.h"
+#include "Rendering/Revamped/DeferredController.h"
 
 
 namespace TDS {
@@ -10,7 +11,6 @@ namespace TDS {
 
 
 	ParticleSystem::ParticleSystem() {
-		Init();
 	}
 
 	ParticleSystem::~ParticleSystem() {
@@ -48,6 +48,8 @@ namespace TDS {
 		ParticleComputeEntry.m_PipelineConfig.m_SrcAlphaBlend = VK_BLEND_FACTOR_ZERO;
 		ParticleComputeEntry.m_ShaderInputs.m_Shaders.insert(std::make_pair(SHADER_FLAG::COMPUTE_SHADER, "../assets/shaders/ParticleCompute.spv"));
 
+		GlobalBufferPool::GetInstance()->AddToGlobalPool(1000 * sizeof(Mat4), 3, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, "v_TransformMatrix");
+
 		m_ComputePipeline->Create(ParticleComputeEntry);
 
 
@@ -60,11 +62,14 @@ namespace TDS {
 		ParticleRenderEntry.m_PipelineConfig.m_SrcClrBlend = VK_BLEND_FACTOR_ZERO;
 		ParticleRenderEntry.m_PipelineConfig.m_DstAlphaBlend = VK_BLEND_FACTOR_ZERO;
 		ParticleRenderEntry.m_PipelineConfig.m_SrcAlphaBlend = VK_BLEND_FACTOR_ZERO;
-		ParticleRenderEntry.m_ShaderInputs.m_Shaders.insert(std::make_pair(SHADER_FLAG::VERTEX, "../assets/shaders/ParticleVert.spv"));
-		ParticleRenderEntry.m_ShaderInputs.m_Shaders.insert(std::make_pair(SHADER_FLAG::FRAGMENT, "../assets/shaders/ParticleFrag.spv"));
+		ParticleRenderEntry.m_FBTarget = GraphicsManager::getInstance().GetDeferredController()->GetFrameBuffer(RENDER_PASS::RENDER_COMPOSITION);
+		ParticleRenderEntry.m_ShaderInputs.m_Shaders.insert(std::make_pair(SHADER_FLAG::VERTEX, "../assets/shaders/RenderParticleVert.spv"));
+		ParticleRenderEntry.m_ShaderInputs.m_Shaders.insert(std::make_pair(SHADER_FLAG::FRAGMENT, "../assets/shaders/RenderParticleFrag.spv"));
 
-
-
+		VertexLayout layout = VertexLayout({
+			VertexBufferElement(VAR_TYPE::VEC2, "in_Position")
+			});
+		ParticleRenderEntry.m_ShaderInputs.m_InputVertex.push_back(VertexBufferInfo(false, layout, sizeof(Vec2)));
 		TypeReference<MeshController> instance;
 
 		MeshRenderBuffers[CUBE].m_IndexBuffer = AssetManager::GetInstance()->GetMeshFactory().GetMeshController("cube_Bin.bin", instance)->GetMeshBuffer()->m_IndexBuffer;
@@ -75,8 +80,8 @@ namespace TDS {
 
 		MeshRenderBuffers[CAPSULE].m_IndexBuffer = AssetManager::GetInstance()->GetMeshFactory().GetMeshController("capsule_Bin.bin", instance)->GetMeshBuffer()->m_IndexBuffer;
 		MeshRenderBuffers[CAPSULE].m_VertexBuffer = AssetManager::GetInstance()->GetMeshFactory().GetMeshController("capsule_Bin.bin", instance)->GetMeshBuffer()->m_VertexBuffer;
-			
 		
+
 		m_RenderPipeline->Create(ParticleRenderEntry);
 
 
@@ -93,16 +98,16 @@ namespace TDS {
 		m_EmitterPipeline->SetCommandBuffer(m_cmdbuffer);
 		m_EmitterPipeline->BindPipeline();
 		for (unsigned int i{ 0 }; i < Entities.size(); ++i) {
-			ParticleEmitter currentEmitter = EmitterList[i].GetEmitter();
+			Particle_Component currentEmitter = EmitterList[i];
 			currentEmitter.spawntimer += deltatime;
 
-			unsigned int SpawnAmt = currentEmitter.spawntimer / currentEmitter.spawninterval;
+			unsigned int SpawnAmt = currentEmitter.GetSpawnTimer() / currentEmitter.GetSpawnInterval();
 
 			if (SpawnAmt <= 0)
 				continue;
-
-			m_EmitterPipeline->UpdateUBO(&SpawnAmt, sizeof(int), 0, currentframe);
-			m_EmitterPipeline->UpdateUBO(&currentEmitter, sizeof(ParticleEmitter), 1, currentframe);
+			
+			Particle_Emitter_PushData GPUPush = { SpawnAmt, currentEmitter.GetEmitter() };
+			m_EmitterPipeline->UpdateUBO(&GPUPush, sizeof(Particle_Emitter_PushData), 3, currentframe);
 			//bind ssbos?
 
 
@@ -122,11 +127,12 @@ namespace TDS {
 		//compute particles
 		m_ComputePipeline->SetCommandBuffer(m_cmdbuffer);
 		m_ComputePipeline->BindPipeline();
+		float dt = TimeStep::GetDeltaTime();
 		for (unsigned int i{ 0 }; i < Entities.size(); ++i) {
-			ParticleEmitter currentEmitter = EmitterList[i].GetEmitter();
+			Particle_Component& currentEmitter = EmitterList[i];
 			//bind ssbos?
-
-			int numwrkgrp = (currentEmitter.maxparticles + 128 - 1) / 128;
+			m_ComputePipeline->UpdateUBO(&dt, sizeof(float), 4, currentframe);
+			int numwrkgrp = (currentEmitter.GetMaxParticles() + 128 - 1) / 128;
 			m_ComputePipeline->DispatchCompute(numwrkgrp, 1, 1);
 		}
 	}
@@ -134,19 +140,22 @@ namespace TDS {
 	void ParticleSystem::Render(const float deltatime, const std::vector<EntityID>& Entities, Transform* Xform, Particle_Component* EmitterList) {
 		uint32_t currentframe = GraphicsManager::getInstance().GetSwapchainRenderer().getFrameIndex();
 		TDSCamera cam = GraphicsManager::getInstance().GetCamera();
+		Mat4 view = cam.GetViewMatrix();
 		Mat4 proj = Mat4::Perspective(cam.m_Fov * Mathf::Deg2Rad,
 			GraphicsManager::getInstance().GetSwapchainRenderer().getAspectRatio(), 0.1f, 1000000.f);
 		//send data into vertex and fragment shader to render into scene
 		m_RenderPipeline->SetCommandBuffer(m_cmdbuffer);
 		m_RenderPipeline->BindPipeline();
-		m_RenderPipeline->UpdateUBO(&cam.GetViewMatrix(), sizeof(Mat4), 1, currentframe);
-		m_RenderPipeline->UpdateUBO(&proj, sizeof(Mat4), 2, currentframe);
+		CameraUBO temp = { view, proj };
+		m_RenderPipeline->UpdateUBO(&temp, sizeof(CameraUBO), 2, currentframe);
 		for (unsigned int i{ 0 }; i < Entities.size(); ++i) {
-			ParticleEmitter currentEmitter = EmitterList[i].GetEmitter();
-			unsigned int SpawnAmt = currentEmitter.spawntimer / currentEmitter.spawninterval;
+			Particle_Component currentEmitter = EmitterList[i];
+			unsigned int SpawnAmt = currentEmitter.GetSpawnTimer() / currentEmitter.GetSpawnInterval();
 			
 			m_RenderPipeline->BindVertexBuffer(*MeshRenderBuffers[EmitterList[i].GetMeshType()].m_VertexBuffer);
 			m_RenderPipeline->BindIndexBuffer(*MeshRenderBuffers[EmitterList[i].GetMeshType()].m_IndexBuffer);
+
+
 
 			m_RenderPipeline->DrawInstancedIndexed(*MeshRenderBuffers[EmitterList[i].GetMeshType()].m_VertexBuffer, *MeshRenderBuffers[EmitterList[i].GetMeshType()].m_IndexBuffer, SpawnAmt, currentframe);
 		}
@@ -154,43 +163,7 @@ namespace TDS {
 
 	void ParticleSystem::ShutDown() {
 		m_ComputePipeline->ShutDown();
-		m_ComputeBuffer->DestroyBuffer();
-		delete m_RenderPass;
-		delete m_RenderTarget;
-		delete m_FrameBuffer;
-	}
-
-	void ParticleSystem::UpdateEmitter(float deltatime, EntityID ID, Particle_Component* Emitter) {
-		/*std::uint32_t currentparticlecount = Emitter->GetCurrentParticleCount();
-		std::uint32_t Desiredparticlecount = Emitter->GetDesiredParticleCount();
-		if (currentparticlecount != Desiredparticlecount) {
-			AddParticlestoEmitter(Emitter, Desiredparticlecount - currentparticlecount, ID);
-		}
-		//if amount is equal, run the update loop for the particle activity
-		else {
-			for (auto& particle : Emitter->GetParticleVector()) {
-				if (particle.isActive) {
-					particle.Age += deltatime;
-					if (particle.Age >= particle.Lifetime) {
-						particle.Age = 0.f;
-						particle.isActive = false;
-						continue;
-					}
-					particle.Velocity += particle.Acceleration * deltatime;//updating velocity with acceleration
-					particle.Acceleration *= std::exp(-Emitter->GetDecayRate() * deltatime);//decaying acceleration per frame
-					particle.Position += particle.Velocity * deltatime;//updaing particle position
-				}
-			}
-		}*/
-	}
-
-	void ParticleSystem::AddParticlestoEmitter(Particle_Component* Emitter, std::uint32_t particleamount, EntityID ID) {
-		/*Particle newparticle = Particle();
-		Transform* EntityXform = ecs.getComponent<Transform>(ID);
-		newparticle.Position = EntityXform->GetPosition();
-		for (size_t i{ 0 }; i < particleamount; ++i) {
-			Emitter->GetParticleVector().push_back(newparticle);
-
-		}*/
+		m_EmitterPipeline->ShutDown();
+		m_RenderPipeline->ShutDown();
 	}
 }

@@ -7,6 +7,7 @@
 #include "dotnet/ImportExport.h"
 #include "components/transform.h"
 #include "renderPass.h"
+#include "dotnet/ImportExport.h"
 
 namespace TDS {
 
@@ -18,39 +19,39 @@ namespace TDS {
 			std::shared_ptr<VMABuffer> m_IndexBuffer = nullptr;
 		};
 
+		struct CameraUBO {
+			Mat4 view;
+			Mat4 Proj;
+		};
 
-		ParticleSystem();
-		~ParticleSystem();
+
+		DLL_API ParticleSystem();
+		DLL_API ~ParticleSystem();
 
 		ParticleSystem(const ParticleSystem&) = delete;
 		ParticleSystem& operator=(const ParticleSystem&) = delete;
 
-		void Init();
+		DLL_API static void Init();
 		//sends data into compute shader for calculations
-		void UpdateSystem(const float deltatime, const std::vector<EntityID>& Entities, Transform* Xform, Particle_Component* Particles);
+		DLL_API static void UpdateSystem(const float deltatime, const std::vector<EntityID>& Entities, Transform* Xform, Particle_Component* Particles);
 		//Spawn/Draws all particles from all entities
-		void Render(const float deltatime, const std::vector<EntityID>& Entities, Transform* Xform, Particle_Component* EmitterList);
-		void ShutDown();
+		DLL_API void Render(const float deltatime, const std::vector<EntityID>& Entities, Transform* Xform, Particle_Component* EmitterList);
+		DLL_API void ShutDown();
 
 		//helper functions
-		//updates the all particles tied to a single entity
-		void UpdateEmitter(float deltatime, EntityID ID, Particle_Component* Emitter);
-		void AddParticlestoEmitter(Particle_Component* Emitter, std::uint32_t particleamount, EntityID id);
-	private:
-		VkCommandBuffer m_cmdbuffer;
-
+		
+		inline static VkCommandBuffer m_cmdbuffer;
 		//for compute
-		std::shared_ptr<VulkanPipeline> m_ComputePipeline;
-		std::shared_ptr<VulkanPipeline> m_EmitterPipeline;
-		std::shared_ptr<VMABuffer> m_ComputeBuffer;
-		std::shared_ptr<VMABuffer> m_EmitterBuffer;
-
+		inline static std::shared_ptr<VulkanPipeline> m_ComputePipeline;
+		inline static std::shared_ptr<VulkanPipeline> m_EmitterPipeline;
 		//for rendering
-		RenderPass* m_RenderPass{};
-		RenderTarget* m_RenderTarget{};
-		FrameBuffer* m_FrameBuffer{};
-		std::shared_ptr<VulkanPipeline> m_RenderPipeline;
-		std::array<InputRenderBuffers, ParticleMesh::MAX_MESHES>  MeshRenderBuffers;
+		inline static std::shared_ptr<VulkanPipeline> m_RenderPipeline;
+		inline static std::array<InputRenderBuffers, ParticleMesh::MAX_MESHES>  MeshRenderBuffers;
+	private:
+
+		//std::shared_ptr<VMABuffer> m_ComputeBuffer;
+		//std::shared_ptr<VMABuffer> m_EmitterBuffer;
+
 	};
 
 
