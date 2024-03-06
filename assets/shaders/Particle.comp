@@ -54,41 +54,41 @@ layout(local_size_x = 256, local_size_y = 1, local_size_z =1) in;
 
 
 mat4 GenerateTransform(vec3 Scale, vec3 Rotate, vec3 Translate){
-    mat4 Scalemat{
+    mat4 Scalemat = mat4(
         Scale.x, 0.0, 0.0, 0.0,
         0.0, Scale.y, 0.0, 0.0,
         0.0, 0.0, Scale.z, 0.0,
-        0.0, 0.0, 0.0, 1.0};
+        0.0, 0.0, 0.0, 1.0);
     
-    mat4 rotationX{
+    mat4 rotationX = mat4(
         1.0, 0.0, 0.0, 0.0,
         0.0, cos(Rotate.x), -sin(Rotate.x), 0.0,
         0.0, sin(Rotate.x), cos(Rotate.x), 0.0,
         0.0, 0.0, 0.0, 1.0
-    };
+    );
 
-    mat4 rotationY{
+    mat4 rotationY= mat4(
         cos(Rotate.y), 0.0, sin(Rotate.y), 0.0,
         0.0, 1.0, 0.0, 0.0,
         -sin(Rotate.y), 0.0, cos(Rotate.y), 0.0,
         0.0, 0.0, 0.0, 1.0
-    };
+    );
 
-    mat4 rotationZ{
+    mat4 rotationZ = mat4(
         cos(Rotate.z), -sin(Rotate.z), 0.0, 0.0,
         sin(Rotate.z), cos(Rotate.z), 0.0, 0.0,
         0.0, 0.0, 1.0, 0.0,
         0.0, 0.0, 0.0, 1.0
-    };
+    );
 
     mat4 Rotmat = rotationZ * rotationY * rotationX;
 
-    mat4 Translatemat{
+    mat4 Translatemat = mat4(
         1.0, 0.0, 0.0, 0.0,
         0.0, 1.0, 0.0, 0.0,
         0.0, 0.0, 1.0, 0.0,
         Translate.x, Translate.y, Translate.z, 1.0
-    }
+    );
 
     mat4 Xform = Translatemat* Rotmat* Scalemat;
     return Xform;

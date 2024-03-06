@@ -1,5 +1,9 @@
 #version 450 core
 
+layout (set = 0,location = 0) in vec2 in_Position;
+layout (set = 0,location = 1) in mat4 ViewMatrix;
+layout (set = 0,location = 5) in mat4 ProjectionMatrix;
+
 struct Particle {
     //transform params
     vec3 Size;//xyz scale of the particle
@@ -18,22 +22,20 @@ struct Particle {
 
 layout (std140, binding = 1) buffer Particles {
     Particle List[];
-}Particles;
+}v_Particles;
 
-layout (std140, binding = 3) buffer v_TransformMatrix{
+layout (std140, binding = 2) buffer TransformMatrix{
     mat4 List[];
 }v_TransformMatrix;
 
 //vertex positions
-layout (location = 0) in vec2 in_Position;
-layout (location = 1) in mat4 ViewMatrix;
-layout (location = 2) in mat4 ProjectionMatrix;
+
 
 //output to fragment shader
 layout (location = 0) out vec3 out_Color;
 
 void main(){
-    int index = gl_InstanceID;
+    int index = gl_InstanceIndex;
 
     mat4 currentParticlexform = v_TransformMatrix.List[index];
 
@@ -42,11 +44,10 @@ void main(){
     gl_Position = ProjectionMatrix * ViewMatrix * worldPosition;
 
     //output the color
-    out_Color = Particles.List[index].Color;
+    out_Color = v_Particles.List[index].Color;
 
     //if the particle is not active, don't draw it
-    if(!Particles.List[index].Active){
+    if(!v_Particles.List[index].Active){
         gl_Position = vec4(0.0, 0.0, 0.0, 0.0);
     }
-    5 
 }

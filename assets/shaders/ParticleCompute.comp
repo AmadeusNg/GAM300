@@ -18,55 +18,57 @@ struct Particle {
 
 layout (std140, binding = 1) buffer Particles {
     Particle List[];
-}Particles;
+}v_Particles;
 
 layout (std140, binding = 2) buffer Freelist{
     int count;
     int indices[];
-}Freelist;
+}v_Freelist;
 
-layout (std140, binding = 3) writeonly buffer v_TransformMatrix{
+layout (std140, binding = 3) writeonly buffer TransformMatrix{
     mat4 List[];
 }v_TransformMatrix;
 
-layout (location = 1 ) uniform float DeltaTime;
+layout(set = 0, binding = 1) buffer TimeBlock {
+    float DeltaTime;
+}Time;
 
 mat4 GenerateTransform(vec3 Scale, vec3 Rotate, vec3 Translate){
-    mat4 Scalemat{
+    mat4 Scalemat = mat4(
         Scale.x, 0.0, 0.0, 0.0,
         0.0, Scale.y, 0.0, 0.0,
         0.0, 0.0, Scale.z, 0.0,
-        0.0, 0.0, 0.0, 1.0};
+        0.0, 0.0, 0.0, 1.0);
     
-    mat4 rotationX{
+    mat4 rotationX = mat4(
         1.0, 0.0, 0.0, 0.0,
         0.0, cos(Rotate.x), -sin(Rotate.x), 0.0,
         0.0, sin(Rotate.x), cos(Rotate.x), 0.0,
         0.0, 0.0, 0.0, 1.0
-    };
+    );
 
-    mat4 rotationY{
+    mat4 rotationY= mat4(
         cos(Rotate.y), 0.0, sin(Rotate.y), 0.0,
         0.0, 1.0, 0.0, 0.0,
         -sin(Rotate.y), 0.0, cos(Rotate.y), 0.0,
         0.0, 0.0, 0.0, 1.0
-    };
+    );
 
-    mat4 rotationZ{
+    mat4 rotationZ = mat4(
         cos(Rotate.z), -sin(Rotate.z), 0.0, 0.0,
         sin(Rotate.z), cos(Rotate.z), 0.0, 0.0,
         0.0, 0.0, 1.0, 0.0,
         0.0, 0.0, 0.0, 1.0
-    };
+    );
 
     mat4 Rotmat = rotationZ * rotationY * rotationX;
 
-    mat4 Translatemat{
+    mat4 Translatemat = mat4(
         1.0, 0.0, 0.0, 0.0,
         0.0, 1.0, 0.0, 0.0,
         0.0, 0.0, 1.0, 0.0,
         Translate.x, Translate.y, Translate.z, 1.0
-    }
+    );
 
     mat4 Xform = Translatemat* Rotmat* Scalemat;
     return Xform;
@@ -74,13 +76,13 @@ mat4 GenerateTransform(vec3 Scale, vec3 Rotate, vec3 Translate){
 
 void ComputeParticle(inout Particle p, int index){
     if (p.Age > 0.0){
-        p.Age -= DeltaTime;
-        p.Velocity += p.Acceleration * DeltaTime;
-        p.CurrentPosition += p.Velocity * DeltaTime;
+        p.Age -= Time.DeltaTime;
+        p.Velocity += p.Acceleration * Time.DeltaTime;
+        p.CurrentPosition += p.Velocity * Time.DeltaTime;
 
         if (p.Age <= 0.0){
             p.Active = false;
-            Freelist.indices[atomicAdd(Freelist.count,1)] = index;
+            v_Freelist.indices[atomicAdd(v_Freelist.count,1)] = index;
         }
     }
 }
@@ -90,10 +92,21 @@ layout(local_size_x =128, local_size_y = 1, local_size_z = 1) in;
 
 void main(){
     uint index = gl_GlobalInvocationID.x;
-    if (index >= Particles.List.length()){
+    if (index >= v_Particles.List.length()){
         return;
     }
-    ComputeParticle(Particle.List[index], index);
 
-    v_ParticleXform.list[index] = GenerateTransform(Particle.List[index].Size, Particle.List[index].Rotation, Particle.List[index].CurrentPosition);
+    Particle currentparticle = v_Particles.List[index];
+    if (currentparticle.Age > 0.){
+        currentparticle.Age -= Time.DeltaTime;
+        currentparticle.Velocity += currentparticle.Acceleration * Time.DeltaTime;
+        currenparticle.CurrentPosition += currentparticle.Velocity * Time.DeltaTime;
+        if (currentparticle.Age <= 0.0){
+            currentparticle.Active = false;
+            v_Freelist.indices[atomicAdd(v_Freelist.count,1)] = index;
+        }
+    }
+    //ComputeParticle(v_Particles.List[index], index);
+
+    v_TransformMatrix.List[index] = GenerateTransform(v_Particles.List[index].Size, v_Particles.List[index].Rotation, v_Particles.List[index].CurrentPosition);
 }
