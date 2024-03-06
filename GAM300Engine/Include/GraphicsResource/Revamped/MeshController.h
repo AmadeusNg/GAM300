@@ -12,6 +12,7 @@ namespace TDS
 		std::uint32_t m_VertexOffset, m_VertexCount, m_IndexOffset, m_IndexCount;
 		std::shared_ptr<VMABuffer>							m_VertexBuffer = nullptr;
 		std::shared_ptr<VMABuffer>							m_IndexBuffer = nullptr;
+		std::shared_ptr<VMABuffer>							m_IndirectBuffer = nullptr;
 	};
 
 	struct Modelpack;
@@ -43,9 +44,10 @@ namespace TDS
 		std::uint32_t										m_MeshCnt = 0;
 		std::map<std::string, SceneNode>					m_RootNodes;
 		std::unordered_map<std::string, std::uint32_t>		m_MeshIDMap;
+		
 
 	public:
-		std::set<std::uint32_t>								m_EntityList;
+		std::unordered_map<std::uint32_t, std::string>		m_EntityToNodeName;
 		Modelpack* m_ModelPack = nullptr;
 
 	public:
@@ -64,6 +66,8 @@ namespace TDS
 		DLL_API void							BuildMeshTree();
 
 		DLL_API void							BuildSceneAABB();
+
+		DLL_API void							ResetMeshPosition();
 
 		DLL_API Modelpack* GetModelPack();
 

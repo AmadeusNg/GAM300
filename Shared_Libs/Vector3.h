@@ -119,6 +119,7 @@ public:
     float z;
     static constexpr float kEpsilon = 0.00001f;
     static constexpr float kEpsilonNormalSqrt = 1e-15f;
+
 }; 
 // Operators (unary arithmetic)
 Vec3 operator-(const Vec3& v);

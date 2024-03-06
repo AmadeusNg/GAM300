@@ -53,7 +53,7 @@ namespace TDS
 		GraphicsComponent* parentGra = GetGraphicsComponent(parent);
 		GraphicsComponent* childGra = GetGraphicsComponent(childEntity);
 
-		//childGra->m_ModelName = parentGra->m_ModelName;
+		childGra->m_ModelName = parentGra->m_ModelName;
 
 
 

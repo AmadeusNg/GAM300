@@ -177,6 +177,9 @@
     <ClInclude Include="Include\Tools\CompilerRevamped\MeshLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Include\imguiHelper\ImguiAssetManagerDisplay.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="entry.cpp">

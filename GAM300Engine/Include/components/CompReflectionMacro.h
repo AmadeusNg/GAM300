@@ -12,3 +12,13 @@
 
 #define RTTR_REGISTER_PROPERTY_WITH_NAME(CLASS_NAME, MEMBER_VAR, NAME)\
         .property(NAME, &CLASS_NAME::MEMBER_VAR)
+
+#define RTTR_REGISTER_ENUM(ENUM_NAME)\
+        rttr::registration::enumeration<ENUM_NAME>(#ENUM_NAME)
+        
+
+
+#define RTTR_REGISTER_ENUM_VALUES(ENUM_NAME, VALUE_NAME)\
+        rttr::value(#VALUE_NAME, ENUM_NAME##::VALUE_NAME)
+    
+

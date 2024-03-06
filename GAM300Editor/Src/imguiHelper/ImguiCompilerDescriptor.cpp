@@ -29,21 +29,30 @@ namespace TDS
 
 			ImGui::EndCombo();
 		}
-		//DisplaySettings(m_CurrDescType);
+		DisplaySettings(m_CurrDescType);
 	}
 	void CompilerDescriptors::DisplaySettings(DESCRIPTOR_TYPE descType)
 	{
+		
 		if (descType == DESC_GEOMETRY)
 		{
 			if (ImGui::TreeNode("Geometry Descriptor"))
 			{
 				auto geomDesc = static_cast<GeomDescDisplay*>(m_CompilerDescriptors[descType]);
-				ImGui::SliderFloat3("Scale", geomDesc->m_GeomDecriptor.m_Descriptor.m_L2W.m_Scale, 0.0f, 10.0f);
-				ImGui::SliderFloat3("Rotate", geomDesc->m_GeomDecriptor.m_Descriptor.m_L2W.m_Rotate, -180.0f, 180.0f);
-				ImGui::SliderFloat3("Translate", geomDesc->m_GeomDecriptor.m_Descriptor.m_L2W.m_Translate, -100.0f, 100.0f);
+				ImGui::InputFloat3("Scale", geomDesc->m_GeomDecriptor.m_Descriptor.m_L2W.m_Scale);
+				ImGui::InputFloat3("Rotate", geomDesc->m_GeomDecriptor.m_Descriptor.m_L2W.m_Rotate);
+				ImGui::InputFloat3("Translate", geomDesc->m_GeomDecriptor.m_Descriptor.m_L2W.m_Translate);
+				ImGui::InputFloat2("Normalization", geomDesc->m_GeomDecriptor.m_NDC.m_MinMax);
+				ImGui::Checkbox("PreTransform Vertices", &geomDesc->m_GeomDecriptor.m_PretransformedVertices);
+				ImGui::Checkbox("Compress Mesh", &geomDesc->m_GeomDecriptor.m_Compress);
+				ImGui::Checkbox("Load Mesh", &geomDesc->m_GeomDecriptor.m_LoadMesh);
+				ImGui::Checkbox("Load Animations", &geomDesc->m_GeomDecriptor.m_LoadAnimation);
+				ImGui::Checkbox("Load Materials", &geomDesc->m_GeomDecriptor.m_LoadMaterials);
+				ImGui::Checkbox("Merge Mesh", &geomDesc->m_GeomDecriptor.m_MergeMesh);
 				ImGui::Checkbox("Create LOD", &geomDesc->m_GeomDecriptor.m_LodOptions.m_CreateLOD);
-				ImGui::InputInt("Max LODs", &geomDesc->m_GeomDecriptor.m_LodOptions.m_Max_num_lods);
+				ImGui::Checkbox("Remove Child Meshes", &geomDesc->m_GeomDecriptor.m_RemoveChildMeshes);
 				ImGui::SliderFloat("Reduction Factor", &geomDesc->m_GeomDecriptor.m_LodOptions.ReductionFactor, 0.0f, 1.0f);
+
 				ImGui::TreePop();
 			}
 			
@@ -65,6 +74,8 @@ namespace TDS
 				ImGui::TreePop();
 			}
 		}
+
+
 
 	}
 }

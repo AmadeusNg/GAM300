@@ -29,7 +29,8 @@ RTTR_REGISTRATION
 		.property("IsRayCast", &RigidBody::mIsRayCast)
 		.property("RayOrigin", &RigidBody::mRayOrigin)
 		.property("RayDirection", &RigidBody::mRayDirection)
-		.property("RayScale", &RigidBody::mRayScale);
+		.property("RayScale", &RigidBody::mRayScale)
+		.property("Door", &RigidBody::mDoor);
 
 	rttr::registration::enumeration<RigidBody::MotionType>("MotionType")
 		(
@@ -59,7 +60,8 @@ namespace TDS
 							 mRayOrigin(Vec3(0.0f, 0.0f, 0.0f)),
 							 mRayDirection(Vec3(0.0f, 0.0f, 0.0f)),
 							 mRayScale(1.f),
-							 mIsRayHit(false)
+							 mIsRayHit(false),
+							 mDoor(false)
 	{ }
 
 
@@ -83,7 +85,8 @@ namespace TDS
 														mRayOrigin(toMove.mRayOrigin),
 														mRayDirection(toMove.mRayDirection),
 														mRayScale(toMove.mRayScale),
-														mIsRayHit(toMove.mIsRayHit)
+														mIsRayHit(toMove.mIsRayHit),
+														mDoor(toMove.mDoor)
 
 	{ }
 

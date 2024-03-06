@@ -192,38 +192,33 @@ namespace TDS
 		CommandManager& cmdMgr = GraphicsManager::getInstance().getCommandManager();
 		Texture textureInfo{};
 		std::uint32_t width{4}, height{ 4 }, mips{ 1 };
-		std::uint32_t size = width * height * 4;
-		std::uint32_t data = 0xFFFFFFFF;
 		std::shared_ptr<VulkanTexture> texture = std::make_shared<VulkanTexture>();
 		VkImageUsageFlags usage = VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT;
 		CreateImageParams params{ VK_FORMAT_R8G8B8A8_UNORM, VkImageTiling::VK_IMAGE_TILING_OPTIMAL, usage };
 		texture->m_ImageHdl = VulkanTexture::CreateVulkanImage(VkExtent2D{ width, height }, 1, VK_SAMPLE_COUNT_1_BIT, params, texture->m_Allocation);
-		VMABuffer staging = VMABuffer::CreateStagingBuffer(size, instance, &data);
-
 
 		VkImageSubresourceRange subresourceRange{};
 		subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+		subresourceRange.baseMipLevel = 0;
 		subresourceRange.levelCount = 1;
+		subresourceRange.baseArrayLayer = 0;
 		subresourceRange.layerCount = 1;
 
 		CommandBufferInfo cmdInfo{};
 		cmdMgr.CreateSingleUseCommandBuffer(cmdInfo);
-		ImageMemoryLayoutInput transferToDestination{ texture->m_ImageHdl, 0, VK_ACCESS_TRANSFER_WRITE_BIT, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, subresourceRange };
-		SetImageMemoryBarrier(cmdInfo.m_CommandBuffer.m_CmdBuffer, transferToDestination);
 
-		VkBufferImageCopy bufferCopyImage{};
-		bufferCopyImage.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-		bufferCopyImage.imageSubresource.mipLevel = 0;
-		bufferCopyImage.imageSubresource.baseArrayLayer = 0;
-		bufferCopyImage.imageSubresource.layerCount = 1;
-		bufferCopyImage.imageExtent.width = width;
-		bufferCopyImage.imageExtent.height = height;
-		bufferCopyImage.imageExtent.depth = 1;
+		// Transition image to VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL for clearing
+		ImageMemoryLayoutInput prepareForClear{ texture->m_ImageHdl, 0, VK_ACCESS_TRANSFER_WRITE_BIT, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, subresourceRange };
+		SetImageMemoryBarrier(cmdInfo.m_CommandBuffer.m_CmdBuffer, prepareForClear);
 
-		vkCmdCopyBufferToImage(cmdInfo.m_CommandBuffer.m_CmdBuffer, staging.GetBuffer(), texture->m_ImageHdl, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &bufferCopyImage);
+		// Clear the image to a specific color
+		VkClearColorValue clearColor = { { 0.5f, 0.5f, 0.5f, 1.0f } }; // Gray color in floating point
+		vkCmdClearColorImage(cmdInfo.m_CommandBuffer.m_CmdBuffer, texture->m_ImageHdl, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, &clearColor, 1, &subresourceRange);
 
-		ImageMemoryLayoutInput transitionToFirstMip{ texture->m_ImageHdl, VK_ACCESS_TRANSFER_WRITE_BIT, VK_ACCESS_TRANSFER_READ_BIT, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, subresourceRange };
-		SetImageMemoryBarrier(cmdInfo.m_CommandBuffer.m_CmdBuffer, transitionToFirstMip);
+		// Transition image to VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL for shader access
+		ImageMemoryLayoutInput transitionToShaderRead{ texture->m_ImageHdl, VK_ACCESS_TRANSFER_WRITE_BIT, VK_ACCESS_SHADER_READ_BIT, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, subresourceRange };
+		SetImageMemoryBarrier(cmdInfo.m_CommandBuffer.m_CmdBuffer, transitionToShaderRead);
+
 		cmdMgr.EndExecution(cmdInfo);
 
 		texture->m_ImageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
@@ -233,10 +228,10 @@ namespace TDS
 		texture->m_DescriptorImageInfo.imageLayout = texture->m_ImageLayout;
 		texture->m_DescriptorImageInfo.imageView = texture->m_BaseImageView;
 		texture->m_DescriptorImageInfo.sampler = texture->m_Sampler;
-		staging.DestroyBuffer();
 
 		return texture;
 	}
+
 	std::shared_ptr<VulkanTexture> VulkanTexture::CreateDefaultCubeTexture(bool useAnistrophy)
 	{
 		std::shared_ptr<VulkanTexture> texture = std::make_shared<VulkanTexture>();

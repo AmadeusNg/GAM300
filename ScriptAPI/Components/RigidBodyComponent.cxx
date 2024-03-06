@@ -169,6 +169,19 @@ namespace ScriptAPI
 		TDS::SetPosition(*TDS::GetRigidBody(entityID), inPositionVec3, true);
 	}
 
+	void RigidBodyComponent::SetRotation(Quaternion inRotation)
+	{
+		if (!TDS::GetRigidBody(entityID))
+		{
+			// throw error instead (not sure how)
+			return;
+		}
+
+		TDS::Quat inRotationQuat = TDS::floatsToQuat(inRotation.X, inRotation.Y, inRotation.Z, inRotation.W);
+		TDS::SetRotation(*TDS::GetRigidBody(entityID), inRotationQuat, true);
+
+	}
+
 	// FORCES
 	void RigidBodyComponent::AddForce(Vector3 inForce)
 	{

@@ -1,0 +1,2605 @@
+{
+    "Archetype Sizes": {
+        "110000100000100000": {
+            "0": 2584,
+            "1": 7296,
+            "6": 6840,
+            "12": 6840
+        }
+    },
+    "Entity Data": {
+        "1": {
+            "ArchetypeID": "110000100000100000",
+            "Enabled": true,
+            "Name Tag": {
+                "Name": "Background",
+                "Tag": "",
+                "IsActive": true,
+                "HierarchyParent": 0,
+                "HierarchyIndex": 0,
+                "HierarchyChildren": []
+            },
+            "Transform": {
+                "Position": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "Scale": {
+                    "x": 2.0,
+                    "y": 2.0,
+                    "z": 1.0
+                },
+                "Rotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "FakePosition": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "FakeRotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "FakeScale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "OldPosition": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "OldScale": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "OldRotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "OldFakePosition": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "OldFakeScale": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "OldFakeRotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "ParentPosition": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            "Graphics Component": {
+                "PointLight": false,
+                "TextureName": "",
+                "Show Mesh": true,
+                "Debug": false,
+                "ModelName": "",
+                "MeshName": "",
+                "MeshNodeName": "",
+                "Color": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0,
+                    "w": 1.0
+                },
+                "Used In 2D": false,
+                "Model UID": 0
+            },
+            "UI Sprite": {
+                "Texture": "options_menu_bg.dds",
+                "EnableSprite": true,
+                "LayerID": 1,
+                "is Font": false,
+                "message": "",
+                "Font Texture": "",
+                "ForeGroundColour": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0,
+                    "w": 0.0
+                },
+                "Sprite Color": {
+                    "x": 0.10000000149011612,
+                    "y": 0.10000000149011612,
+                    "z": 0.10000000149011612,
+                    "w": 1.0
+                },
+                "BackGroundColour": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0,
+                    "w": 1.0
+                },
+                "BoundingBoxMin": {
+                    "x": -1.0,
+                    "y": -1.0
+                },
+                "BoundingBoxMax": {
+                    "x": 1.0,
+                    "y": 1.0
+                }
+            }
+        },
+        "2": {
+            "ArchetypeID": "110000100000100000",
+            "Enabled": true,
+            "Name Tag": {
+                "Name": "Settings Title",
+                "Tag": "",
+                "IsActive": true,
+                "HierarchyParent": 0,
+                "HierarchyIndex": 1,
+                "HierarchyChildren": []
+            },
+            "Transform": {
+                "Position": {
+                    "x": -0.4309859871864319,
+                    "y": 0.5647668838500977,
+                    "z": 0.0
+                },
+                "Scale": {
+                    "x": 0.25,
+                    "y": 0.15000000596046448,
+                    "z": 1.0
+                },
+                "Rotation": {
+                    "x": 0.0,
+                    "y": -0.0,
+                    "z": 0.0
+                },
+                "FakePosition": {
+                    "x": -0.4309859871864319,
+                    "y": 0.5647668838500977,
+                    "z": 0.0
+                },
+                "FakeRotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "FakeScale": {
+                    "x": 0.2599993944168091,
+                    "y": 0.13684195280075073,
+                    "z": 1.0
+                },
+                "OldPosition": {
+                    "x": -0.4309859871864319,
+                    "y": 0.5647668838500977,
+                    "z": 0.0
+                },
+                "OldScale": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "OldRotation": {
+                    "x": 0.2599993944168091,
+                    "y": 0.13684192299842834,
+                    "z": 1.0
+                },
+                "OldFakePosition": {
+                    "x": -0.4309859871864319,
+                    "y": 0.5647668838500977,
+                    "z": 0.0
+                },
+                "OldFakeScale": {
+                    "x": 0.2599993944168091,
+                    "y": 0.13684195280075073,
+                    "z": 1.0
+                },
+                "OldFakeRotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "ParentPosition": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            "Graphics Component": {
+                "PointLight": false,
+                "TextureName": "",
+                "Show Mesh": true,
+                "Debug": false,
+                "ModelName": "",
+                "MeshName": "",
+                "MeshNodeName": "",
+                "Color": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0,
+                    "w": 1.0
+                },
+                "Used In 2D": false,
+                "Model UID": 0
+            },
+            "UI Sprite": {
+                "Texture": "options_settings_text.dds",
+                "EnableSprite": true,
+                "LayerID": 1,
+                "is Font": false,
+                "message": "",
+                "Font Texture": "",
+                "ForeGroundColour": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0,
+                    "w": 0.0
+                },
+                "Sprite Color": {
+                    "x": 0.10000000149011612,
+                    "y": 0.10000000149011612,
+                    "z": 0.10000000149011612,
+                    "w": 1.0
+                },
+                "BackGroundColour": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0,
+                    "w": 1.0
+                },
+                "BoundingBoxMin": {
+                    "x": -0.5559859871864319,
+                    "y": 0.4897668957710266
+                },
+                "BoundingBoxMax": {
+                    "x": -0.3059859871864319,
+                    "y": 0.6397668719291687
+                }
+            }
+        },
+        "3": {
+            "ArchetypeID": "110000100000100000",
+            "Enabled": true,
+            "Name Tag": {
+                "Name": "AudioTitle",
+                "Tag": "",
+                "IsActive": true,
+                "HierarchyParent": 0,
+                "HierarchyIndex": 2,
+                "HierarchyChildren": []
+            },
+            "Transform": {
+                "Position": {
+                    "x": -0.6789431571960449,
+                    "y": 0.3374994993209839,
+                    "z": 0.0
+                },
+                "Scale": {
+                    "x": 0.15000000596046448,
+                    "y": 0.10000000149011612,
+                    "z": 0.9699999690055847
+                },
+                "Rotation": {
+                    "x": 0.0,
+                    "y": -0.0,
+                    "z": 0.0
+                },
+                "FakePosition": {
+                    "x": -0.6789431571960449,
+                    "y": 0.3374994993209839,
+                    "z": 0.0
+                },
+                "FakeRotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "FakeScale": {
+                    "x": 0.079429030418396,
+                    "y": 0.09056876599788666,
+                    "z": 0.9699999690055847
+                },
+                "OldPosition": {
+                    "x": -0.6789431571960449,
+                    "y": 0.3374994993209839,
+                    "z": 0.0
+                },
+                "OldScale": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "OldRotation": {
+                    "x": 0.15000000596046448,
+                    "y": 0.10000000149011612,
+                    "z": 0.9699999690055847
+                },
+                "OldFakePosition": {
+                    "x": -0.6789431571960449,
+                    "y": 0.3374994993209839,
+                    "z": 0.0
+                },
+                "OldFakeScale": {
+                    "x": 0.079429030418396,
+                    "y": 0.09056876599788666,
+                    "z": 0.9699999690055847
+                },
+                "OldFakeRotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "ParentPosition": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            "Graphics Component": {
+                "PointLight": false,
+                "TextureName": "",
+                "Show Mesh": true,
+                "Debug": false,
+                "ModelName": "",
+                "MeshName": "",
+                "MeshNodeName": "",
+                "Color": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0,
+                    "w": 1.0
+                },
+                "Used In 2D": false,
+                "Model UID": 0
+            },
+            "UI Sprite": {
+                "Texture": "options_Audio.dds",
+                "EnableSprite": true,
+                "LayerID": 1,
+                "is Font": false,
+                "message": "",
+                "Font Texture": "",
+                "ForeGroundColour": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0,
+                    "w": 0.0
+                },
+                "Sprite Color": {
+                    "x": 0.10000000149011612,
+                    "y": 0.10000000149011612,
+                    "z": 0.10000000149011612,
+                    "w": 1.0
+                },
+                "BackGroundColour": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0,
+                    "w": 1.0
+                },
+                "BoundingBoxMin": {
+                    "x": -0.753943145275116,
+                    "y": 0.28749948740005493
+                },
+                "BoundingBoxMax": {
+                    "x": -0.6039431691169739,
+                    "y": 0.38749951124191284
+                }
+            }
+        },
+        "4": {
+            "ArchetypeID": "110000100000100000",
+            "Enabled": true,
+            "Name Tag": {
+                "Name": "MasterVolumeTitle",
+                "Tag": "",
+                "IsActive": true,
+                "HierarchyParent": 0,
+                "HierarchyIndex": 3,
+                "HierarchyChildren": []
+            },
+            "Transform": {
+                "Position": {
+                    "x": -0.622535228729248,
+                    "y": 0.18866407871246338,
+                    "z": 0.0
+                },
+                "Scale": {
+                    "x": 0.2580645680427551,
+                    "y": 0.07999999821186066,
+                    "z": 1.0
+                },
+                "Rotation": {
+                    "x": 0.0,
+                    "y": -0.0,
+                    "z": 0.0
+                },
+                "FakePosition": {
+                    "x": -0.6309858560562134,
+                    "y": 0.18866407871246338,
+                    "z": 0.0
+                },
+                "FakeRotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "FakeScale": {
+                    "x": 0.2580645680427551,
+                    "y": 0.1276187300682068,
+                    "z": 1.0
+                },
+                "OldPosition": {
+                    "x": -0.622535228729248,
+                    "y": 0.18866407871246338,
+                    "z": 0.0
+                },
+                "OldScale": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "OldRotation": {
+                    "x": 0.2580645680427551,
+                    "y": 0.07999999821186066,
+                    "z": 1.0
+                },
+                "OldFakePosition": {
+                    "x": -0.6309858560562134,
+                    "y": 0.18866407871246338,
+                    "z": 0.0
+                },
+                "OldFakeScale": {
+                    "x": 0.2580645680427551,
+                    "y": 0.1276187300682068,
+                    "z": 1.0
+                },
+                "OldFakeRotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "ParentPosition": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            "Graphics Component": {
+                "PointLight": false,
+                "TextureName": "",
+                "Show Mesh": true,
+                "Debug": false,
+                "ModelName": "",
+                "MeshName": "",
+                "MeshNodeName": "",
+                "Color": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0,
+                    "w": 1.0
+                },
+                "Used In 2D": false,
+                "Model UID": 0
+            },
+            "UI Sprite": {
+                "Texture": "options_Master Volume.dds",
+                "EnableSprite": true,
+                "LayerID": 1,
+                "is Font": false,
+                "message": "",
+                "Font Texture": "",
+                "ForeGroundColour": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0,
+                    "w": 0.0
+                },
+                "Sprite Color": {
+                    "x": 0.10000000149011612,
+                    "y": 0.10000000149011612,
+                    "z": 0.10000000149011612,
+                    "w": 1.0
+                },
+                "BackGroundColour": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0,
+                    "w": 1.0
+                },
+                "BoundingBoxMin": {
+                    "x": -0.7515674829483032,
+                    "y": 0.14866408705711365
+                },
+                "BoundingBoxMax": {
+                    "x": -0.4935029447078705,
+                    "y": 0.2286640703678131
+                }
+            }
+        },
+        "5": {
+            "ArchetypeID": "110000100000100000",
+            "Enabled": true,
+            "Name Tag": {
+                "Name": "BgmTitle",
+                "Tag": "",
+                "IsActive": true,
+                "HierarchyParent": 0,
+                "HierarchyIndex": 4,
+                "HierarchyChildren": []
+            },
+            "Transform": {
+                "Position": {
+                    "x": -0.5958592891693115,
+                    "y": 0.027797579765319824,
+                    "z": 0.0
+                },
+                "Scale": {
+                    "x": 0.3100000023841858,
+                    "y": 0.10000000149011612,
+                    "z": 1.0
+                },
+                "Rotation": {
+                    "x": 0.0,
+                    "y": -0.0,
+                    "z": 0.0
+                },
+                "FakePosition": {
+                    "x": -0.5874085426330566,
+                    "y": 0.027797579765319824,
+                    "z": 0.0
+                },
+                "FakeRotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "FakeScale": {
+                    "x": 0.4615391492843628,
+                    "y": 0.3157893419265747,
+                    "z": 1.0
+                },
+                "OldPosition": {
+                    "x": -0.5958592891693115,
+                    "y": 0.027797579765319824,
+                    "z": 0.0
+                },
+                "OldScale": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "OldRotation": {
+                    "x": 0.3100000023841858,
+                    "y": 0.10000000149011612,
+                    "z": 1.0
+                },
+                "OldFakePosition": {
+                    "x": -0.5874085426330566,
+                    "y": 0.027797579765319824,
+                    "z": 0.0
+                },
+                "OldFakeScale": {
+                    "x": 0.4615391492843628,
+                    "y": 0.3157893419265747,
+                    "z": 1.0
+                },
+                "OldFakeRotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "ParentPosition": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            "Graphics Component": {
+                "PointLight": false,
+                "TextureName": "",
+                "Show Mesh": true,
+                "Debug": false,
+                "ModelName": "",
+                "MeshName": "",
+                "MeshNodeName": "",
+                "Color": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0,
+                    "w": 1.0
+                },
+                "Used In 2D": false,
+                "Model UID": 0
+            },
+            "UI Sprite": {
+                "Texture": "options_Background Music.dds",
+                "EnableSprite": true,
+                "LayerID": 1,
+                "is Font": false,
+                "message": "",
+                "Font Texture": "",
+                "ForeGroundColour": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0,
+                    "w": 0.0
+                },
+                "Sprite Color": {
+                    "x": 0.10000000149011612,
+                    "y": 0.10000000149011612,
+                    "z": 0.10000000149011612,
+                    "w": 1.0
+                },
+                "BackGroundColour": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0,
+                    "w": 1.0
+                },
+                "BoundingBoxMin": {
+                    "x": -0.750859260559082,
+                    "y": -0.022202420979738235
+                },
+                "BoundingBoxMax": {
+                    "x": -0.44085928797721863,
+                    "y": 0.07779757678508759
+                }
+            }
+        },
+        "6": {
+            "ArchetypeID": "110000100000100000",
+            "Enabled": true,
+            "Name Tag": {
+                "Name": "SfxTitle",
+                "Tag": "",
+                "IsActive": true,
+                "HierarchyParent": 0,
+                "HierarchyIndex": 5,
+                "HierarchyChildren": []
+            },
+            "Transform": {
+                "Position": {
+                    "x": -0.7162393927574158,
+                    "y": -0.10628032684326172,
+                    "z": 0.0
+                },
+                "Scale": {
+                    "x": 0.0675664097070694,
+                    "y": 0.06149483099579811,
+                    "z": 1.0
+                },
+                "Rotation": {
+                    "x": 0.0,
+                    "y": -0.0,
+                    "z": 0.0
+                },
+                "FakePosition": {
+                    "x": -0.7162393927574158,
+                    "y": -0.10628032684326172,
+                    "z": 0.0
+                },
+                "FakeRotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "FakeScale": {
+                    "x": 0.0675664097070694,
+                    "y": 0.06149483099579811,
+                    "z": 1.0
+                },
+                "OldPosition": {
+                    "x": -0.7162393927574158,
+                    "y": -0.10628032684326172,
+                    "z": 0.0
+                },
+                "OldScale": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "OldRotation": {
+                    "x": 0.0675664097070694,
+                    "y": 0.06149483099579811,
+                    "z": 1.0
+                },
+                "OldFakePosition": {
+                    "x": -0.7162393927574158,
+                    "y": -0.10628032684326172,
+                    "z": 0.0
+                },
+                "OldFakeScale": {
+                    "x": 0.0675664097070694,
+                    "y": 0.06149483099579811,
+                    "z": 1.0
+                },
+                "OldFakeRotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "ParentPosition": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            "Graphics Component": {
+                "PointLight": false,
+                "TextureName": "",
+                "Show Mesh": true,
+                "Debug": false,
+                "ModelName": "",
+                "MeshName": "",
+                "MeshNodeName": "",
+                "Color": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0,
+                    "w": 1.0
+                },
+                "Used In 2D": false,
+                "Model UID": 0
+            },
+            "UI Sprite": {
+                "Texture": "options_SFX.dds",
+                "EnableSprite": true,
+                "LayerID": 1,
+                "is Font": false,
+                "message": "",
+                "Font Texture": "",
+                "ForeGroundColour": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0,
+                    "w": 0.0
+                },
+                "Sprite Color": {
+                    "x": 0.10000000149011612,
+                    "y": 0.10000000149011612,
+                    "z": 0.10000000149011612,
+                    "w": 1.0
+                },
+                "BackGroundColour": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0,
+                    "w": 1.0
+                },
+                "BoundingBoxMin": {
+                    "x": -0.7500225901603699,
+                    "y": -0.13702774047851563
+                },
+                "BoundingBoxMax": {
+                    "x": -0.6824561953544617,
+                    "y": -0.07553291320800781
+                }
+            }
+        },
+        "7": {
+            "ArchetypeID": "110000100000100000",
+            "Enabled": true,
+            "Name Tag": {
+                "Name": "MasterVolUp",
+                "Tag": "",
+                "IsActive": true,
+                "HierarchyParent": 0,
+                "HierarchyIndex": 6,
+                "HierarchyChildren": []
+            },
+            "Transform": {
+                "Position": {
+                    "x": -0.1899999976158142,
+                    "y": 0.18400000035762787,
+                    "z": 0.0
+                },
+                "Scale": {
+                    "x": 0.07999999821186066,
+                    "y": 0.15000000596046448,
+                    "z": 1.0
+                },
+                "Rotation": {
+                    "x": 0.0,
+                    "y": -0.0,
+                    "z": 0.0
+                },
+                "FakePosition": {
+                    "x": -0.19436627626419067,
+                    "y": 0.18784844875335693,
+                    "z": 0.0
+                },
+                "FakeRotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "FakeScale": {
+                    "x": 0.08838356286287308,
+                    "y": 0.15277768671512604,
+                    "z": 1.0
+                },
+                "OldPosition": {
+                    "x": -0.1899999976158142,
+                    "y": 0.18427354097366333,
+                    "z": 0.0
+                },
+                "OldScale": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "OldRotation": {
+                    "x": 0.07999999821186066,
+                    "y": 0.15000000596046448,
+                    "z": 1.0
+                },
+                "OldFakePosition": {
+                    "x": -0.19436627626419067,
+                    "y": 0.18784844875335693,
+                    "z": 0.0
+                },
+                "OldFakeScale": {
+                    "x": 0.08838356286287308,
+                    "y": 0.15277768671512604,
+                    "z": 1.0
+                },
+                "OldFakeRotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "ParentPosition": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            "Graphics Component": {
+                "PointLight": false,
+                "TextureName": "",
+                "Show Mesh": true,
+                "Debug": false,
+                "ModelName": "",
+                "MeshName": "",
+                "MeshNodeName": "",
+                "Color": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0,
+                    "w": 1.0
+                },
+                "Used In 2D": false,
+                "Model UID": 0
+            },
+            "UI Sprite": {
+                "Texture": "optionsVolUp.dds",
+                "EnableSprite": true,
+                "LayerID": 1,
+                "is Font": false,
+                "message": "",
+                "Font Texture": "",
+                "ForeGroundColour": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0,
+                    "w": 0.0
+                },
+                "Sprite Color": {
+                    "x": 0.10000000149011612,
+                    "y": 0.10000000149011612,
+                    "z": 0.10000000149011612,
+                    "w": 1.0
+                },
+                "BackGroundColour": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0,
+                    "w": 1.0
+                },
+                "BoundingBoxMin": {
+                    "x": -0.22999998927116394,
+                    "y": 0.10899999737739563
+                },
+                "BoundingBoxMax": {
+                    "x": -0.15000000596046448,
+                    "y": 0.2590000033378601
+                }
+            }
+        },
+        "8": {
+            "ArchetypeID": "110000100000100000",
+            "Enabled": true,
+            "Name Tag": {
+                "Name": "MasterVolDown",
+                "Tag": "",
+                "IsActive": true,
+                "HierarchyParent": 0,
+                "HierarchyIndex": 7,
+                "HierarchyChildren": []
+            },
+            "Transform": {
+                "Position": {
+                    "x": -0.3737030029296875,
+                    "y": 0.1837606430053711,
+                    "z": 0.0
+                },
+                "Scale": {
+                    "x": 0.07999999821186066,
+                    "y": 0.15000000596046448,
+                    "z": 1.0
+                },
+                "Rotation": {
+                    "x": 0.0,
+                    "y": -0.0,
+                    "z": 0.0
+                },
+                "FakePosition": {
+                    "x": -0.3737030029296875,
+                    "y": 0.1837606430053711,
+                    "z": 0.0
+                },
+                "FakeRotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "FakeScale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "OldPosition": {
+                    "x": -0.3737030029296875,
+                    "y": 0.1837606430053711,
+                    "z": 0.0
+                },
+                "OldScale": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "OldRotation": {
+                    "x": 0.07999999821186066,
+                    "y": 0.15000000596046448,
+                    "z": 1.0
+                },
+                "OldFakePosition": {
+                    "x": -0.3737030029296875,
+                    "y": 0.1837606430053711,
+                    "z": 0.0
+                },
+                "OldFakeScale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "OldFakeRotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "ParentPosition": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            "Graphics Component": {
+                "PointLight": false,
+                "TextureName": "",
+                "Show Mesh": true,
+                "Debug": false,
+                "ModelName": "",
+                "MeshName": "",
+                "MeshNodeName": "",
+                "Color": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0,
+                    "w": 1.0
+                },
+                "Used In 2D": false,
+                "Model UID": 0
+            },
+            "UI Sprite": {
+                "Texture": "optionsVolDown.dds",
+                "EnableSprite": true,
+                "LayerID": 1,
+                "is Font": false,
+                "message": "",
+                "Font Texture": "",
+                "ForeGroundColour": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0,
+                    "w": 0.0
+                },
+                "Sprite Color": {
+                    "x": 0.10000000149011612,
+                    "y": 0.10000000149011612,
+                    "z": 0.10000000149011612,
+                    "w": 1.0
+                },
+                "BackGroundColour": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0,
+                    "w": 1.0
+                },
+                "BoundingBoxMin": {
+                    "x": -0.41370299458503723,
+                    "y": 0.10876064002513885
+                },
+                "BoundingBoxMax": {
+                    "x": -0.33370301127433777,
+                    "y": 0.25876063108444214
+                }
+            }
+        },
+        "9": {
+            "ArchetypeID": "110000100000100000",
+            "Enabled": true,
+            "Name Tag": {
+                "Name": "BgmVolUp",
+                "Tag": "",
+                "IsActive": true,
+                "HierarchyParent": 0,
+                "HierarchyIndex": 8,
+                "HierarchyChildren": []
+            },
+            "Transform": {
+                "Position": {
+                    "x": -0.1899999976158142,
+                    "y": 0.02991461753845215,
+                    "z": 0.0
+                },
+                "Scale": {
+                    "x": 0.07999999821186066,
+                    "y": 0.15000000596046448,
+                    "z": 1.0
+                },
+                "Rotation": {
+                    "x": 0.0,
+                    "y": -0.0,
+                    "z": 0.0
+                },
+                "FakePosition": {
+                    "x": -0.18873244524002075,
+                    "y": 0.02991461753845215,
+                    "z": 0.0
+                },
+                "FakeRotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "FakeScale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "OldPosition": {
+                    "x": -0.1899999976158142,
+                    "y": 0.02991461753845215,
+                    "z": 0.0
+                },
+                "OldScale": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "OldRotation": {
+                    "x": 0.07999999821186066,
+                    "y": 0.15000000596046448,
+                    "z": 1.0
+                },
+                "OldFakePosition": {
+                    "x": -0.18873244524002075,
+                    "y": 0.02991461753845215,
+                    "z": 0.0
+                },
+                "OldFakeScale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "OldFakeRotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "ParentPosition": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            "Graphics Component": {
+                "PointLight": false,
+                "TextureName": "",
+                "Show Mesh": true,
+                "Debug": false,
+                "ModelName": "",
+                "MeshName": "",
+                "MeshNodeName": "",
+                "Color": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0,
+                    "w": 1.0
+                },
+                "Used In 2D": false,
+                "Model UID": 0
+            },
+            "UI Sprite": {
+                "Texture": "optionsVolUp.dds",
+                "EnableSprite": true,
+                "LayerID": 1,
+                "is Font": false,
+                "message": "",
+                "Font Texture": "",
+                "ForeGroundColour": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0,
+                    "w": 0.0
+                },
+                "Sprite Color": {
+                    "x": 0.10000000149011612,
+                    "y": 0.10000000149011612,
+                    "z": 0.10000000149011612,
+                    "w": 1.0
+                },
+                "BackGroundColour": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0,
+                    "w": 1.0
+                },
+                "BoundingBoxMin": {
+                    "x": -0.22999998927116394,
+                    "y": -0.04508538544178009
+                },
+                "BoundingBoxMax": {
+                    "x": -0.15000000596046448,
+                    "y": 0.10491462051868439
+                }
+            }
+        },
+        "10": {
+            "ArchetypeID": "110000100000100000",
+            "Enabled": true,
+            "Name Tag": {
+                "Name": "BgmVolDown",
+                "Tag": "",
+                "IsActive": true,
+                "HierarchyParent": 0,
+                "HierarchyIndex": 9,
+                "HierarchyChildren": []
+            },
+            "Transform": {
+                "Position": {
+                    "x": -0.37400001287460327,
+                    "y": 0.029999999329447746,
+                    "z": 0.0
+                },
+                "Scale": {
+                    "x": 0.07999999821186066,
+                    "y": 0.15000000596046448,
+                    "z": 1.0
+                },
+                "Rotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "FakePosition": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "FakeRotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "FakeScale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "OldPosition": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "OldScale": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "OldRotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "OldFakePosition": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "OldFakeScale": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "OldFakeRotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "ParentPosition": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            "Graphics Component": {
+                "PointLight": false,
+                "TextureName": "",
+                "Show Mesh": true,
+                "Debug": false,
+                "ModelName": "",
+                "MeshName": "",
+                "MeshNodeName": "",
+                "Color": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0,
+                    "w": 1.0
+                },
+                "Used In 2D": false,
+                "Model UID": 0
+            },
+            "UI Sprite": {
+                "Texture": "optionsVolDown.dds",
+                "EnableSprite": true,
+                "LayerID": 1,
+                "is Font": false,
+                "message": "",
+                "Font Texture": "",
+                "ForeGroundColour": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0,
+                    "w": 0.0
+                },
+                "Sprite Color": {
+                    "x": 0.10000000149011612,
+                    "y": 0.10000000149011612,
+                    "z": 0.10000000149011612,
+                    "w": 1.0
+                },
+                "BackGroundColour": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0,
+                    "w": 1.0
+                },
+                "BoundingBoxMin": {
+                    "x": -0.414000004529953,
+                    "y": -0.04500000178813934
+                },
+                "BoundingBoxMax": {
+                    "x": -0.33400002121925354,
+                    "y": 0.10500000417232513
+                }
+            }
+        },
+        "11": {
+            "ArchetypeID": "110000100000100000",
+            "Enabled": true,
+            "Name Tag": {
+                "Name": "SfxVolUp",
+                "Tag": "",
+                "IsActive": true,
+                "HierarchyParent": 0,
+                "HierarchyIndex": 10,
+                "HierarchyChildren": []
+            },
+            "Transform": {
+                "Position": {
+                    "x": -0.1899999976158142,
+                    "y": -0.11111104488372803,
+                    "z": 0.0
+                },
+                "Scale": {
+                    "x": 0.07999999821186066,
+                    "y": 0.15000000596046448,
+                    "z": 1.0
+                },
+                "Rotation": {
+                    "x": 0.0,
+                    "y": -0.0,
+                    "z": 0.0
+                },
+                "FakePosition": {
+                    "x": -0.19154924154281616,
+                    "y": -0.11111104488372803,
+                    "z": 0.0
+                },
+                "FakeRotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "FakeScale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "OldPosition": {
+                    "x": -0.1899999976158142,
+                    "y": -0.11111104488372803,
+                    "z": 0.0
+                },
+                "OldScale": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "OldRotation": {
+                    "x": 0.07999999821186066,
+                    "y": 0.15000000596046448,
+                    "z": 1.0
+                },
+                "OldFakePosition": {
+                    "x": -0.19154924154281616,
+                    "y": -0.11111104488372803,
+                    "z": 0.0
+                },
+                "OldFakeScale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "OldFakeRotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "ParentPosition": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            "Graphics Component": {
+                "PointLight": false,
+                "TextureName": "",
+                "Show Mesh": true,
+                "Debug": false,
+                "ModelName": "",
+                "MeshName": "",
+                "MeshNodeName": "",
+                "Color": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0,
+                    "w": 1.0
+                },
+                "Used In 2D": false,
+                "Model UID": 0
+            },
+            "UI Sprite": {
+                "Texture": "optionsVolUp.dds",
+                "EnableSprite": true,
+                "LayerID": 1,
+                "is Font": false,
+                "message": "",
+                "Font Texture": "",
+                "ForeGroundColour": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0,
+                    "w": 0.0
+                },
+                "Sprite Color": {
+                    "x": 0.10000000149011612,
+                    "y": 0.10000000149011612,
+                    "z": 0.10000000149011612,
+                    "w": 1.0
+                },
+                "BackGroundColour": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0,
+                    "w": 1.0
+                },
+                "BoundingBoxMin": {
+                    "x": -0.22999998927116394,
+                    "y": -0.18611104786396027
+                },
+                "BoundingBoxMax": {
+                    "x": -0.15000000596046448,
+                    "y": -0.03611104190349579
+                }
+            }
+        },
+        "12": {
+            "ArchetypeID": "110000100000100000",
+            "Enabled": true,
+            "Name Tag": {
+                "Name": "SfxVolDown",
+                "Tag": "",
+                "IsActive": true,
+                "HierarchyParent": 0,
+                "HierarchyIndex": 11,
+                "HierarchyChildren": []
+            },
+            "Transform": {
+                "Position": {
+                    "x": -0.37400001287460327,
+                    "y": -0.11100000143051147,
+                    "z": 0.0
+                },
+                "Scale": {
+                    "x": 0.07999999821186066,
+                    "y": 0.15000000596046448,
+                    "z": 1.0
+                },
+                "Rotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "FakePosition": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "FakeRotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "FakeScale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "OldPosition": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "OldScale": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "OldRotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "OldFakePosition": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "OldFakeScale": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "OldFakeRotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "ParentPosition": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            "Graphics Component": {
+                "PointLight": false,
+                "TextureName": "",
+                "Show Mesh": true,
+                "Debug": false,
+                "ModelName": "",
+                "MeshName": "",
+                "MeshNodeName": "",
+                "Color": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0,
+                    "w": 1.0
+                },
+                "Used In 2D": false,
+                "Model UID": 0
+            },
+            "UI Sprite": {
+                "Texture": "optionsVolDown.dds",
+                "EnableSprite": true,
+                "LayerID": 1,
+                "is Font": false,
+                "message": "",
+                "Font Texture": "",
+                "ForeGroundColour": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0,
+                    "w": 0.0
+                },
+                "Sprite Color": {
+                    "x": 0.10000000149011612,
+                    "y": 0.10000000149011612,
+                    "z": 0.10000000149011612,
+                    "w": 1.0
+                },
+                "BackGroundColour": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0,
+                    "w": 1.0
+                },
+                "BoundingBoxMin": {
+                    "x": -0.414000004529953,
+                    "y": -0.1860000044107437
+                },
+                "BoundingBoxMax": {
+                    "x": -0.33400002121925354,
+                    "y": -0.035999998450279236
+                }
+            }
+        },
+        "13": {
+            "ArchetypeID": "110000100000100000",
+            "Enabled": true,
+            "Name Tag": {
+                "Name": "MasterVolBox",
+                "Tag": "",
+                "IsActive": true,
+                "HierarchyParent": 0,
+                "HierarchyIndex": 12,
+                "HierarchyChildren": []
+            },
+            "Transform": {
+                "Position": {
+                    "x": -0.28260868787765503,
+                    "y": 0.18400000035762787,
+                    "z": 0.0
+                },
+                "Scale": {
+                    "x": 0.11243926733732224,
+                    "y": 0.1151939257979393,
+                    "z": 1.0
+                },
+                "Rotation": {
+                    "x": 0.0,
+                    "y": -0.0,
+                    "z": 0.0
+                },
+                "FakePosition": {
+                    "x": -0.0662527084350586,
+                    "y": 0.18214941024780273,
+                    "z": 0.0
+                },
+                "FakeRotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "FakeScale": {
+                    "x": -0.8923529386520386,
+                    "y": 0.1151939257979393,
+                    "z": 1.0
+                },
+                "OldPosition": {
+                    "x": -0.28260868787765503,
+                    "y": 0.18214941024780273,
+                    "z": 0.0
+                },
+                "OldScale": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "OldRotation": {
+                    "x": 0.11243926733732224,
+                    "y": 0.1151939257979393,
+                    "z": 1.0
+                },
+                "OldFakePosition": {
+                    "x": -0.0662527084350586,
+                    "y": 0.18214941024780273,
+                    "z": 0.0
+                },
+                "OldFakeScale": {
+                    "x": -0.8923529386520386,
+                    "y": 0.1151939257979393,
+                    "z": 1.0
+                },
+                "OldFakeRotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "ParentPosition": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            "Graphics Component": {
+                "PointLight": false,
+                "TextureName": "",
+                "Show Mesh": true,
+                "Debug": false,
+                "ModelName": "",
+                "MeshName": "",
+                "MeshNodeName": "",
+                "Color": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0,
+                    "w": 1.0
+                },
+                "Used In 2D": false,
+                "Model UID": 0
+            },
+            "UI Sprite": {
+                "Texture": "optionsVolBox.dds",
+                "EnableSprite": true,
+                "LayerID": 1,
+                "is Font": false,
+                "message": "",
+                "Font Texture": "",
+                "ForeGroundColour": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0,
+                    "w": 0.0
+                },
+                "Sprite Color": {
+                    "x": 0.10000000149011612,
+                    "y": 0.10000000149011612,
+                    "z": 0.10000000149011612,
+                    "w": 1.0
+                },
+                "BackGroundColour": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0,
+                    "w": 1.0
+                },
+                "BoundingBoxMin": {
+                    "x": -0.33882832527160645,
+                    "y": 0.12640303373336792
+                },
+                "BoundingBoxMax": {
+                    "x": -0.2263890504837036,
+                    "y": 0.24159696698188782
+                }
+            }
+        },
+        "14": {
+            "ArchetypeID": "110000100000100000",
+            "Enabled": true,
+            "Name Tag": {
+                "Name": "BgmBox",
+                "Tag": "",
+                "IsActive": true,
+                "HierarchyParent": 0,
+                "HierarchyIndex": 13,
+                "HierarchyChildren": []
+            },
+            "Transform": {
+                "Position": {
+                    "x": -0.28299999237060547,
+                    "y": 0.029999999329447746,
+                    "z": 0.0
+                },
+                "Scale": {
+                    "x": 0.1120000034570694,
+                    "y": 0.11500000208616257,
+                    "z": 1.0
+                },
+                "Rotation": {
+                    "x": 0.0,
+                    "y": -0.0,
+                    "z": 0.0
+                },
+                "FakePosition": {
+                    "x": 0.0,
+                    "y": 0.021857857704162598,
+                    "z": 0.0
+                },
+                "FakeRotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "FakeScale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "OldPosition": {
+                    "x": -0.28299999237060547,
+                    "y": 0.021857857704162598,
+                    "z": 0.0
+                },
+                "OldScale": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "OldRotation": {
+                    "x": 0.1120000034570694,
+                    "y": 0.11500000208616257,
+                    "z": 1.0
+                },
+                "OldFakePosition": {
+                    "x": 0.0,
+                    "y": 0.021857857704162598,
+                    "z": 0.0
+                },
+                "OldFakeScale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "OldFakeRotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "ParentPosition": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            "Graphics Component": {
+                "PointLight": false,
+                "TextureName": "",
+                "Show Mesh": true,
+                "Debug": false,
+                "ModelName": "",
+                "MeshName": "",
+                "MeshNodeName": "",
+                "Color": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0,
+                    "w": 1.0
+                },
+                "Used In 2D": false,
+                "Model UID": 0
+            },
+            "UI Sprite": {
+                "Texture": "optionsVolBox.dds",
+                "EnableSprite": true,
+                "LayerID": 1,
+                "is Font": false,
+                "message": "",
+                "Font Texture": "",
+                "ForeGroundColour": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0,
+                    "w": 0.0
+                },
+                "Sprite Color": {
+                    "x": 0.10000000149011612,
+                    "y": 0.10000000149011612,
+                    "z": 0.10000000149011612,
+                    "w": 1.0
+                },
+                "BackGroundColour": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0,
+                    "w": 1.0
+                },
+                "BoundingBoxMin": {
+                    "x": -0.33899998664855957,
+                    "y": -0.027500001713633537
+                },
+                "BoundingBoxMax": {
+                    "x": -0.22699999809265137,
+                    "y": 0.08749999850988388
+                }
+            }
+        },
+        "15": {
+            "ArchetypeID": "110000100000100000",
+            "Enabled": true,
+            "Name Tag": {
+                "Name": "SfxBox",
+                "Tag": "",
+                "IsActive": true,
+                "HierarchyParent": 0,
+                "HierarchyIndex": 14,
+                "HierarchyChildren": []
+            },
+            "Transform": {
+                "Position": {
+                    "x": -0.28300005197525024,
+                    "y": -0.11100000143051147,
+                    "z": 0.0
+                },
+                "Scale": {
+                    "x": 0.1120000034570694,
+                    "y": 0.11500000208616257,
+                    "z": 1.0
+                },
+                "Rotation": {
+                    "x": 0.0,
+                    "y": -0.0,
+                    "z": 0.0
+                },
+                "FakePosition": {
+                    "x": -5.960464477539063e-8,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "FakeRotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "FakeScale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "OldPosition": {
+                    "x": -0.28300005197525024,
+                    "y": -0.11100000143051147,
+                    "z": 0.0
+                },
+                "OldScale": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "OldRotation": {
+                    "x": 0.1120000034570694,
+                    "y": 0.11500000208616257,
+                    "z": 1.0
+                },
+                "OldFakePosition": {
+                    "x": -5.960464477539063e-8,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "OldFakeScale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "OldFakeRotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "ParentPosition": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            "Graphics Component": {
+                "PointLight": false,
+                "TextureName": "",
+                "Show Mesh": true,
+                "Debug": false,
+                "ModelName": "",
+                "MeshName": "",
+                "MeshNodeName": "",
+                "Color": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0,
+                    "w": 1.0
+                },
+                "Used In 2D": false,
+                "Model UID": 0
+            },
+            "UI Sprite": {
+                "Texture": "optionsVolBox.dds",
+                "EnableSprite": true,
+                "LayerID": 1,
+                "is Font": false,
+                "message": "",
+                "Font Texture": "",
+                "ForeGroundColour": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0,
+                    "w": 0.0
+                },
+                "Sprite Color": {
+                    "x": 0.10000000149011612,
+                    "y": 0.10000000149011612,
+                    "z": 0.10000000149011612,
+                    "w": 1.0
+                },
+                "BackGroundColour": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0,
+                    "w": 1.0
+                },
+                "BoundingBoxMin": {
+                    "x": -0.33900004625320435,
+                    "y": -0.16850000619888306
+                },
+                "BoundingBoxMax": {
+                    "x": -0.22700005769729614,
+                    "y": -0.05350000038743019
+                }
+            }
+        },
+        "16": {
+            "ArchetypeID": "110000100000100000",
+            "Enabled": true,
+            "Name Tag": {
+                "Name": "BackButton",
+                "Tag": "",
+                "IsActive": true,
+                "HierarchyParent": 0,
+                "HierarchyIndex": 15,
+                "HierarchyChildren": []
+            },
+            "Transform": {
+                "Position": {
+                    "x": 0.5577466487884521,
+                    "y": -0.76756751537323,
+                    "z": 0.0
+                },
+                "Scale": {
+                    "x": 0.1712244600057602,
+                    "y": 0.13189521431922913,
+                    "z": 1.0
+                },
+                "Rotation": {
+                    "x": 0.0,
+                    "y": -0.0,
+                    "z": 0.0
+                },
+                "FakePosition": {
+                    "x": 0.5577466487884521,
+                    "y": -0.76756751537323,
+                    "z": 0.0
+                },
+                "FakeRotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "FakeScale": {
+                    "x": 0.1712244600057602,
+                    "y": 0.13189521431922913,
+                    "z": 1.0
+                },
+                "OldPosition": {
+                    "x": 0.5577466487884521,
+                    "y": -0.76756751537323,
+                    "z": 0.0
+                },
+                "OldScale": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "OldRotation": {
+                    "x": 0.1712244600057602,
+                    "y": 0.13189521431922913,
+                    "z": 1.0
+                },
+                "OldFakePosition": {
+                    "x": 0.5577466487884521,
+                    "y": -0.76756751537323,
+                    "z": 0.0
+                },
+                "OldFakeScale": {
+                    "x": 0.1712244600057602,
+                    "y": 0.13189521431922913,
+                    "z": 1.0
+                },
+                "OldFakeRotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "ParentPosition": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            "Graphics Component": {
+                "PointLight": false,
+                "TextureName": "",
+                "Show Mesh": true,
+                "Debug": false,
+                "ModelName": "",
+                "MeshName": "",
+                "MeshNodeName": "",
+                "Color": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0,
+                    "w": 1.0
+                },
+                "Used In 2D": false,
+                "Model UID": 0
+            },
+            "UI Sprite": {
+                "Texture": "options_back.dds",
+                "EnableSprite": true,
+                "LayerID": 1,
+                "is Font": false,
+                "message": "",
+                "Font Texture": "",
+                "ForeGroundColour": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0,
+                    "w": 0.0
+                },
+                "Sprite Color": {
+                    "x": 0.10000000149011612,
+                    "y": 0.10000000149011612,
+                    "z": 0.10000000149011612,
+                    "w": 1.0
+                },
+                "BackGroundColour": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0,
+                    "w": 1.0
+                },
+                "BoundingBoxMin": {
+                    "x": 0.47213441133499146,
+                    "y": -0.8335151076316833
+                },
+                "BoundingBoxMax": {
+                    "x": 0.6433588862419128,
+                    "y": -0.7016199231147766
+                }
+            }
+        },
+        "17": {
+            "ArchetypeID": "110000100000100000",
+            "Enabled": true,
+            "Name Tag": {
+                "Name": "MasterText",
+                "Tag": "",
+                "IsActive": true,
+                "HierarchyParent": 0,
+                "HierarchyIndex": 16,
+                "HierarchyChildren": []
+            },
+            "Transform": {
+                "Position": {
+                    "x": -0.3229812979698181,
+                    "y": 0.1552107334136963,
+                    "z": 0.0
+                },
+                "Scale": {
+                    "x": 0.04646846652030945,
+                    "y": 0.06611117720603943,
+                    "z": 1.0
+                },
+                "Rotation": {
+                    "x": 0.0,
+                    "y": -0.0,
+                    "z": 0.0
+                },
+                "FakePosition": {
+                    "x": -0.3229812979698181,
+                    "y": 0.1552107334136963,
+                    "z": 0.0
+                },
+                "FakeRotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "FakeScale": {
+                    "x": 0.04646846652030945,
+                    "y": 0.06611117720603943,
+                    "z": 1.0
+                },
+                "OldPosition": {
+                    "x": -0.3229812979698181,
+                    "y": 0.1552107334136963,
+                    "z": 0.0
+                },
+                "OldScale": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "OldRotation": {
+                    "x": 0.04646846652030945,
+                    "y": 0.06611117720603943,
+                    "z": 1.0
+                },
+                "OldFakePosition": {
+                    "x": -0.3229812979698181,
+                    "y": 0.1552107334136963,
+                    "z": 0.0
+                },
+                "OldFakeScale": {
+                    "x": 0.04646846652030945,
+                    "y": 0.06611117720603943,
+                    "z": 1.0
+                },
+                "OldFakeRotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "ParentPosition": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            "Graphics Component": {
+                "PointLight": false,
+                "TextureName": "",
+                "Show Mesh": true,
+                "Debug": false,
+                "ModelName": "",
+                "MeshName": "",
+                "MeshNodeName": "",
+                "Color": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0,
+                    "w": 1.0
+                },
+                "Used In 2D": false,
+                "Model UID": 0
+            },
+            "UI Sprite": {
+                "Texture": "",
+                "EnableSprite": true,
+                "LayerID": 1,
+                "is Font": true,
+                "message": "100",
+                "Font Texture": "Roboto-Medium.dds",
+                "ForeGroundColour": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0,
+                    "w": 1.0
+                },
+                "Sprite Color": {
+                    "x": 0.10000000149011612,
+                    "y": 0.10000000149011612,
+                    "z": 0.10000000149011612,
+                    "w": 1.0
+                },
+                "BackGroundColour": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0,
+                    "w": 1.0
+                },
+                "BoundingBoxMin": {
+                    "x": -0.5,
+                    "y": -0.5
+                },
+                "BoundingBoxMax": {
+                    "x": 0.5,
+                    "y": 0.5
+                }
+            }
+        },
+        "18": {
+            "ArchetypeID": "110000100000100000",
+            "Enabled": true,
+            "Name Tag": {
+                "Name": "BgmText",
+                "Tag": "",
+                "IsActive": true,
+                "HierarchyParent": 0,
+                "HierarchyIndex": 17,
+                "HierarchyChildren": []
+            },
+            "Transform": {
+                "Position": {
+                    "x": -0.3211268186569214,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "Scale": {
+                    "x": 0.04600000008940697,
+                    "y": 0.06599999964237213,
+                    "z": 1.0
+                },
+                "Rotation": {
+                    "x": 0.0,
+                    "y": -0.0,
+                    "z": 0.0
+                },
+                "FakePosition": {
+                    "x": -0.3211268186569214,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "FakeRotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "FakeScale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "OldPosition": {
+                    "x": -0.3211268186569214,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "OldScale": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "OldRotation": {
+                    "x": 0.04600000008940697,
+                    "y": 0.06599999964237213,
+                    "z": 1.0
+                },
+                "OldFakePosition": {
+                    "x": -0.3211268186569214,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "OldFakeScale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "OldFakeRotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "ParentPosition": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            "Graphics Component": {
+                "PointLight": false,
+                "TextureName": "",
+                "Show Mesh": true,
+                "Debug": false,
+                "ModelName": "",
+                "MeshName": "",
+                "MeshNodeName": "",
+                "Color": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0,
+                    "w": 1.0
+                },
+                "Used In 2D": false,
+                "Model UID": 0
+            },
+            "UI Sprite": {
+                "Texture": "",
+                "EnableSprite": true,
+                "LayerID": 1,
+                "is Font": true,
+                "message": "100",
+                "Font Texture": "Roboto-Medium.dds",
+                "ForeGroundColour": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0,
+                    "w": 0.0
+                },
+                "Sprite Color": {
+                    "x": 0.10000000149011612,
+                    "y": 0.10000000149011612,
+                    "z": 0.10000000149011612,
+                    "w": 1.0
+                },
+                "BackGroundColour": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0,
+                    "w": 1.0
+                },
+                "BoundingBoxMin": {
+                    "x": -0.5,
+                    "y": -0.5
+                },
+                "BoundingBoxMax": {
+                    "x": 0.5,
+                    "y": 0.5
+                }
+            }
+        },
+        "19": {
+            "ArchetypeID": "110000100000100000",
+            "Enabled": true,
+            "Name Tag": {
+                "Name": "SfxText",
+                "Tag": "",
+                "IsActive": true,
+                "HierarchyParent": 0,
+                "HierarchyIndex": 18,
+                "HierarchyChildren": []
+            },
+            "Transform": {
+                "Position": {
+                    "x": -0.3211268186569214,
+                    "y": -0.14054059982299805,
+                    "z": 0.0
+                },
+                "Scale": {
+                    "x": 0.04600000008940697,
+                    "y": 0.06599999964237213,
+                    "z": 1.0
+                },
+                "Rotation": {
+                    "x": 0.0,
+                    "y": -0.0,
+                    "z": 0.0
+                },
+                "FakePosition": {
+                    "x": -0.3211268186569214,
+                    "y": -0.14054059982299805,
+                    "z": 0.0
+                },
+                "FakeRotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "FakeScale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "OldPosition": {
+                    "x": -0.3211268186569214,
+                    "y": -0.14054059982299805,
+                    "z": 0.0
+                },
+                "OldScale": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "OldRotation": {
+                    "x": 0.04600000008940697,
+                    "y": 0.06599999964237213,
+                    "z": 1.0
+                },
+                "OldFakePosition": {
+                    "x": -0.3211268186569214,
+                    "y": -0.14054059982299805,
+                    "z": 0.0
+                },
+                "OldFakeScale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "OldFakeRotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "ParentPosition": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            "Graphics Component": {
+                "PointLight": false,
+                "TextureName": "",
+                "Show Mesh": true,
+                "Debug": false,
+                "ModelName": "",
+                "MeshName": "",
+                "MeshNodeName": "",
+                "Color": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0,
+                    "w": 1.0
+                },
+                "Used In 2D": false,
+                "Model UID": 0
+            },
+            "UI Sprite": {
+                "Texture": "",
+                "EnableSprite": true,
+                "LayerID": 1,
+                "is Font": true,
+                "message": "100",
+                "Font Texture": "Roboto-Medium.dds",
+                "ForeGroundColour": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0,
+                    "w": 0.0
+                },
+                "Sprite Color": {
+                    "x": 0.10000000149011612,
+                    "y": 0.10000000149011612,
+                    "z": 0.10000000149011612,
+                    "w": 1.0
+                },
+                "BackGroundColour": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0,
+                    "w": 1.0
+                },
+                "BoundingBoxMin": {
+                    "x": -0.5,
+                    "y": -0.5
+                },
+                "BoundingBoxMax": {
+                    "x": 0.5,
+                    "y": 0.5
+                }
+            }
+        }
+    },
+    "Scripts": {
+        "1": {},
+        "2": {},
+        "3": {},
+        "4": {},
+        "5": {},
+        "6": {},
+        "7": {
+            "OptionsMasterVolume": {
+                "pressedVolumeUp": {
+                    "System.Boolean": "True"
+                },
+                "masterText": {
+                    "ScriptAPI.GameObject": 17
+                },
+                "gameObject": {
+                    "ScriptAPI.GameObject": 7
+                }
+            }
+        },
+        "8": {
+            "OptionsMasterVolume": {
+                "pressedVolumeUp": {
+                    "System.Boolean": "False"
+                },
+                "masterText": {
+                    "ScriptAPI.GameObject": 17
+                },
+                "gameObject": {
+                    "ScriptAPI.GameObject": 8
+                }
+            }
+        },
+        "9": {
+            "OptionsBgmVolume": {
+                "BGMpressedVolUp": {
+                    "System.Boolean": "True"
+                },
+                "bgmText": {
+                    "ScriptAPI.GameObject": 18
+                },
+                "gameObject": {
+                    "ScriptAPI.GameObject": 9
+                }
+            }
+        },
+        "10": {
+            "OptionsBgmVolume": {
+                "BGMpressedVolUp": {
+                    "System.Boolean": "False"
+                },
+                "bgmText": {
+                    "ScriptAPI.GameObject": 18
+                },
+                "gameObject": {
+                    "ScriptAPI.GameObject": 10
+                }
+            }
+        },
+        "11": {
+            "OptionsSfxVolume": {
+                "SFXpressedVolUp": {
+                    "System.Boolean": "True"
+                },
+                "sfxText": {
+                    "ScriptAPI.GameObject": 19
+                },
+                "gameObject": {
+                    "ScriptAPI.GameObject": 11
+                }
+            }
+        },
+        "12": {
+            "OptionsSfxVolume": {
+                "SFXpressedVolUp": {
+                    "System.Boolean": "False"
+                },
+                "sfxText": {
+                    "ScriptAPI.GameObject": 19
+                },
+                "gameObject": {
+                    "ScriptAPI.GameObject": 12
+                }
+            }
+        },
+        "13": {},
+        "14": {},
+        "15": {},
+        "16": {
+            "OptionsBack": {
+                "optionsmenusound": {
+                    "ScriptAPI.AudioComponent": 0
+                },
+                "gameObject": {
+                    "ScriptAPI.GameObject": 16
+                }
+            }
+        },
+        "17": {},
+        "18": {},
+        "19": {}
+    },
+    "Active Archetype": {
+        "1": "110000100000100000",
+        "2": "110000100000100000",
+        "3": "110000100000100000",
+        "4": "110000100000100000",
+        "5": "110000100000100000",
+        "6": "110000100000100000",
+        "7": "110000100000100000",
+        "8": "110000100000100000",
+        "9": "110000100000100000",
+        "10": "110000100000100000",
+        "11": "110000100000100000",
+        "12": "110000100000100000",
+        "13": "110000100000100000",
+        "14": "110000100000100000",
+        "15": "110000100000100000",
+        "16": "110000100000100000",
+        "17": "110000100000100000",
+        "18": "110000100000100000",
+        "19": "110000100000100000"
+    }
+}

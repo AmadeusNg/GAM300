@@ -121,7 +121,8 @@ class Mat4
   float& operator[](int index);
   float const& operator[](int index) const;
   // Variables
-  float m[4][4];
+  /*float m[4][4];*/
+  std::array<std::array<float, 4>, 4> m;
 };
 // unary operators
 Mat4 operator-(const Mat4& var);

@@ -81,7 +81,10 @@ namespace TDS
         std::vector<TDSModel::Vertex> batchedVertexData;
         std::vector<std::uint32_t> batchedIndexData;
 
+        std::vector<VkDrawIndexedIndirectCommand> indirectCommands;
         size_t currentVertexOffset = 0;
+        size_t currentIndexOffset = 0; 
+
         std::map<std::string, int> duplicates;
 
         m_MeshCnt = std::uint32_t(m_ModelPack->m_ModelHandle.m_Mesh.size());
@@ -147,6 +150,17 @@ namespace TDS
             }
 
 
+            VkDrawIndexedIndirectCommand command = {};
+            command.indexCount = SubMesh.m_nIndices;
+            command.instanceCount = 1; 
+            command.firstIndex = currentIndexOffset;
+            command.vertexOffset = 0; 
+            command.firstInstance = 0; 
+
+            indirectCommands.push_back(command);
+
+            // Update offsets
+            currentIndexOffset += SubMesh.m_nIndices;
             currentVertexOffset += SubMesh.m_nVertices;
         }
 
@@ -158,7 +172,10 @@ namespace TDS
         m_MeshBuffer.m_IndexBuffer->MappedStaging(batchedIndexData.size() * sizeof(std::uint32_t), VkBufferUsageFlagBits::VK_BUFFER_USAGE_INDEX_BUFFER_BIT, GraphicsManager::getInstance().getVkInstance(), batchedIndexData.data());
         m_MeshBuffer.m_IndexBuffer->SetDataCnt(batchedIndexData.size());
 
-
+        m_MeshBuffer.m_IndirectBuffer = std::make_shared<VMABuffer>();
+        size_t indirectBufferSize = indirectCommands.size() * sizeof(VkDrawIndexedIndirectCommand);
+        m_MeshBuffer.m_IndirectBuffer->MappedStaging(indirectBufferSize, VkBufferUsageFlagBits::VK_BUFFER_USAGE_INDIRECT_BUFFER_BIT, GraphicsManager::getInstance().getVkInstance(), indirectCommands.data());
+        m_MeshBuffer.m_IndirectBuffer->SetDataCnt(indirectCommands.size());
         m_Loaded = true;
         return m_Loaded;
     }
@@ -167,14 +184,15 @@ namespace TDS
     {
         vkQueueWaitIdle(GraphicsManager::getInstance().getVkInstance().getGraphicsQueue());
 
-        if (m_MeshBuffer.m_VertexBuffer && m_MeshBuffer.m_IndexBuffer)
+        if (m_MeshBuffer.m_VertexBuffer && m_MeshBuffer.m_IndexBuffer && m_MeshBuffer.m_IndirectBuffer)
         {
             m_MeshBuffer.m_VertexBuffer->DestroyBuffer();
             m_MeshBuffer.m_IndexBuffer->DestroyBuffer();
+            m_MeshBuffer.m_IndirectBuffer->DestroyBuffer();
         }
         m_MeshBuffer.m_VertexBuffer = nullptr;
         m_MeshBuffer.m_IndexBuffer = nullptr;
-
+        m_MeshBuffer.m_IndirectBuffer = nullptr;
         if (m_ModelPack)
         {
             delete m_ModelPack;
@@ -239,6 +257,34 @@ namespace TDS
             }
             m_SceneBoundingBox.extend(sceneNode.m_NodeBoundingBox);
         }
+    }
+
+    void MeshController::ResetMeshPosition()
+    {
+        if (m_EntityToNodeName.empty())
+            return;
+
+        for (auto itr : m_EntityToNodeName)
+        {
+            auto findRoot = m_RootNodes.find(itr.second);
+
+            if (findRoot == m_RootNodes.end()) continue;
+
+            Vec3 translate = m_RootNodes[itr.second].m_SceneTranslation;
+            Vec3 scale = m_RootNodes[itr.second].m_SceneScale;
+            Vec3 Rotation = m_RootNodes[itr.second].m_SceneRotation;
+            Transform* trans = ecs.getComponent<Transform>(itr.first);
+            GraphicsComponent* graphComp = ecs.getComponent<GraphicsComponent>(itr.first);
+            trans->SetPosition(m_RootNodes[itr.second].m_SceneTranslation);
+            trans->SetScale(m_RootNodes[itr.second].m_SceneScale);
+            trans->SetRotation(m_RootNodes[itr.second].m_SceneRotation);
+            trans->GenerateTransform();
+
+            graphComp->m_MeshName = m_RootNodes[itr.second].m_MeshList.begin()->first;
+
+
+        }
+        
     }
 
 

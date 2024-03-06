@@ -254,27 +254,30 @@ namespace TDS
 					else
 					{
 						std::cout << "Deserialize: Invalid type" << std::endl;
+						values.referenceEntityID = variableTypeValue.MemberBegin()->value.GetUint64();
+						scriptReferences.emplace_back(std::tuple<EntityID, std::string, ScriptValues>(currentEntity, scriptName, values));
+						continue; // Set value later
 
 						// Old code, in case there is old files using the old serialization method
-						if (values.type == "Bool")
-							values.value = variableTypeValue.MemberBegin()->value.GetBool() ? "true" : "false";
-						else if (values.type == "Int")
-							values.value = std::to_string(static_cast<int>(variableTypeValue.MemberBegin()->value.GetInt()));
-						else if (values.type == "UInt")
-							values.value = std::to_string(static_cast<uint32_t>(variableTypeValue.MemberBegin()->value.GetUint()));
-						else if (values.type == "Double")
-							values.value = std::to_string(static_cast<double>(variableTypeValue.MemberBegin()->value.GetDouble()));
-						else if (values.type == "Float")
-							values.value = std::to_string(static_cast<double>(variableTypeValue.MemberBegin()->value.GetDouble()));
-						else if (values.type == "String")
-							values.value = variableTypeValue.MemberBegin()->value.GetString();
-						else if (values.type == "Vector3")
-						{
-							auto object = variableTypeValue.MemberBegin()->value.GetObj();
-							values.vectorValueX = object["X"].GetFloat();
-							values.vectorValueY = object["Y"].GetFloat();
-							values.vectorValueZ = object["Z"].GetFloat();
-						}
+						//if (values.type == "Bool")
+						//	values.value = variableTypeValue.MemberBegin()->value.GetBool() ? "true" : "false";
+						//else if (values.type == "Int")
+						//	values.value = std::to_string(static_cast<int>(variableTypeValue.MemberBegin()->value.GetInt()));
+						//else if (values.type == "UInt")
+						//	values.value = std::to_string(static_cast<uint32_t>(variableTypeValue.MemberBegin()->value.GetUint()));
+						//else if (values.type == "Double")
+						//	values.value = std::to_string(static_cast<double>(variableTypeValue.MemberBegin()->value.GetDouble()));
+						//else if (values.type == "Float")
+						//	values.value = std::to_string(static_cast<double>(variableTypeValue.MemberBegin()->value.GetDouble()));
+						//else if (values.type == "String")
+						//	values.value = variableTypeValue.MemberBegin()->value.GetString();
+						//else if (values.type == "Vector3")
+						//{
+						//	auto object = variableTypeValue.MemberBegin()->value.GetObj();
+						//	values.vectorValueX = object["X"].GetFloat();
+						//	values.vectorValueY = object["Y"].GetFloat();
+						//	values.vectorValueZ = object["Z"].GetFloat();
+						//}
 					}
 
 					allVariableInfo.emplace_back(values);
@@ -461,7 +464,8 @@ namespace TDS
 						}
 						else
 						{
-							std::cout << "Serialize: Invalid type" << std::endl;
+							writer->Uint64(scriptValues.referenceEntityID);
+							//std::cout << "Serialize: Invalid type" << std::endl;
 						}
 
 						//if (scriptValues.type == "System.Boolean")

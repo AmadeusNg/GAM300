@@ -55,7 +55,7 @@ void TDS::GamePlayScene::update()
 		//{
 		//	Input::setExitCursor(true);
 		//}
-		if (inputSystem->isKeyPressed(VK_ESCAPE))
+		if ((inputSystem->isKeyDown(VK_SHIFT) || inputSystem->isKeyPressed(VK_SHIFT)) && inputSystem->isKeyPressed(VK_ESCAPE))
 		{
 			gamePaused = true;
 			inputSystem->setCursorVisible(true);
@@ -63,6 +63,7 @@ void TDS::GamePlayScene::update()
 		}
 		else if (inputSystem->getCursorVisible() && ImGui::IsWindowHovered() && inputSystem->isMousePressed(VK_LBUTTON) && gamePaused)
 		{
+			proxy_audio_system::ScriptPlayAllPaused();
 			inputSystem->setCursorVisible(false);
 			inputSystem->setMouseLock(true);
 			gamePaused = false;

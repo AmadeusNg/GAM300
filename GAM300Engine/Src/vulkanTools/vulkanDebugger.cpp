@@ -33,7 +33,7 @@ namespace TDS
 				prefix = "Error: "sv;
 
 			std::stringstream debugMessage;
-			//debugMessage << prefix << "[" << pCallbackData->messageIdNumber << "][" << pCallbackData->pMessageIdName << "] : " << pCallbackData->pMessage;
+			debugMessage << prefix << "[" << pCallbackData->messageIdNumber << "][" << pCallbackData->pMessageIdName << "] : " << pCallbackData->pMessage;
 
 
 

@@ -31,6 +31,7 @@ public class Hiding : Script
     String[] voClips;
     public String[] subtitles;
     int counter;
+    public static bool playOnce = true;
     GameObject textmachine;
 
     private float timer = 1.0f;
@@ -43,12 +44,12 @@ public class Hiding : Script
     {
         numOfPaintingsTook = 0;
 
-        counter = 0;
+        //counter = 0;
         audioPlayer = gameObject.GetComponent<AudioComponent>();
         voClips = new string[3];
         voClips[0] = "pc_hideinclosetfirst";
         voClips[1] = "pc_wanderingcloset";
-        voClips[2] = "pc_monstergoesaway2";
+        voClips[2] = "pc_monstergoesaway2"; //i have to watch my back
         subtitles = new String[2];
         subtitles[0] = "Nothing inside";
         subtitles[1] = "But I could hide in here in case someone shows up";
@@ -60,29 +61,43 @@ public class Hiding : Script
         hidingPos = closet.transform.GetPosition();
         _RotationAngle = 180.0f;
 
-        timer = 0.7f;
+        timer = 0.8f;
+
     }
 
     public override void Update()
     {
-        
+
         if (interactable && gameObject.GetComponent<RigidBodyComponent>().IsRayHit())
         {
             _InteractUI.SetActive(true);
 
-            //textmachine.SetActive(false);
-            UISpriteComponent Sprite = GameObjectScriptFind("VOSubtitles").GetComponent<UISpriteComponent>();
-            if(timer <= 0.0f)
-            {
-                counter = 1;
-            }
-            else
-            {
-                timer -= Time.deltaTime;
-            }
-            Sprite.SetFontMessage(subtitles[counter]);
 
-            audioPlayer.play(voClips[0]);
+            if (playOnce && !Painting_Script.isPaintingCollected)
+            {
+                //textmachine.SetActive(false);
+                //UISpriteComponent Sprite = GameObjectScriptFind("VOSubtitles").GetComponent<UISpriteComponent>();
+                if (timer <= 0.0f)
+                {
+                    //counter = 1;
+
+                    GameplaySubtitles.counter = 10; //but i could hide
+                    playOnce = false;
+                }
+                else
+                {
+                    timer -= Time.deltaTime;
+                    GameplaySubtitles.counter = 9; //nothing inside
+                    audioPlayer.play(voClips[0]);
+
+
+                }
+            }
+            
+            
+            //Sprite.SetFontMessage(subtitles[counter]); //no effect
+
+            
 
             if (Input.GetKeyDown(Keycode.E) && hiding == false)
             {
@@ -90,7 +105,7 @@ public class Hiding : Script
                 interactable = false;
                 nonHidingPos = player.transform.GetPosition();
                 //player.transform.SetPosition(closet.transform.GetPosition());
-                counter = 1;
+                //counter = 1;
 
                 Vector3 rotation = new Vector3(0, 0, 0);
                 //player.transform.SetRotation(rotation);
@@ -141,15 +156,23 @@ public class Hiding : Script
                 player.GetComponent<FPS_Controller_Script>().playerCanMove = true;
                 player.GetComponent<FPS_Controller_Script>().enableHeadBob = true;
                 _flashlight.SetActive(true);
-                audioPlayer.play(voClips[2]);
+                if (GhostMovement.GhostGone)
+                {
+                    audioPlayer.play(voClips[2]);
+                    GameplaySubtitles.counter = 15;
+                }
+                
+
                 //Input.KeyRelease(Keycode.E);
             }
         }
         else
         {
             _InteractUI.SetActive(false);
+            
+
         }
-        
+
     }
 
     /*private void OnTriggerEnter(GameObject other)

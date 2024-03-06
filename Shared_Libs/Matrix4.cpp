@@ -156,10 +156,16 @@ namespace TDS
 
     Mat4 Mat4::transpose()
     {
-        Vec4 v1(m[0], m[4], m[8], m[12]);
-        Vec4 v2(m[1], m[5], m[9], m[13]);
-        Vec4 v3(m[2], m[6], m[10], m[14]);
-        Vec4 v4(m[3], m[7], m[11], m[15]);
+        //Vec4 v1(m[0], m[4], m[8], m[12]);
+        //Vec4 v2(m[1], m[5], m[9], m[13]);
+        //Vec4 v3(m[2], m[6], m[10], m[14]);
+        //Vec4 v4(m[3], m[7], m[11], m[15]);
+
+        Vec4 v1(m[0].data(), m[4].data(), m[8].data(), m[12].data());
+        Vec4 v2(m[1].data(), m[5].data(), m[9].data(), m[13].data());
+        Vec4 v3(m[2].data(), m[6].data(), m[10].data(), m[14].data());
+        Vec4 v4(m[3].data(), m[7].data(), m[11].data(), m[15].data());
+
         return Mat4(v1, v2, v3, v4);
     }
 

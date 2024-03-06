@@ -4,6 +4,9 @@
 #include "Identifier/UniqueID.h"
 #include "Rendering/GraphicsManager.h"
 #include "GraphicsResource/GeomSerializer.h"
+#include "Animation/AnimationLoader.h"
+
+
 namespace TDS
 {
 
@@ -18,21 +21,25 @@ namespace TDS
 		Vec3							m_SceneRotate;
 		Vec3							m_SceneScale;
 		std::vector<std::uint32_t>		m_Indices;
-		int								iMatertialInstance;
+		int								iMatertialInstance{};
+		std::vector<std::uint32_t>		m_BoneIDs{};
+		std::vector<float>			    m_BoneWeight{};
+		std::vector<Mat4>				m_Bones{};
+		std::vector<AnimNode>			m_Nodes{};
+		std::vector<AnimationVertex>				 m_AnimationVertex{}; 
+		std::map<std::string_view, unsigned int>	 m_BoneMap{};
+		std::map<std::string_view, int>				 m_NodeMap{};
+		std::vector<Animation>						 m_Animations{};
+
 	};
 
-
+	inline Mat4 aiToMat4(aiMatrix4x4 mat);
 	MeshLoader::MeshLoader()
 	{
 	}
 	MeshLoader::~MeshLoader()
 	{
 	}
-
-	struct dummy
-	{
-		Vec3 test;
-	};
 
 	void ListNodes(const aiNode* pNode, int level = 0)
 	{
@@ -148,10 +155,13 @@ namespace TDS
 			| aiProcess_FindInstances
 			| aiProcess_CalcTangentSpace
 			| aiProcess_GenBoundingBoxes
-			| aiProcess_GenNormals
+			| aiProcess_GenSmoothNormals
 			| aiProcess_RemoveRedundantMaterials
 			| aiProcess_FindInvalidData
 			| aiProcess_FlipUVs;
+
+		if (request.currSetting.m_RemoveChildMeshes)
+			flags |= aiProcess_PreTransformVertices;
 
 		currSceneInfo->m_Scene = importer.ReadFile(filePath, flags);
 
@@ -166,12 +176,54 @@ namespace TDS
 
 		std::vector<RawMeshData> assimpData;
 		ImportMeshData(request, *currSceneInfo, assimpData);
+
+		for (auto& data : assimpData)
+		{
+			if (!data.m_AnimationVertex.empty())
+			{
+				for (unsigned int vert{ 0 }; vert < data.m_AnimationVertex.size(); vert++)
+				{
+					for (unsigned int vecElement{ 0 }; vecElement < 4; vecElement++)
+					{
+						if (data.m_AnimationVertex[vert].m_BoneIDs.size() <= vecElement)
+						{
+							data.m_Vertices[vert].m_BoneID[vecElement] = -1; // this vertex no boneID
+							data.m_Vertices[vert].m_Weights[vecElement] = 0; // hence no weight
+						}
+						else
+						{
+							data.m_Vertices[vert].m_BoneID[vecElement] = data.m_AnimationVertex[vert].m_BoneIDs[vecElement];
+							data.m_Vertices[vert].m_Weights[vecElement] = data.m_AnimationVertex[vert].m_BoneWeights[vecElement];
+						}
+					}
+
+					if (data.m_AnimationVertex[vert].m_BoneIDs.size() > 4)
+					{
+						std::cerr << "index : " << vert << "influnced more than 4 bones, but only bones will be used!\n";
+					}
+				}
+			}
+		}
+
 		MergeMesh(request, assimpData);
 		CreateLODs(request, assimpData);
-		//OptimizeMesh(assimpData);
+
 		GeomData data{};
-		CreateFinalGeom(assimpData, data);
+		if (request.currSetting.m_LoadMaterials)
+			LoadMaterials(*currSceneInfo, request, assimpData);
+		if (request.currSetting.m_Compress)
+			OptimizeMesh(assimpData);
+		CreateFinalGeom(assimpData, data, request);
 		data.ConvertToTDSModel(request.m_Output);
+
+		request.m_Output.Serialize(request.m_OutFile);
+
+		if (request.currSetting.m_LoadAnimation)
+		{
+			AnimationData::Serialize(request.m_AnimationData, "test.json", false);
+		}
+
+
 		//std::ofstream fileStream(request.m_OutFile.data(), std::ios::binary);
 		//if (!fileStream)
 		//{
@@ -180,7 +232,11 @@ namespace TDS
 		//SerializeGeom(request.m_Output, fileStream);
 
 
-		request.m_Output.Serialize(request.m_OutFile);
+		
+
+
+
+
 		//
 
 
@@ -285,7 +341,27 @@ namespace TDS
 			}
 		}
 
-		ProcessScene(assimpData, *assimp.m_Scene->mRootNode, *assimp.m_Scene, assimp.m_AppliedTransformation, rootName, request);
+		ProcessScene(assimpData, *assimp.m_Scene->mRootNode, *assimp.m_Scene, assimp.m_AppliedTransformation, rootName, request, -1);
+
+		for (auto& i : assimpData)
+		{
+			for (auto& e : i.m_BoneMap)
+			{
+				i.m_Nodes[i.m_NodeMap[e.first]].m_BoneID = e.second;
+				i.m_Nodes[i.m_NodeMap[e.first]].m_boneOffset = i.m_Bones[e.second];
+			}
+
+			TDS_LOGGER("model bone count: ", i.m_Bones.size());
+			TDS_LOGGER("model animation count: ", assimp.m_Scene->mNumAnimations);
+
+			if (assimp.m_Scene->HasAnimations())
+			{
+				for (size_t j{ 0 }; j < assimp.m_Scene->mNumAnimations; j++)
+				{
+					buildAnimation(i, assimp.m_Scene->mAnimations[j]);
+				}
+			}
+		}
 	}
 
 	aiMatrix4x4 GetScaleMatrix(const aiMatrix4x4& m)
@@ -386,13 +462,27 @@ namespace TDS
 		scale.z = sqrt(mat.a3 * mat.a3 + mat.b3 * mat.b3 + mat.c3 * mat.c3);
 	}
 
-	void MeshLoader::ProcessScene(std::vector<RawMeshData>& assimpData, const aiNode& Node, const aiScene& Scene, aiMatrix4x4& ParentTransform, std::string_view parentNode, Request& request)
+	void MeshLoader::ProcessScene(std::vector<RawMeshData>& assimpData, const aiNode& Node, const aiScene& Scene, aiMatrix4x4& ParentTransform, std::string_view ParentName, Request& request, int _ParentNode)
 	{
 		aiMatrix4x4 AccumulatedTransform = ParentTransform * Node.mTransformation;
 		aiMatrix4x4 transformWithoutTrans;
 		size_t iNode = assimpData.size();
 
 		assimpData.resize(iNode + Scene.mNumMeshes);
+
+		if (Scene.HasAnimations())
+		{
+			assimpData[iNode].m_Nodes.push_back(AnimNode{});
+			assimpData[iNode].m_Nodes.back().m_ParentNode = _ParentNode;
+			assimpData[iNode].m_Nodes.back().m_Transform = aiToMat4(Node.mTransformation);
+
+			int thisID = static_cast<int>(assimpData[iNode].m_Nodes.size() - 1);
+			assimpData[iNode].m_NodeMap[Node.mName.C_Str()] = thisID;
+			if (_ParentNode >= 0)
+			{
+				assimpData[iNode].m_Nodes[_ParentNode].m_Child.push_back(thisID);
+			}
+		}
 
 		for (std::uint32_t i = 0; i < Node.mNumMeshes; ++i)
 		{
@@ -468,7 +558,7 @@ namespace TDS
 			aiVector3D rot = ExtractEulerAngles(AccumulatedTransform);
 			aiVector3D scaling;
 			ExtractScale(AccumulatedTransform, scaling);
-			rawMesh.m_ParentNode = parentNode;
+			rawMesh.m_ParentNode = ParentName;
 			rawMesh.m_NodeName = std::string(Node.mName.C_Str());
 			rawMesh.m_MeshName = std::string(mesh.mName.C_Str());
 
@@ -485,14 +575,18 @@ namespace TDS
 
 
 			rawMesh.m_Vertices.resize(mesh.mNumVertices);
+			rawMesh.m_AnimationVertex.resize(mesh.mNumVertices);
 			rawMesh.m_ScenePos = Vec3(translate.x, translate.y, translate.z);
 			rawMesh.m_SceneRotate = Vec3(rot.x, rot.y, rot.z);
 			rawMesh.m_SceneScale = Vec3(scaling.x, scaling.y, scaling.z);
 			for (std::uint32_t i = 0; i < mesh.mNumVertices; ++i)
 			{
 				auto& vert = rawMesh.m_Vertices[i];
-
-				auto L = AccumulatedTransform * mesh.mVertices[i];
+				aiVector3D L;
+				if (request.currSetting.m_PretransformedVertices)
+					L = AccumulatedTransform * mesh.mVertices[i];
+				else
+					L = mesh.mVertices[i];
 
 				vert.m_Position = Vec3(static_cast<float>(L.x), static_cast<float>(L.y), static_cast<float>(L.z));
 
@@ -517,14 +611,21 @@ namespace TDS
 
 				if (mesh.HasTangentsAndBitangents())
 				{
-					const auto T = currRotation.Rotate(mesh.mTangents[i]);
-					const auto B = currRotation.Rotate(mesh.mBitangents[i]);
-					const auto N = currRotation.Rotate(mesh.mNormals[i]);
+					aiVector3D T{}, B{}, N{};
+					if (request.currSetting.m_PretransformedVertices)
+					{
+						T = currRotation.Rotate(mesh.mTangents[i]);
+						B = currRotation.Rotate(mesh.mBitangents[i]);
+						N = currRotation.Rotate(mesh.mNormals[i]);
+					}
+					else
+					{
+						T = mesh.mTangents[i];
+						B = mesh.mBitangents[i];
+						N = mesh.mNormals[i];
+					}
 
-					//const auto T = mesh.mTangents[i];
-					//const auto B = mesh.mBitangents[i];
-					//const auto N = mesh.mNormals[i];
-
+				
 					vert.m_Normal = { N.x, N.y, N.z };
 					vert.m_Tangent = { T.x, T.y, T.z };
 					vert.m_Bitangent = { B.x, B.y, B.z };
@@ -535,8 +636,15 @@ namespace TDS
 				}
 				else
 				{
-					const auto N = currRotation.Rotate(mesh.mNormals[i]);
-		/*			const auto N = mesh.mNormals[i];*/
+					aiVector3D N{};
+
+					if (request.currSetting.m_PretransformedVertices)
+						N = currRotation.Rotate(mesh.mNormals[i]);
+					
+					else
+						N = mesh.mNormals[i];
+					
+
 					vert.m_Normal = { N.x, N.y, N.z };
 					vert.m_Tangent = { 1.f, 0.f, 0.f };
 					vert.m_Bitangent = { 1.f, 0.f, 0.f };
@@ -552,9 +660,36 @@ namespace TDS
 
 			}
 
-			int iMaterial = -1;
 
-			if (request.currSetting.m_LoadMaterials)
+			//Bones relies on verticies
+			for (std::uint32_t i = 0; i < mesh.mNumBones; ++i)
+			{
+				auto aibone = mesh.mBones[i];
+				std::uint32_t boneID{};
+				std::string_view boneName = aibone->mName.C_Str();
+
+				if (rawMesh.m_BoneMap.find(boneName) == rawMesh.m_BoneMap.end())
+				{
+					rawMesh.m_Bones.push_back(aiToMat4(aibone->mOffsetMatrix * AccumulatedTransform));
+					boneID = (unsigned int)(rawMesh.m_Bones.size() - 1);
+					rawMesh.m_BoneMap[boneName] = boneID;
+				}
+				else
+					boneID = rawMesh.m_BoneMap[boneName];
+
+				for (unsigned int weightI{ 0 }; weightI < aibone->mNumWeights; ++weightI)
+				{
+					auto vertexWeight = aibone->mWeights[weightI];
+					rawMesh.m_AnimationVertex[vertexWeight.mVertexId].m_BoneIDs.push_back(boneID == -1 ? 0 : boneID);
+					rawMesh.m_AnimationVertex[vertexWeight.mVertexId].m_BoneWeights.push_back(vertexWeight.mWeight);
+				}
+			}
+
+			rawMesh.iMatertialInstance = mesh.mMaterialIndex;
+		
+
+
+			/*if (request.currSetting.m_LoadMaterials)
 			{
 				if (mesh.mMaterialIndex >= 0)
 				{
@@ -607,8 +742,8 @@ namespace TDS
 				}
 
 				iMaterial = static_cast<int>(request.m_MaterialList.m_MaterialInfos.size() - 1);
-			}
-			rawMesh.iMatertialInstance = mesh.mMaterialIndex;
+			}*/
+			//rawMesh.iMatertialInstance = mesh.mMaterialIndex;
 
 		}
 		if (iNode != assimpData.size())
@@ -617,7 +752,7 @@ namespace TDS
 		}
 		for (std::uint32_t i = 0; i < Node.mNumChildren; ++i)
 		{
-			ProcessScene(assimpData, *Node.mChildren[i], Scene, AccumulatedTransform, std::string(Node.mName.C_Str()), request);
+			ProcessScene(assimpData, *Node.mChildren[i], Scene, AccumulatedTransform, std::string(Node.mName.C_Str()), request, _ParentNode);
 		}
 
 	}
@@ -740,8 +875,9 @@ namespace TDS
 		}
 	}
 
-	void MeshLoader::CreateFinalGeom(const std::vector<RawMeshData>& rawMesh, GeomData& geom)
+	void MeshLoader::CreateFinalGeom(const std::vector<RawMeshData>& rawMesh, GeomData& geom, Request& request)
 	{
+		
 		for (auto& mesh : rawMesh)
 		{
 			int iMyMesh = -1;
@@ -774,163 +910,281 @@ namespace TDS
 			subMesh.m_iMaterial = mesh.iMatertialInstance;
 			subMesh.m_Lods = mesh.m_Lod;
 			subMesh.m_SubMeshName = mesh.m_MeshName;
+			
+
+
+			for (auto& animation : mesh.m_Animations)
+				request.m_AnimationData.m_Animations.push_back(animation);
+			
+			
+			for (auto& boneMap : mesh.m_BoneMap)
+				request.m_AnimationData.m_BoneMap[boneMap.first.data()] = boneMap.second;
+			
+
+			for (auto& bone : mesh.m_Bones)
+				request.m_AnimationData.m_Bones.push_back(bone);
+			
 
 		}
 	}
 
-	void MeshLoader::LoadAnimationData(Request& request, AssimpSceneInfo& assimp)
+	void MeshLoader::buildAnimation(TDS::RawMeshData& data, aiAnimation* aiAnim)
 	{
-		std::unordered_map<std::string, const aiNode*> m_NodeNameMap;
-		std::unordered_map<std::string, const aiBone*> m_BoneNameMap;
+		data.m_Animations.push_back(TDS::Animation());
+		auto anim = &data.m_Animations[data.m_Animations.size() - 1];
+		anim->m_name = aiAnim->mName.C_Str();
 
-		for (std::uint32_t i = 0; i < assimp.m_Scene->mNumMeshes; ++i)
+
+		//copy nodes from the fbx
+		anim->m_nodes.resize(data.m_Nodes.size());
+		for (int i{ 0 }; i < data.m_Nodes.size(); i++)
 		{
-			const auto& mesh = assimp.m_Scene->mMeshes[i];
-			for (std::uint32_t boneIndx = 0; boneIndx < mesh->mNumBones; ++boneIndx)
+			anim->m_nodes[i].m_ModelNode = data.m_Nodes[i];
+		}
+
+		anim->m_duration = aiAnim->mDuration;
+		anim->m_ticks = aiAnim->mTicksPerSecond * 0.001f; //in terms of millisec time
+		if (anim->m_ticks == 0.f)
+		{
+			//if fbx some how does specify any tics/ms assume 1/ms
+			anim->m_ticks = 1.f;
+		}
+
+
+		//setup the animation properties for anime nodes
+		for (unsigned int i{ 0 }; i < aiAnim->mNumChannels; i++)
+		{
+			auto channel = aiAnim->mChannels[i];
+			std::string nodeName = channel->mNodeName.C_Str();
+			auto node = &anim->m_nodes[data.m_NodeMap[nodeName]];
+			extractKeyFrame(node, channel);
+		}
+
+	}
+
+	void MeshLoader::extractKeyFrame(TDS::AnimationNodes* pNode, aiNodeAnim* AssimpNode)
+	{
+		//key for pos
+		for (unsigned int pos{ 0 }; pos < AssimpNode->mNumPositionKeys; pos++)
+		{
+			auto poskey = &AssimpNode->mPositionKeys[pos];
+			TDS::AnimPos animPos;
+			animPos.m_Pos = Vec3(poskey->mValue.x, poskey->mValue.y, poskey->mValue.z);
+			animPos.m_time = poskey->mTime;
+			pNode->m_positions.push_back(animPos);
+		}
+
+		//key for rot
+		for (unsigned int rotQ{ 0 }; rotQ < AssimpNode->mNumRotationKeys; rotQ++)
+		{
+			auto rotKey = &AssimpNode->mRotationKeys[rotQ];
+			TDS::AnimRotQ animRotQ;
+			animRotQ.m_RotQ = Quat(rotKey->mValue.x, rotKey->mValue.y, rotKey->mValue.z, rotKey->mValue.w);
+			animRotQ.m_time = rotKey->mTime;
+			pNode->m_rotationsQ.push_back(animRotQ);
+		}
+
+
+		//key for scale
+		for (unsigned int scale{ 0 }; scale < AssimpNode->mNumScalingKeys; scale++)
+		{
+			auto scaleKey = &AssimpNode->mScalingKeys[scale];
+			AnimScale scaling;
+			scaling.m_Scale = Vec3(scaleKey->mValue.x, scaleKey->mValue.y, scaleKey->mValue.z);
+			scaling.m_time = scaleKey->mTime;
+			pNode->m_scalings.push_back(scaling);
+		}
+	}
+
+	void MeshLoader::LoadMaterials(AssimpSceneInfo& assimp, Request& request, std::vector<RawMeshData>& assimpData)
+	{
+		
+		for (auto& Mesh : assimpData)
+		{
+			auto mat = assimp.m_Scene->mMaterials[Mesh.iMatertialInstance];
+			auto& MatInstance = request.m_MaterialData.m_MaterialInfos.emplace_back();
+
+			MatInstance.m_MaterialName = mat->GetName().C_Str();
+
+			int shadingType = -1;
+			aiGetMaterialInteger(mat, AI_MATKEY_SHADING_MODEL, (int*)&shadingType);
+			switch (shadingType)
 			{
-				const auto& aibone = *mesh->mBones[boneIndx];
-				auto boneItr = m_BoneNameMap.find(aibone.mName.data);
-				if (boneItr == m_BoneNameMap.end())
-				{
-					auto pNode = assimp.m_Scene->mRootNode->FindNode(aibone.mName);
-					m_BoneNameMap[aibone.mName.data] = &aibone;
-					m_NodeNameMap[aibone.mName.data] = pNode;
-
-				}
-
+				case aiShadingMode_Gouraud:     MatInstance.m_ShadingType = SHADING_TYPE::GOURAUD; break;
+				case aiShadingMode_Flat:
+				case aiShadingMode_Phong:
+				case aiShadingMode_Blinn:       MatInstance.m_ShadingType = SHADING_TYPE::PHONG_BLINN; break;
+				case aiShadingMode_Toon:        MatInstance.m_ShadingType = SHADING_TYPE::TOOL; break;
+				case aiShadingMode_NoShading:   MatInstance.m_ShadingType = SHADING_TYPE::UNLIGHT; break;
+				case aiShadingMode_OrenNayar:
+				case aiShadingMode_Minnaert:
+				case aiShadingMode_Fresnel:
+				case aiShadingMode_CookTorrance:
+				case aiShadingMode_PBR_BRDF:    MatInstance.m_ShadingType = SHADING_TYPE::PBR; break;
+				default:                        MatInstance.m_ShadingType = SHADING_TYPE::UNKNOWN; break;
+				
 			}
-		}
 
-		for (std::uint32_t i = 0; i < assimp.m_Scene->mNumAnimations; ++i)
-		{
-			const aiAnimation& currentAnim = *assimp.m_Scene->mAnimations[i];
-			for (std::uint32_t stream = 0; stream < currentAnim.mNumChannels; ++stream)
 			{
-				auto& currChannel = *currentAnim.mChannels[stream];
-				auto findItr = m_NodeNameMap.find(currChannel.mNodeName.data);
-
-				if (findItr == m_NodeNameMap.end())
-				{
-					m_NodeNameMap.insert({ currChannel.mNodeName.data,
-						assimp.m_Scene->mRootNode->FindNode(currChannel.mNodeName) });
-
-				}
+				aiColor4D C(1, 1, 1, 1);
+				aiGetMaterialColor(mat, AI_MATKEY_COLOR_DIFFUSE, (aiColor4D*)&C);
+				MatInstance.m_MaterialColor[MATERIAL_COLOR::MATERIAL_COLOR_DIFFUSE] = Vec4(C.r, C.g, C.b, C.a);
 			}
-		}
-
-		for (auto& itr : m_NodeNameMap)
-		{
-			for (auto pParentNode = m_NodeNameMap.find(itr.first)->second->mParent; pParentNode != nullptr; pParentNode = pParentNode->mParent)
 			{
-				if (auto e = m_NodeNameMap.find(pParentNode->mName.C_Str()); e == m_NodeNameMap.end())
-				{
-					m_NodeNameMap[pParentNode->mName.C_Str()] = pParentNode;
-				}
+				aiColor4D C(0, 0, 0, 1);
+				aiGetMaterialColor(mat, AI_MATKEY_COLOR_AMBIENT, (aiColor4D*)&C);
+				MatInstance.m_MaterialColor[MATERIAL_COLOR::MATERIAL_COLOR_AMBIENT] = Vec4(C.r, C.g, C.b, C.a);
 			}
-		}
-
-		if (m_NodeNameMap.size() > 255)
-		{
-			TDS_ERROR("This mesh have {} bones! Only upto 256 is supported...");
-		}
-
-		struct SkeletonBuildTemp
-		{
-			const aiNode* Node;
-			std::int32_t	layer;
-			std::int32_t	children;
-			std::int32_t	totalChildren;
-		};
-
-		std::vector<SkeletonBuildTemp> tempBuild(m_NodeNameMap.size());
-
-		int i = 0;
-		for (auto& itr : m_NodeNameMap)
-		{
-			auto& p = tempBuild[i++];
-			p.Node = itr.second;
-		}
-
-		for (size_t i = 0; i < tempBuild.size(); ++i)
-		{
-			auto& p = tempBuild[i];
-			bool foundParent = false;
-
-			for (aiNode* pNode = p.Node->mParent; pNode; pNode = pNode->mParent)
 			{
-				p.layer++;
+				aiColor4D C(0, 0, 0, 1);
+				aiGetMaterialColor(mat, AI_MATKEY_COLOR_AMBIENT, (aiColor4D*)&C);
+				MatInstance.m_MaterialColor[MATERIAL_COLOR::MATERIAL_COLOR_EMISSIVE] = Vec4(C.r, C.g, C.b, C.a);
+			}
 
-				for (size_t j = 0; j < tempBuild.size(); ++j)
+		
+				aiGetMaterialFloat(mat, AI_MATKEY_OPACITY, &MatInstance.m_MaterialFloat[MATERIAL_FLOAT::MATERIAL_FLOAT_OPACITY]);
+				aiGetMaterialFloat(mat, AI_MATKEY_OPACITY, &MatInstance.m_MaterialFloat[MATERIAL_FLOAT::MATERIAL_FLOAT_SHININESS]);
+				aiGetMaterialFloat(mat, AI_MATKEY_OPACITY, &MatInstance.m_MaterialFloat[MATERIAL_FLOAT::MATERIAL_FLOAT_SHININESS_STRENGTH]);
+
 				{
-					auto& parent = tempBuild[j];
-					if (pNode == parent.Node)
+					aiString texPath{};
+					aiTextureMapMode mapU(aiTextureMapMode_Wrap), mapV(aiTextureMapMode_Wrap);
+					if (aiGetMaterialString(mat, AI_MATKEY_TEXTURE_DIFFUSE(0), &texPath) != AI_SUCCESS)
 					{
-						parent.totalChildren++;
-						if (foundParent == false)
-							parent.children++;
-						foundParent = true;
-						break;
+						for (std::uint32_t i = 0; i < mat->mNumProperties; ++i)
+						{
+							const auto& Props = *mat->mProperties[i];
+							if (Props.mType == aiPTI_String)
+							{
+								if (Props.mSemantic != aiTextureType_NONE)
+								{
+									if (Props.mSemantic == aiTextureType_BASE_COLOR)
+									{
+										texPath = *(aiString*)Props.mData;
+										break;
+									}
+									else if (Props.mSemantic == aiTextureType_UNKNOWN)
+									{
+										std::string defaultClr = std::string(((aiString*)Props.mData)->C_Str());
+										if (defaultClr.find("_Base_Color") != -1)
+										{
+											texPath = *(aiString*)Props.mData;
+											break;
+										}
+										
+									}
+								}
+							}
+						}
+					}
+					aiGetMaterialInteger(mat, AI_MATKEY_MAPPINGMODE_U_DIFFUSE(0), (int*)&mapU);
+					aiGetMaterialInteger(mat, AI_MATKEY_MAPPINGMODE_V_DIFFUSE(0), (int*)&mapV);
+
+					auto& texInfo = MatInstance.m_TexturesPath[MATERIALS_TEXTURE::MATERIAL_DIFFUSE].emplace_back();
+					texInfo.m_TextureName = std::string(texPath.C_Str());
+
+
+				}
+
+				{
+					aiString         texPath;
+					aiTextureMapMode mapU(aiTextureMapMode_Wrap), mapV(aiTextureMapMode_Wrap);
+					aiGetMaterialString(mat, AI_MATKEY_TEXTURE_SPECULAR(0), &texPath);
+					aiGetMaterialInteger(mat, AI_MATKEY_MAPPINGMODE_U_SPECULAR(0), (int*)&mapU);
+					aiGetMaterialInteger(mat, AI_MATKEY_MAPPINGMODE_V_SPECULAR(0), (int*)&mapV);
+					auto& texInfo = MatInstance.m_TexturesPath[MATERIALS_TEXTURE::MATERIAL_SPECULAR].emplace_back();
+					texInfo.m_TextureName = std::string(texPath.C_Str());
+				}
+				{
+					aiString         texPath;
+					aiTextureMapMode mapU(aiTextureMapMode_Wrap), mapV(aiTextureMapMode_Wrap);
+					if (AI_SUCCESS == aiGetMaterialString(mat, AI_MATKEY_TEXTURE_OPACITY(0), &texPath))
+					{
+						aiGetMaterialInteger(mat, AI_MATKEY_MAPPINGMODE_U_OPACITY(0), (int*)&mapU);
+						aiGetMaterialInteger(mat, AI_MATKEY_MAPPINGMODE_V_OPACITY(0), (int*)&mapV);
+						auto& texInfo = MatInstance.m_TexturesPath[MATERIALS_TEXTURE::MATERIAL_OPACITY].emplace_back();
+						texInfo.m_TextureName = std::string(texPath.C_Str());
+					}
+					else
+					{
+						int flags = 0;
+						aiGetMaterialInteger(mat, AI_MATKEY_TEXFLAGS_DIFFUSE(0), &flags);
+
+						auto& texInfo = MatInstance.m_TexturesPath[MATERIALS_TEXTURE::MATERIAL_OPACITY].emplace_back();
+						texInfo.m_TextureName = std::string(texPath.C_Str());
 					}
 				}
-			}
-		}
 
-		std::qsort(tempBuild.data(), tempBuild.size(), sizeof(SkeletonBuildTemp), [](const void* a, const void* b) -> int
-			{
-				const auto& A = *reinterpret_cast<const SkeletonBuildTemp*>(a);
-				const auto& B = *reinterpret_cast<const SkeletonBuildTemp*>(b);
-
-				if (A.layer < B.layer) return -1;
-
-				if (A.layer > B.layer) return 1;
-
-				if (A.totalChildren < B.totalChildren) return -1;
-
-				return (A.totalChildren > B.totalChildren);
-			});
-
-		request.m_AnimationMesh.m_SkeletonData.m_BoneList.resize(tempBuild.size());
-
-		i = 0;
-		for (auto& bone : request.m_AnimationMesh.m_SkeletonData.m_BoneList)
-		{
-			auto& tempBone = tempBuild[i++];
-			bone.m_Name = std::string(tempBone.Node->mName.C_Str());
-			bone.m_ParentID = -1;
-
-			for (aiNode* pNode = tempBone.Node->mParent; bone.m_ParentID == -1 && pNode != nullptr; pNode = pNode->mParent)
-			{
-				for (int j = 0; j < i; ++j)
+				// Ambient Texture
 				{
-					if (tempBuild[j].Node == tempBone.Node->mParent)
-					{
-						bone.m_ParentID = j;
-						bone.m_ParentName = std::string(tempBuild[j].Node->mName.C_Str());
-						break;
-					}
+					aiString         texPath;
+					aiTextureMapMode mapU(aiTextureMapMode_Wrap), mapV(aiTextureMapMode_Wrap);
+					aiGetMaterialString(mat, AI_MATKEY_TEXTURE_AMBIENT(0), &texPath);
+					aiGetMaterialInteger(mat, AI_MATKEY_MAPPINGMODE_U_AMBIENT(0), (int*)&mapU);
+					aiGetMaterialInteger(mat, AI_MATKEY_MAPPINGMODE_V_AMBIENT(0), (int*)&mapV);
+					auto& texInfo = MatInstance.m_TexturesPath[MATERIALS_TEXTURE::MATERIAL_AMBIENT].emplace_back();
+					texInfo.m_TextureName = std::string(texPath.C_Str());
 				}
-			}
 
-			auto itr = m_BoneNameMap.find(tempBone.Node->mName.data);
+				// Emmisive Texture
+				{
+					aiString         texPath;
+					aiTextureMapMode mapU(aiTextureMapMode_Wrap), mapV(aiTextureMapMode_Wrap);
+					aiGetMaterialString(mat, AI_MATKEY_TEXTURE_EMISSIVE(0), &texPath);
+					aiGetMaterialInteger(mat, AI_MATKEY_MAPPINGMODE_U_EMISSIVE(0), (int*)&mapU);
+					aiGetMaterialInteger(mat, AI_MATKEY_MAPPINGMODE_V_EMISSIVE(0), (int*)&mapV);
+					auto& texInfo = MatInstance.m_TexturesPath[MATERIALS_TEXTURE::MATERIAL_EMISSIVE].emplace_back();
+					texInfo.m_TextureName = std::string(texPath.C_Str());
+				}
 
-			if (itr != m_BoneNameMap.end())
-			{
-				aiMatrix4x4 OffsetMatrix = itr->second->mOffsetMatrix;
-				bone.m_BoneTransform = OffsetMatrix;
-				bone.m_BoneTransform = bone.m_BoneTransform.Transpose();
-			}
+				// Shininess Texture
+				{
+					aiString         texPath;
+					aiTextureMapMode mapU(aiTextureMapMode_Wrap), mapV(aiTextureMapMode_Wrap);
+					aiGetMaterialString(mat, AI_MATKEY_TEXTURE_SHININESS(0), &texPath);
+					aiGetMaterialInteger(mat, AI_MATKEY_MAPPINGMODE_U_SHININESS(0), (int*)&mapU);
+					aiGetMaterialInteger(mat, AI_MATKEY_MAPPINGMODE_V_SHININESS(0), (int*)&mapV);
+					auto& texInfo = MatInstance.m_TexturesPath[MATERIALS_TEXTURE::MATERIAL_SHININESS].emplace_back();
+					texInfo.m_TextureName = std::string(texPath.C_Str());
+				}
+
+				// Lightmap Texture
+				{
+					aiString         texPath;
+					aiTextureMapMode mapU(aiTextureMapMode_Wrap), mapV(aiTextureMapMode_Wrap);
+					aiGetMaterialString(mat, AI_MATKEY_TEXTURE_LIGHTMAP(0), &texPath);
+					aiGetMaterialInteger(mat, AI_MATKEY_MAPPINGMODE_U_LIGHTMAP(0), (int*)&mapU);
+					aiGetMaterialInteger(mat, AI_MATKEY_MAPPINGMODE_V_LIGHTMAP(0), (int*)&mapV);
+					auto& texInfo = MatInstance.m_TexturesPath[MATERIALS_TEXTURE::MATERIAL_LIGHTMAP].emplace_back();
+					texInfo.m_TextureName = std::string(texPath.C_Str());
+				}
+
+				// Normal Texture
+				{
+					aiString         texPath;
+					aiTextureMapMode mapU(aiTextureMapMode_Wrap), mapV(aiTextureMapMode_Wrap);
+					aiGetMaterialString(mat, AI_MATKEY_TEXTURE_NORMALS(0), &texPath);
+					aiGetMaterialInteger(mat, AI_MATKEY_MAPPINGMODE_U_NORMALS(0), (int*)&mapU);
+					aiGetMaterialInteger(mat, AI_MATKEY_MAPPINGMODE_V_NORMALS(0), (int*)&mapV);
+					auto& texInfo = MatInstance.m_TexturesPath[MATERIALS_TEXTURE::MATERIAL_NORMALS].emplace_back();
+					texInfo.m_TextureName = std::string(texPath.C_Str());
+				}
+
+				// Height Texture
+				{
+					aiString         texPath;
+					aiTextureMapMode mapU(aiTextureMapMode_Wrap), mapV(aiTextureMapMode_Wrap);
+					aiGetMaterialString(mat, AI_MATKEY_TEXTURE_HEIGHT(0), &texPath);
+					aiGetMaterialInteger(mat, AI_MATKEY_MAPPINGMODE_U_HEIGHT(0), (int*)&mapU);
+					aiGetMaterialInteger(mat, AI_MATKEY_MAPPINGMODE_V_HEIGHT(0), (int*)&mapV);
+					auto& texInfo = MatInstance.m_TexturesPath[MATERIALS_TEXTURE::MATERIAL_HEIGHT].emplace_back();
+					texInfo.m_TextureName = std::string(texPath.C_Str());
+				}
 
 		}
-
-
-
-
 	}
 
-	void MeshLoader::LoadAnimations(Request& request, AssimpSceneInfo& assimp, int SamplingFPS)
-	{
 
-	}
 
 
 	void MeshLoader::OptimizeMesh(std::vector<RawMeshData>& assimpData)
@@ -1008,6 +1262,32 @@ namespace TDS
 
 		}
 
+	}
+	inline Mat4 aiToMat4(aiMatrix4x4 mat)
+	{
+		Mat4 convertMatrix{};
+
+		convertMatrix.m[0][0] = mat.a1;
+		convertMatrix.m[0][1] = mat.b1;
+		convertMatrix.m[0][2] = mat.c1;
+		convertMatrix.m[0][3] = mat.d1;
+
+		convertMatrix.m[1][0] = mat.a2;
+		convertMatrix.m[1][1] = mat.b2;
+		convertMatrix.m[1][2] = mat.c2;
+		convertMatrix.m[1][3] = mat.d2;
+
+		convertMatrix.m[2][0] = mat.a3;
+		convertMatrix.m[2][1] = mat.b3;
+		convertMatrix.m[2][2] = mat.c3;
+		convertMatrix.m[2][3] = mat.d3;
+
+		convertMatrix.m[3][0] = mat.a4;
+		convertMatrix.m[3][1] = mat.b4;
+		convertMatrix.m[3][2] = mat.c4;
+		convertMatrix.m[3][3] = mat.d4;
+
+		return convertMatrix;
 	}
 
 }

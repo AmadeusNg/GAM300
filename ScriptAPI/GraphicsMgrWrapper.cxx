@@ -17,6 +17,14 @@ namespace ScriptAPI
 	 {
 		 TDS::GraphicsManagerWrapperCalls::SetLayerToRender(ID);
 	 }
+	 void GraphicsManagerWrapper::SetFadeFactor(float value)
+	 {
+		 TDS::GraphicsManagerWrapperCalls::SetFadeFactor(value);
+	 }
+	 float GraphicsManagerWrapper::GetFadeFactor()
+	 {
+		 return TDS::GraphicsManagerWrapperCalls::GetFadeFactor();
+	 }
 	 int GraphicsManagerWrapper::CurrentRenderedLayer()
 	 {
 		 return TDS::GraphicsManagerWrapperCalls::CurrentRenderedLayer();

@@ -298,12 +298,12 @@ namespace TDS
 
             if (isPlaying)
             {
-                if (Input::isKeyPressed(VK_ESCAPE))
-                {
-                    proxy_audio_system::ScriptPlayAllPaused();
-                    gamePaused = !gamePaused;
-                    std::cout << "editor system paused = " << gamePaused << std::endl;
-                }
+                //if (InputSystem::GetInstance()->isKeyDown(VK_CONTROL) && InputSystem::GetInstance()->isKeyPressed(VK_ESCAPE))
+                //{
+                //    proxy_audio_system::ScriptPlayAllPaused();
+                //    gamePaused = !gamePaused;
+                //    std::cout << "editor system paused = " << gamePaused << std::endl;
+                //}
 
                 if (startPlaying)
                 {

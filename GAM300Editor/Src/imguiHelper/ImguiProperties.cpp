@@ -20,6 +20,8 @@
 
 #include "Input/Input.h"
 
+#include "GraphicsResource/Revamped/MeshController.h"
+
 namespace TDS
 {
 	/*!*************************************************************************
@@ -467,7 +469,19 @@ namespace TDS
 						{
 							ImguiComponentDisplay(componentName, componentBase);
 						}
+						if (componentName == "Graphics Component")
+						{
+							if (ImGui::Button("Reset all Mesh position(MANSION MESH ONLY)"))
+							{
+								GraphicsComponent* graphComponent = reinterpret_cast<GraphicsComponent*>(componentBase);
+								if (graphComponent->m_MeshControllerRef.m_ResourcePtr != nullptr)
+								{
+									graphComponent->m_MeshControllerRef.m_ResourcePtr->ResetMeshPosition();
+								}
 
+
+							}
+						}
 						ImGui::PopItemWidth();
 						ImGui::EndTable();
 					}

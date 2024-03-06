@@ -53,34 +53,7 @@ namespace TDS
 
 			if (playing)
 			{
-				for (SoundInfo& sort : music)
-				{
-					if (sort.isPlaying())
-					{
-						sort.stop();
-					}
-				}
-				for (SoundInfo& sort : SFX)
-				{
-					if (sort.isPlaying())
-					{
-						sort.stop();
-					}
-				}
-				for (SoundInfo& sort : background)
-				{
-					if (sort.isPlaying())
-					{
-						sort.stop();
-					}
-				}
-				for (SoundInfo& sort : VO)
-				{
-					if (sort.isPlaying())
-					{
-						sort.stop();
-					}
-				}
+				
 
 				playing = false;
 			}

@@ -123,30 +123,9 @@ namespace ScriptAPI
 		}
 		else
 		{
-			// Old code, in case there is old files using the old serialization method
-			if (fieldType == "Bool")
-				variable->SetValue(object, Convert::ToBoolean(value));
-			else if (fieldType == "Int")
-				variable->SetValue(object, Convert::ToInt64(value));
-			else if (fieldType == "UInt")
-				variable->SetValue(object, Convert::ToUInt64(value));
-			else if (fieldType == "Byte")
-				variable->SetValue(object, Convert::ToByte(value));
-			else if (fieldType == "Double")
-				variable->SetValue(object, Convert::ToDouble(value));
-			else if (fieldType == "Float")
-				variable->SetValue(object, Convert::ToSingle(value));
-			else if (fieldType == "Char")
-				variable->SetValue(object, Convert::ToChar(value));
-			else if (fieldType == "String")
-				variable->SetValue(object, value);
-			else if (fieldType == "Vector3")
-				variable->SetValue(object, Vector3(variableInfo.vectorValueX, variableInfo.vectorValueY, variableInfo.vectorValueZ));
-			else // Not old code, assumuing that it is a script
-				variable->SetValue(object, EngineInterface::GetScriptReference(variableInfo.referenceEntityID, fieldType));
-
-
-			System::Console::WriteLine("what even: " + fieldType);
+			// Assumuing that it is a script
+			variable->SetValue(object, EngineInterface::GetScriptReference(variableInfo.referenceEntityID, fieldType));
+			//System::Console::WriteLine("what even: " + fieldType);
 		}
 	}
 }

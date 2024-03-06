@@ -92,6 +92,7 @@ class Vec2
         float y;
         static constexpr float kEpsilon = 0.00001f;
         static constexpr float kEpsilonNormalSqrt = 1e-15f;
+
 };
 
 // Operators (unary arithmetic)
@@ -115,6 +116,7 @@ bool operator!=(const Vec2& v1, const Vec2& v2);
 std::ostream& operator<<(std::ostream& os, const Vec2& v);
 
 DLL_API Vec2 floatsToVec2(float x, float y);
+
 
 }
 #endif // VECTOR2_H

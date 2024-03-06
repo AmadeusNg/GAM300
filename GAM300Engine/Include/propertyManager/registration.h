@@ -23,6 +23,14 @@ RTTR_REGISTRATION
 		.property("y", &Vec4::y)
 		.property("z", &Vec4::z)
 		.property("w", &Vec4::w);
+	rttr::registration::class_<Mat4>("Mat4")
+		.property("m", &Mat4::m);
+	rttr::registration::class_<Quat>("Quat")
+		.property("x", &Quat::x)
+		.property("y", &Quat::y)
+		.property("z", &Quat::z)
+		.property("w", &Quat::w);
+
 }
 
 #endif //COMPONENT_RTTR_REGISTRATION

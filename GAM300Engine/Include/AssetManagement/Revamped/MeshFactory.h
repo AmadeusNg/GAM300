@@ -28,6 +28,10 @@ namespace TDS
 		std::uint32_t													m_TotalBatchMeshes = 0;
 
 	public:
+		std::uint32_t GetBatchCount()
+		{
+			return m_TotalBatchMeshes;
+		}
 
 		std::array<MeshController, MAX_MODELS>& GetMeshControllers()
 		{

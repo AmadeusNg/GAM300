@@ -47,6 +47,7 @@
     <ClInclude Include="EditorApp.h" />
     <ClInclude Include="Include\EditorRenderer\ImguiLayer.h" />
     <ClInclude Include="Include\imguiHelper\ImguiAssetBrowser.h" />
+    <ClInclude Include="Include\imguiHelper\ImguiAssetManagerDisplay.h" />
     <ClInclude Include="Include\imguiHelper\ImguiAudio.h" />
     <ClInclude Include="Include\imguiHelper\ImguiBehaviourTree.h" />
     <ClInclude Include="Include\imguiHelper\ImguiCompilerDescriptor.h" />

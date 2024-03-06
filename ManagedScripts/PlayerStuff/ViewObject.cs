@@ -14,10 +14,8 @@ using System.Diagnostics;
 
 public class View_Object : Script
 {
-    GameObject ObjectViewer;
-    GameObject ObjectViewerCam;
-    GameObject ObjectViewerModel;
     GameObject ViewingModel;
+    CameraComponent ObjectViewerCam;
     
     //public static string ModelName;
     public static string ObjectName;
@@ -25,31 +23,19 @@ public class View_Object : Script
     public static bool isExamining;
     
     float root_y;
-    float rotateValue;
+    float rotateValueY, rotateValueX;
+    Vector3 originalPos, originalRot;
     bool isZoomed;
 
     public override void Awake()
     {
+        ObjectViewerCam = gameObject.GetComponent<CameraComponent>();
     }
 
-    // MAKE SURE OBJECTVIEWER IS ACTIVE WHEN STARTING THE GAME SO START() RUNS
     public override void Start()
     {
         Console.WriteLine("Init ObjectViewer\n");
-        ObjectViewer        = GameObjectScriptFind("ObjectViewer");
-        ObjectViewerCam     = GameObjectScriptFind("ObjectViewerCam");
-        ObjectViewerModel   = GameObjectScriptFind("ObjectViewerModel");
-
-        ObjectViewer.SetActive(false);
         gameObject.SetActive(false);
-
-        //playercam = MainCam.GetComponent<CameraComponent>();
-        ObjectViewerCam.GetComponent<CameraComponent>().SetFieldOfView(60f);
-
-        OnEnter = false;
-        isExamining = false;
-        rotateValue = 0.0f;
-        root_y = gameObject.transform.GetPosition().Y;
     }
     public override void Update()
     {
@@ -61,8 +47,30 @@ public class View_Object : Script
 
             //ObjectViewerModel.GetComponent<GraphicComponent>().SetModelName("cube_Bin.bin"); // Not working.. probably becaus some models have many entities
             ViewingModel = GameObjectScriptFind(ObjectName);
-            ViewingModel.transform.SetPosition(ObjectViewerModel.transform.GetPosition());
+            //ViewingModel.transform.SetPosition(ObjectViewerModel.transform.GetPosition());
             ViewingModel.SetActive(true);
+
+            ObjectViewerCam.SetFieldOfView(60f);
+            Vector3 objectSize = ViewingModel.GetComponent<BoxColliderComponent>().GetSize();
+            Vector3 offsetScale = ViewingModel.GetComponent<BoxColliderComponent>().GetOffsetScale();
+            objectSize.X /= (offsetScale.X + 1);
+            objectSize.Y /= (offsetScale.Y + 1);
+            objectSize.Z /= (offsetScale.Z + 1);
+            float biggestAxis = Mathf.Max(Mathf.Max(objectSize.X, objectSize.Y), objectSize.Z);
+            float cameraView = 2.0f * Mathf.Tan(0.5f * ObjectViewerCam.GetFieldOfView() * MathF.PI / 180.0f);
+            float distance = 4.0f * biggestAxis / cameraView;
+            distance += 0.5f * biggestAxis;
+            ObjectViewerCam.transform.SetPosition(ViewingModel.transform.GetPosition() - distance * ObjectViewerCam.transform.getForwardVector());
+            
+            //ObjectViewerCam.setForwardVector();
+            //ObjectViewerCam.setForwardVector();
+            rotateValueX = 0.0f;
+            rotateValueY = 0.0f;
+
+            root_y = 0.0f;
+
+            originalPos = ViewingModel.transform.GetPosition();
+            originalRot = ViewingModel.transform.GetRotation();
 
             isExamining = true;
             isZoomed = false;
@@ -83,45 +91,62 @@ public class View_Object : Script
 
     {
         //Console.WriteLine("Check Keyboard Input ViewObject");
-        if (Input.GetKey(Keycode.A))
+        if (Input.GetKey(Keycode.LEFT))
         {
-            Console.WriteLine("A pressed");
+            Console.WriteLine("LEFT pressed");
 
-            rotateValue += 0.01f;
+            rotateValueY += 0.01f;
             //ObjectViewerModel.transform.SetRotation(new Vector3(0, rotateValue, 0));
-            ViewingModel.transform.SetRotation(new Vector3(0, rotateValue, 0));
+            //ViewingModel.transform.SetRotation(new Vector3(0, rotateValue, 0));
         }
-        else if (Input.GetKey(Keycode.D))
+        else if (Input.GetKey(Keycode.RIGHT))
         {
-            Console.WriteLine("D pressed");
+            Console.WriteLine("RIGHT pressed");
 
-            rotateValue -= 0.01f;
+            rotateValueY -= 0.01f;
             //ObjectViewerModel.transform.SetRotation(new Vector3(0, rotateValue, 0));
-            ViewingModel.transform.SetRotation(new Vector3(0, rotateValue, 0));
+            //ViewingModel.transform.SetRotation(new Vector3(0, rotateValue, 0));
         }
+        else if (Input.GetKey(Keycode.UP))
+        {
+            Console.WriteLine("UP pressed");
+
+            rotateValueX += 0.01f;
+            //ObjectViewerModel.transform.SetRotation(new Vector3(0, rotateValue, 0));
+            //ViewingModel.transform.SetRotation(new Vector3(0, 0 , rotateValue));
+        }
+        else if (Input.GetKey(Keycode.DOWN))
+        {
+            Console.WriteLine("DOWN pressed");
+
+            rotateValueX -= 0.01f;
+            //ObjectViewerModel.transform.SetRotation(new Vector3(0, rotateValue, 0));
+            //ViewingModel.transform.SetRotation(new Vector3(0, rotateValueY, 0));
+        }
+        ViewingModel.transform.SetRotation(new Vector3(rotateValueX, rotateValueY, 0));
 
         if (Input.GetKey(Keycode.S))
         {
             Console.WriteLine("S pressed");
 
-            if (ObjectViewerModel.transform.GetPosition().Y > -1.0f)
+            if (root_y > -20.0f)
             {
-                root_y -= 0.01f;
+                root_y -= 1.0f;
                 //ObjectViewerModel.transform.SetPositionY(root_y);
-                ViewingModel.transform.SetPositionY(root_y);
             }
         }
         else if (Input.GetKey(Keycode.W))
         {
             Console.WriteLine("W pressed");
 
-            if (ObjectViewerModel.transform.GetPosition().Y < 1.0f)
+            if (root_y < 20.0f)
             {
-                root_y += 0.01f;
+                root_y += 1.0f;
                 //ObjectViewerModel.transform.SetPositionY(root_y);
-                ViewingModel.transform.SetPositionY(root_y);
             }
         }
+        ViewingModel.transform.SetPositionY(originalPos.Y + root_y);
+
     }
 
     public void CheckMouseInput()  // Mouse Controls
@@ -141,6 +166,8 @@ public class View_Object : Script
             isZoomed = false;
             GraphicsManagerWrapper.ToggleViewFrom2D(false);
             InventoryScript.InventoryIsOpen = true;
+            ViewingModel.transform.SetPosition(originalPos);
+            ViewingModel.transform.SetRotation(originalRot);
             GameObjectScriptFind("InventoryObject").SetActive(true);
             ViewingModel.SetActive(false);
             gameObject.SetActive(false);
@@ -153,11 +180,11 @@ public class View_Object : Script
 
         if (isZoomed)
         {
-            ObjectViewerCam.GetComponent<CameraComponent>().SetFieldOfView(30f);
+            ObjectViewerCam.SetFieldOfView(30f);
         }
         else
         {
-            ObjectViewerCam.GetComponent<CameraComponent>().SetFieldOfView(120f);
+            ObjectViewerCam.SetFieldOfView(120f);
         }
     }
 }

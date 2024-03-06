@@ -13,8 +13,11 @@ using System;
 
 public class PopupUI : Script
 {
+    public GameBlackboard? gameBlackboard;
+
     [SerializeField]
-    public static bool isDisplayed = false;
+    public static bool changeDisplayed = false;
+    //public static bool isDisplayed = false;
     public bool lockpickDisplayed;
     UISpriteComponent popUpScreen;
 
@@ -32,30 +35,45 @@ public class PopupUI : Script
     public override void Update()
     {
 
-        if (Input.GetKeyDown(Keycode.ESC) || Input.GetKeyDown(Keycode.P))
+        if (changeDisplayed || ((Input.GetKeyDown(Keycode.ESC) || Input.GetKeyDown(Keycode.P)) && 
+            (gameBlackboard.previousGameState == GameBlackboard.GameState.InGame || gameBlackboard.previousGameState == GameBlackboard.GameState.Paused)))
         {
-            isDisplayed = !isDisplayed;
+            if (gameBlackboard.gameState == GameBlackboard.GameState.InGame)
+            {
+                popUpScreen.SetEnabled(true);
+                player.GetComponent<FPS_Controller_Script>().playerCanMove = false;
+                player.GetComponent<FPS_Controller_Script>().cameraCanMove = false;
+                gameBlackboard.gameState = GameBlackboard.GameState.Paused;
+            }
+            else
+            {
+                popUpScreen.SetEnabled(false);
+                player.GetComponent<FPS_Controller_Script>().playerCanMove = true;
+                player.GetComponent<FPS_Controller_Script>().cameraCanMove = true;
+                gameBlackboard.gameState = GameBlackboard.GameState.InGame;
+            }
+
+            changeDisplayed = false;
+            //isDisplayed = !isDisplayed;
         }
 
-        if (isDisplayed)
-        {
-            //Console.WriteLine("game paused");
-            popUpScreen.SetEnabled(true);
-            Input.Lock(false);
-            Input.HideMouse(false);
-            //player.GetComponent<FPS_Controller_Script>().playerCanMove = false;
-            //player.GetComponent<FPS_Controller_Script>().cameraCanMove = false;
+        //if (isDisplayed)
+        //if (gameBlackboard.gameState == GameBlackboard.GameState.Paused)
+        //{
+        //    //Console.WriteLine("game paused");
+        //    popUpScreen.SetEnabled(true);
+        //    player.GetComponent<FPS_Controller_Script>().playerCanMove = false;
+        //    player.GetComponent<FPS_Controller_Script>().cameraCanMove = false;
 
-        }
-        else if(!InventoryScript.InventoryIsOpen && !lockpickDisplayed)
-        {
-            //Console.WriteLine("game unpaused");
-            popUpScreen.SetEnabled(false);
-            Input.Lock(true);
-            Input.HideMouse(true);
-            //player.GetComponent<FPS_Controller_Script>().playerCanMove = true;
-            //player.GetComponent<FPS_Controller_Script>().cameraCanMove = true;
-        }
+        //}
+        ////else if(!InventoryScript.InventoryIsOpen && !lockpickDisplayed)
+        //else
+        //{
+        //    //Console.WriteLine("game unpaused");
+        //    popUpScreen.SetEnabled(false);
+        //    //player.GetComponent<FPS_Controller_Script>().playerCanMove = true;
+        //    //player.GetComponent<FPS_Controller_Script>().cameraCanMove = true;
+        //}
     }
 
 }

@@ -172,6 +172,7 @@ namespace ScriptAPI
                     SAFE_NATIVE_CALL_BEGIN
                         if (!script->Value->getAwakeFlag())
                         {
+                            System::Console::WriteLine(script->Key);
                             script->Value->Awake();
                             script->Value->setAwakeFlag();
                         }
@@ -490,6 +491,11 @@ namespace ScriptAPI
             }
             
             if (field->Name == "is_Enabled" || field->Name == "is_Awake" || field->Name == "is_Start")
+            {
+                continue;
+            }
+
+            if (field->GetCustomAttributes(DontSerializeFieldAttribute::typeid, true)->Length > 0)
             {
                 continue;
             }

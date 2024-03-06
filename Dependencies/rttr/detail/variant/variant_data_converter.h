@@ -27,7 +27,8 @@
 
 #ifndef RTTR_VARIANT_DATA_CONVERTER_H_
 #define RTTR_VARIANT_DATA_CONVERTER_H_
-
+#undef max(a,b)
+#undef min(a,b)
 #include "rttr/detail/conversion/std_conversion_functions.h"
 #include "rttr/detail/conversion/number_conversion.h"
 #include "rttr/detail/enumeration/enumeration_helper.h"

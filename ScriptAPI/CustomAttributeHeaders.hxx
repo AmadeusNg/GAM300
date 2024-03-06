@@ -13,3 +13,6 @@ public:
 
 [AttributeUsage(AttributeTargets::Field)]
 public ref class HideInInspectorAttribute : public Attribute { };
+
+[AttributeUsage(AttributeTargets::Field)]
+public ref class DontSerializeFieldAttribute : public Attribute { };

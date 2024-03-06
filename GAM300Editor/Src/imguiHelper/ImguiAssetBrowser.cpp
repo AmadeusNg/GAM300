@@ -12,6 +12,7 @@
 #include "Tools/CompilerRevamped/MeshLoader.h"
 #include <string>
 #include "AssetManagement/Revamped/MeshFactory.h"
+#include "imguiHelper/ImguiCompilerDescriptor.h"
 
 #define ASSET_PATH "../assets"
 namespace TDS
@@ -118,7 +119,7 @@ namespace TDS
 				{
 					//Get asset reference,
 					AssetManager::GetInstance()->GetMeshFactory().GetMeshController(ModelAssetName, graphComp->m_MeshControllerRef);
-
+					
 					//This is a root, so no rendered mesh
 					graphComp->m_MeshName = "";
 					graphComp->m_ModelName = ModelAssetName;
@@ -177,7 +178,7 @@ namespace TDS
 
 						//Get Reference
 						AssetManager::GetInstance()->GetMeshFactory().GetMeshController(ModelAssetName, childGrapComp->m_MeshControllerRef);
-
+			
 						//Set the correct mesh name and model name
 						childGrapComp->m_MeshName = meshNode.first;
 						childGrapComp->m_ModelName = ModelAssetName;
@@ -647,6 +648,9 @@ namespace TDS
 
 	std::string AssetBrowser::LoadAssetRevamped(const std::string& FileName)
 	{
+
+		std::shared_ptr<LevelEditorPanel> panel = LevelEditorManager::GetInstance()->panels[PanelTypes::COMPILER_DESCRIPTOR];
+		std::shared_ptr<CompilerDescriptors> imguiDesc = std::static_pointer_cast<CompilerDescriptors>(panel);
 		std::string OutputPath{};
 		std::string OutName{};
 		if (strstr(FileName.c_str(), ".jpg") || strstr(FileName.c_str(), ".png") || strstr(FileName.c_str(), ".dds"))
@@ -687,6 +691,8 @@ namespace TDS
 		}
 		if (strstr(FileName.c_str(), ".obj") || strstr(FileName.c_str(), ".fbx") || strstr(FileName.c_str(), ".gltf") || strstr(FileName.c_str(), ".bin"))
 		{
+			
+
 			lookUp = false;
 			std::string& OutPath = GeomCompiler::GetInstance()->OutPath;
 			OutPath = "../assets/models/";
@@ -718,14 +724,18 @@ namespace TDS
 
 			if (lookUp == false)
 			{
-				GeomDescriptor m_GeomDescriptor{};
-				m_GeomDescriptor.m_Descriptor.m_FilePath = std::filesystem::path(FileName).filename().string();
+				CompilerDescriptors::GeomDescDisplay* geomDisplay = reinterpret_cast<CompilerDescriptors::GeomDescDisplay*>(imguiDesc->m_CompilerDescriptors[CompilerDescriptors::DESC_GEOMETRY]);
+
+				/*GeomDescriptor m_GeomDescriptor{};
+				m_GeomDescriptor.m_Descriptor.m_FilePath = std::filesystem::path(FileName).filename().string();*/
 
 				MeshLoader::Request req{};
 				req.m_FileName = std::filesystem::path(FileName).filename().string();
 				req.m_OutFile = OutPath;
 				req.m_OutFile += "_Bin";
 				req.m_OutFile += ".bin";
+				req.currSetting = geomDisplay->m_GeomDecriptor;
+				req.currSetting.m_Descriptor.m_FilePath = std::filesystem::path(FileName).filename().string();
 				MeshLoader::GetInstance().RunCompiler(req);
 
 				std::string OutputFile = req.m_OutFile;

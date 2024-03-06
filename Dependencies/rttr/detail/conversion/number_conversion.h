@@ -27,9 +27,13 @@
 
 #ifndef RTTR_NUMBER_CONVERSION_H_
 #define RTTR_NUMBER_CONVERSION_H_
-
+#undef max(a,b)
+#undef min(a,b)
 #include "rttr/detail/base/core_prerequisites.h"
 #include <limits>
+
+#undef max(a,b)
+#undef min(a,b)
 
 namespace rttr
 {

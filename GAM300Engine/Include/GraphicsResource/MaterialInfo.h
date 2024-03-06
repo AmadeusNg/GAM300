@@ -2,6 +2,8 @@
 #ifndef MATERIAL_H
 #define MATERIAL_H
 #include "MathCommon.h"
+#include <rttr/registration.h>
+#include <rttr/registration_friend.h>
 namespace TDS
 {
 
@@ -38,13 +40,16 @@ namespace TDS
 	{
 		DEFINE_MATERIAL_TYPE_LIST
 	}
-	MATERIAL_PROPERTIES;
+	MATERIALS_TEXTURE;
 
 
 #undef ADD_MATERIAL_TYPE
 
 #define ADD_MATERIAL_TYPE(x, y)\
 		materialMapList[y] = #x;
+
+
+
 
 	struct MaterialMapList
 	{
@@ -71,6 +76,69 @@ namespace TDS
 	struct MaterialList
 	{
 		std::vector<MaterialInfo> m_MaterialInfos;
+	};
+
+
+	enum class SHADING_TYPE
+	{
+		PHONG_BLINN = 0,
+		PBR,
+		GOURAUD,
+		TOOL,
+		UNLIGHT,
+		UNKNOWN,
+	};
+
+	enum MATERIAL_COLOR
+	{
+		MATERIAL_COLOR_DIFFUSE = 0,
+		MATERIAL_COLOR_SPECULAR,
+		MATERIAL_COLOR_AMBIENT,
+		MATERIAL_COLOR_EMISSIVE,
+	};
+
+	enum MATERIAL_FLOAT
+	{
+		MATERIAL_FLOAT_OPACITY = 0,
+		MATERIAL_FLOAT_SHININESS,
+		MATERIAL_FLOAT_SHININESS_STRENGTH
+	};
+
+
+	enum class ADDRESS_MODE : std::uint8_t
+	{
+		TILE, MIRROR, CLAMP
+	};
+
+
+	struct MaterialTextureInfo
+	{
+		ADDRESS_MODE	m_UMode;
+		ADDRESS_MODE	m_VMode;
+		std::string		m_TextureName;
+
+	};
+
+	struct MaterialProperty
+	{
+		SHADING_TYPE											m_ShadingType;
+		int														m_MatID;
+		std::size_t												m_GUID;
+		std::string												m_MaterialName;
+		std::unordered_map<MATERIAL_FLOAT, float>				m_MaterialFloat;
+		std::unordered_map<MATERIAL_COLOR, Vec4>				m_MaterialColor;
+		std::unordered_map<MATERIALS_TEXTURE, std::vector<MaterialTextureInfo>>	m_TexturesPath;
+
+		static bool Serialize(MaterialProperty& materials, std::string_view path, bool read = false);
+
+	};
+
+	struct MaterialLoader
+	{
+		std::vector<MaterialProperty>				m_MaterialInfos;
+
+		DLL_API static bool Serialize(MaterialLoader& materials, std::string_view path, bool read = false);
+
 	};
 
 

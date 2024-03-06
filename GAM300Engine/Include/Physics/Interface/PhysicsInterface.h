@@ -35,16 +35,16 @@ namespace TDS
 	/*!*************************************************************************
 	 * Position and rotation of a body
 	 ***************************************************************************/
-	void SetPositionAndRotation(const RigidBody& rb, Vec3& inPosition, Quat& inRotation, bool inActivate);
-	void SetPositionAndRotationWhenChanged(const RigidBody& rb, Vec3& inPosition, Quat& inRotation, bool inActivate);
-	void GetPositionAndRotation(const RigidBody& rb, Vec3& outPosition, Quat& outRotation);
+	void SetPositionAndRotation(RigidBody& rb, Vec3& inPosition, Quat& inRotation, bool inActivate);
+	void SetPositionAndRotationWhenChanged(RigidBody& rb, Vec3& inPosition, Quat& inRotation, bool inActivate);
+	void GetPositionAndRotation(RigidBody& rb, Vec3& outPosition, Quat& outRotation);
 	DLL_API void SetPosition(RigidBody& rb, Vec3& inPosition, bool inActivate);
-	Vec3 GetPosition(const RigidBody& rb);
-	Vec3 GetCenterOfMassPosition(const RigidBody& rb);
-	void SetRotation(const RigidBody& rb, Quat& inRotation, bool inActivate);
-	Quat GetRotation(const RigidBody& rb);
-	Mat4 GetWorldTransform(const RigidBody& rb);
-	Mat4 GetCenterOfMassTransform(const RigidBody& rb);
+	Vec3 GetPosition(RigidBody& rb);
+	Vec3 GetCenterOfMassPosition(RigidBody& rb);
+	DLL_API void SetRotation(RigidBody& rb, Quat& inRotation, bool inActivate);
+	Quat GetRotation(RigidBody& rb);
+	Mat4 GetWorldTransform(RigidBody& rb);
+	Mat4 GetCenterOfMassTransform(RigidBody& rb);
 
 	/*!*************************************************************************
 	 * Add forces to the body

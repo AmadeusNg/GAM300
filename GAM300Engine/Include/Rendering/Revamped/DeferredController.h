@@ -231,6 +231,9 @@ namespace TDS
 
 		void											RenderUISceneMeshBatch(VkCommandBuffer commandBuffer, std::uint32_t frameIndex);
 		void											RenderUISceneMeshInstance(VkCommandBuffer commandBuffer, std::uint32_t frameIndex);
+		void											SetFadeFactor(float fadeValue);
+		float											GetFadeFactor();
+
 
 		void											ClearBatchSubmission();
 		void											SubmitMesh(std::uint32_t entityID, GraphicsComponent* graphComp, Transform* transformComp);
@@ -251,6 +254,7 @@ namespace TDS
 	private:
 
 		//Lighting pass data
+		float											m_ScreenFadeFactor = 1.f;
 		std::uint32_t									m_LightSrcInstance = 0;
 
 		LightingPushConstant							m_LightingPushConstant;

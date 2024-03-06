@@ -131,14 +131,14 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>pch.h</ForcedIncludeFiles>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies;$(SolutionDir)Shared_Libs;$(SolutionDir)Dependencies\spdlog\include;$(SolutionDir)GAM300Engine\Include;$(SolutionDir)GAM300Engine\Include\Geometry;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies;$(SolutionDir)Shared_Libs;$(SolutionDir)Dependencies\spdlog\include;$(SolutionDir)GAM300Engine\Include;$(SolutionDir)GAM300Engine\Include\Geometry;$(SolutionDir)Dependencies\TinyXML;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)Libs;$(SolutionDir)ToolsLibs\DebugLibs;$(SolutionDir)Libs\fmod;$(SolutionDir)Libs\Jolt\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>vulkan-1.lib;fmodL_vc.lib;fmodstudioL_vc.lib;Jolt.lib;rttr_core_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)Libs;$(SolutionDir)ToolsLibs\DebugLibs;$(SolutionDir)Libs\fmod;$(SolutionDir)Libs\Jolt\Debug;$(SolutionDir)Libs\TinyXML;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vulkan-1.lib;fmodL_vc.lib;fmodstudioL_vc.lib;Jolt.lib;rttr_core_d.lib;tinyxml2d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>
@@ -161,7 +161,7 @@ xcopy /y /d "$(SolutionDir)Libs\rttr_core_d.dll" "$(OutDir)"</Command>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalIncludeDirectories>$(SolutionDir)..\Dependencies;$(SolutionDir)Include;$(SolutionDir)..\Shared_Libs;$(SolutionDir)..\Dependencies\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories>$(SolutionDir)..\Dependencies;$(SolutionDir)Include;$(SolutionDir)..\Shared_Libs;$(SolutionDir)Include\Geometry;$(SolutionDir)..\Dependencies\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies;$(SolutionDir)Shared_Libs;$(SolutionDir)Dependencies\spdlog\include;$(SolutionDir)GAM300Engine\Include;$(SolutionDir)GAM300Engine\Include\Geometry;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies;$(SolutionDir)Shared_Libs;$(SolutionDir)Dependencies\spdlog\include;$(SolutionDir)GAM300Engine\Include;$(SolutionDir)GAM300Engine\Include\Geometry;$(SolutionDir)Dependencies\TinyXML;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>pch.h</ForcedIncludeFiles>
@@ -173,8 +173,8 @@ xcopy /y /d "$(SolutionDir)Libs\rttr_core_d.dll" "$(OutDir)"</Command>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)Libs;$(SolutionDir)Libs\fmod;$(SolutionDir)Libs\Jolt\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>vulkan-1.lib;fmod_vc.lib;fmodstudio_vc.lib;rttr_core.lib;Jolt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)Libs;$(SolutionDir)Libs\fmod;$(SolutionDir)Libs\Jolt\Release;$(SolutionDir)Libs\TinyXML;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vulkan-1.lib;fmod_vc.lib;fmodstudio_vc.lib;rttr_core.lib;Jolt.lib;tinyxml2.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>
@@ -197,6 +197,9 @@ xcopy /y /d "$(SolutionDir)Libs\rttr_core.dll" "$(OutDir)"</Command>
     <ClInclude Include="Include\AI\Pathfinder.h" />
     <ClInclude Include="Include\AI\Tile.h" />
     <ClInclude Include="Include\AI\TileEntity.h" />
+    <ClInclude Include="Include\Animation\Animation.h" />
+    <ClInclude Include="Include\Animation\AnimationInfo.h" />
+    <ClInclude Include="Include\Animation\AnimationLoader.h" />
     <ClInclude Include="Include\components\CompReflectionMacro.h" />
     <ClInclude Include="Include\components\DirLightComponent.h" />
     <ClInclude Include="Include\components\ParticleComponent.h" />
@@ -218,12 +221,14 @@ xcopy /y /d "$(SolutionDir)Libs\rttr_core.dll" "$(OutDir)"</Command>
     <ClCompile Include="Src\AI\Pathfinder.cpp" />
     <ClCompile Include="Src\AI\Tile.cpp" />
     <ClCompile Include="Src\AI\TileEntity.cpp" />
+    <ClCompile Include="Src\Animation\Animation.cpp" />
+    <ClCompile Include="Src\Animation\AnimationLoader.cpp" />
     <ClCompile Include="Src\components\DirLightComponent.cpp" />
     <ClCompile Include="Src\components\PointLightComponent.cpp" />
     <ClCompile Include="Src\components\SpotLightComponent.cpp" />
+    <ClCompile Include="Src\GraphicsResource\MaterialInfo.cpp" />
     <ClCompile Include="Src\GraphicsResource\Revamped\MeshController.cpp" />
     <ClCompile Include="Include\Rendering\GraphicsManagerWrapperCalls.cpp" />
-    <ClCompile Include="Src\components\AudioSource.cpp" />
     <ClCompile Include="Src\AI\UIPopupManager.cpp" />
     <ClCompile Include="Src\components\ParticleComponent.cpp" />
     <ClCompile Include="src\components\SoundInfo.cpp" />
@@ -299,6 +304,8 @@ xcopy /y /d "$(SolutionDir)Libs\rttr_core.dll" "$(OutDir)"</Command>
     <ClCompile Include="Src\Rendering\Revamped\FrameBuffers\FrameBufferObject.cpp" />
     <ClCompile Include="Src\Rendering\Revamped\FrameBuffers\G_Buffer.cpp" />
     <ClCompile Include="Src\Rendering\Revamped\LightingBuffer.cpp" />
+    <ClCompile Include="Src\Rendering\MaterialFactory\PBRMaterial.cpp" />
+    <ClCompile Include="Src\Rendering\MaterialFactory\PhongBlinnMaterial.cpp" />
     <ClCompile Include="Src\Rendering\Revamped\MaterialPipeline.cpp" />
     <ClCompile Include="Src\Rendering\Skybox.cpp" />
     <ClCompile Include="Src\Rendering\UISpriteWrapper.cpp" />
@@ -306,6 +313,8 @@ xcopy /y /d "$(SolutionDir)Libs\rttr_core.dll" "$(OutDir)"</Command>
     <ClCompile Include="Src\sceneManager\sceneManager.cpp" />
     <ClCompile Include="Src\sceneManager\serialization.cpp" />
     <ClCompile Include="Src\sceneManager\serializationHelperFunctions.cpp" />
+    <ClCompile Include="Src\Serialization\BinarySerializor.cpp" />
+    <ClCompile Include="Src\Serialization\JSONSerializer.cpp" />
     <ClCompile Include="Src\Shader\ShaderLoader.cpp" />
     <ClCompile Include="Src\Timestep\Timestep.cpp" />
     <ClCompile Include="Src\vulkanTools\Buffer.cpp" />
@@ -414,6 +423,9 @@ xcopy /y /d "$(SolutionDir)Libs\rttr_core.dll" "$(OutDir)"</Command>
     <ClInclude Include="Include\Rendering\GraphicsManagerWrapperCalls.h" />
     <ClInclude Include="Include\Rendering\GridRenderer.h" />
     <ClInclude Include="Include\Rendering\Material.h" />
+    <ClInclude Include="Include\Rendering\MaterialFactory\MaterialShader.h" />
+    <ClInclude Include="Include\Rendering\MaterialFactory\PBRMaterial.h" />
+    <ClInclude Include="Include\Rendering\MaterialFactory\PhongBlinnMaterial.h" />
     <ClInclude Include="Include\Rendering\ModelElement.h" />
     <ClInclude Include="Include\Rendering\ObjectPicking.h" />
     <ClInclude Include="Include\Rendering\ParticleSystem.h" />
@@ -429,13 +441,16 @@ xcopy /y /d "$(SolutionDir)Libs\rttr_core.dll" "$(OutDir)"</Command>
     <ClInclude Include="Include\Rendering\Revamped\FrameBuffers\DebugView.h" />
     <ClInclude Include="Include\Rendering\Revamped\FrameBuffers\FrameBufferObject.h" />
     <ClInclude Include="Include\Rendering\Revamped\FrameBuffers\G_Buffer.h" />
+    <ClInclude Include="Include\Rendering\Revamped\FrameBuffers\IrrandianceFBO.h" />
     <ClInclude Include="Include\Rendering\Revamped\FrameBuffers\LightingBuffer.h" />
+    <ClInclude Include="Include\Rendering\Revamped\FrameBuffers\PrefilteredFBO.h" />
     <ClInclude Include="Include\Rendering\Revamped\MaterialPipeline.h" />
     <ClInclude Include="Include\Rendering\Skybox.h" />
     <ClInclude Include="Include\Rendering\UISpriteWrapper.h" />
     <ClInclude Include="Include\Rendering\UiSystem.h" />
     <ClInclude Include="Include\sceneManager\serializationHelperFunctions.h" />
-    <ClInclude Include="Include\Serialization\Serialization.h" />
+    <ClInclude Include="Include\Serialization\JSONSerializer.h" />
+    <ClInclude Include="Include\Serialization\SerializerBase.h" />
     <ClInclude Include="Include\Shader\ShaderData.h" />
     <ClInclude Include="Include\Shader\ShaderLoader.h" />
     <ClInclude Include="Include\sceneManager\sceneManager.h" />

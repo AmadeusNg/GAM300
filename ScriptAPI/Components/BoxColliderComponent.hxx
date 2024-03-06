@@ -22,6 +22,9 @@ namespace ScriptAPI
 		void SetSizeY(float valueY);
 		void SetSizeZ(float valueZ);
 
+		Vector3 GetOffsetScale();
+		Vector3 GetOffsetCenter();
+
 		virtual TDS::EntityID GetEntityID() override;
 		virtual void SetEntityID(TDS::EntityID ID) override;
 

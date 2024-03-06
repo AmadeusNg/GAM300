@@ -15,26 +15,52 @@ public class StartingCutscene : Script
 {
     String[] Textures;
     int counter;
+    private bool fadeIn = true;
+    private bool fadeOut = true;
+    private float incrementFading = Time.deltaTime / 3f;
+    public GameObject blackScreen;
     public override void Awake()
     {
         GraphicsManagerWrapper.ToggleViewFrom2D(true);
         Textures = new string[9];
         Textures[0] = "Scene00.dds";
         Textures[1] = "Scene01.dds";
-        Textures[2] = "scene02.dds";
-        Textures[3] = "scene03.dds";
-        Textures[4] = "scene04.dds";
-        Textures[5] = "scene05.dds";
-        Textures[6] = "scene06.dds";
-        Textures[7] = "scene07.dds";
-        Textures[8] = "scene08.dds";
+        Textures[2] = "NEW_Scene02.dds";
+        Textures[3] = "NEW_Scene03.dds";
+        Textures[4] = "NEW_Scene04.dds";
+        Textures[5] = "NEW_Scene05.dds";
+        Textures[6] = "NEW_Scene06.dds";
+        Textures[7] = "NEW_Scene07.dds";
+        Textures[8] = "NEW_Scene08.dds";
 
         counter = 0;
     }
 
     public override void Update()
     {
-        
+
+        if (fadeIn == true)
+        {
+            float alpha = blackScreen.GetComponent<UISpriteComponent>().getColourAlpha();
+            alpha -= incrementFading;
+            alpha = Mathf.Clamp(alpha, 0, 1);
+            blackScreen.GetComponent<UISpriteComponent>().setColourAlpha(alpha);
+            if (alpha <= 0)
+            {
+                fadeIn = false;
+            }
+        }
+        if (fadeOut == true)
+        {
+            float alpha = blackScreen.GetComponent<UISpriteComponent>().getColourAlpha();
+            alpha += incrementFading;
+            alpha = Mathf.Clamp(alpha, 0, 1);
+            blackScreen.GetComponent<UISpriteComponent>().setColourAlpha(alpha);
+            if (alpha >= 1)
+            {
+                fadeOut = false;
+            }
+        }
         counter = CutsceneSubtitle.counter;
 
         UISpriteComponent Sprite = gameObject.GetComponent<UISpriteComponent>();
@@ -63,7 +89,11 @@ public class StartingCutscene : Script
         else if (counter == 15)
             Sprite.SetTextureName(Textures[7]);
         else if (counter > 15)
+        {
             Sprite.SetTextureName(Textures[8]);
+            fadeOut = true;
+        }
+        
 
         //change subtitle
 

@@ -13,6 +13,7 @@ using ScriptAPI;
 
 public class ReturnToMainMenuButton : Script
 {
+    public GameBlackboard? gameBlackboard;
     UISpriteComponent returntoMMButtonSprite;
     public override void Awake()
     {
@@ -25,7 +26,8 @@ public class ReturnToMainMenuButton : Script
 
     public override void Update()
     {
-        if (PopupUI.isDisplayed)
+        //if (PopupUI.isDisplayed)
+        if (gameBlackboard.gameState == GameBlackboard.GameState.Paused)
         {
             returntoMMButtonSprite.SetEnabled(true);
         }
@@ -34,12 +36,13 @@ public class ReturnToMainMenuButton : Script
             returntoMMButtonSprite.SetEnabled(false);
         }
 
-        if (Input.GetMouseButtonDown(Keycode.M1) && returntoMMButtonSprite.IsMouseCollided() && PopupUI.isDisplayed == true)
+        //if (Input.GetMouseButtonDown(Keycode.M1) && returntoMMButtonSprite.IsMouseCollided() && PopupUI.isDisplayed == true)
+        if (Input.GetMouseButtonDown(Keycode.M1) && returntoMMButtonSprite.IsMouseCollided() && gameBlackboard.gameState == GameBlackboard.GameState.Paused)
         {
             Console.WriteLine("Return to MM Button Pressed");
             AudioComponent audio = gameObject.GetComponent<AudioComponent>();
             audio.stopAll();
-            PopupUI.isDisplayed = false;
+            //PopupUI.isDisplayed = false;
             SceneLoader.LoadMainMenu();
         }
     }

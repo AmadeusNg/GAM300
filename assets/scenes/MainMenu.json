@@ -1,10 +1,10 @@
 {
     "Archetype Sizes": {
         "110000100000100000": {
-            "0": 816,
-            "1": 2304,
-            "6": 2160,
-            "12": 2160
+            "0": 952,
+            "1": 2688,
+            "6": 2520,
+            "12": 2520
         }
     },
     "Entity Data": {
@@ -787,6 +787,136 @@
                     "y": -0.003653496503829956
                 }
             }
+        },
+        "7": {
+            "ArchetypeID": "110000100000100000",
+            "Enabled": true,
+            "Name Tag": {
+                "Name": "BlackScreen",
+                "Tag": "",
+                "IsActive": true,
+                "HierarchyParent": 0,
+                "HierarchyIndex": 6,
+                "HierarchyChildren": []
+            },
+            "Transform": {
+                "Position": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "Scale": {
+                    "x": 2.0,
+                    "y": 2.0,
+                    "z": 1.0
+                },
+                "Rotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "FakePosition": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "FakeRotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "FakeScale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "OldPosition": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "OldScale": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "OldRotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "OldFakePosition": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "OldFakeScale": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "OldFakeRotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "ParentPosition": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            "Graphics Component": {
+                "PointLight": false,
+                "TextureName": "",
+                "Show Mesh": false,
+                "Debug": false,
+                "ModelName": "",
+                "MeshName": "",
+                "MeshNodeName": "",
+                "Color": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0,
+                    "w": 1.0
+                },
+                "Used In 2D": false,
+                "Model UID": 0
+            },
+            "UI Sprite": {
+                "Texture": "Black.dds",
+                "EnableSprite": true,
+                "LayerID": 3,
+                "is Font": false,
+                "message": "",
+                "Font Texture": "",
+                "ForeGroundColour": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0,
+                    "w": 0.0
+                },
+                "Sprite Color": {
+                    "x": 0.10196078568696976,
+                    "y": 0.10196078568696976,
+                    "z": 0.10196078568696976,
+                    "w": 0.0
+                },
+                "BackGroundColour": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0,
+                    "w": 1.0
+                },
+                "BoundingBoxMin": {
+                    "x": -1.0,
+                    "y": -1.0
+                },
+                "BoundingBoxMax": {
+                    "x": 1.0,
+                    "y": 1.0
+                }
+            }
         }
     },
     "Scripts": {
@@ -799,12 +929,24 @@
                 "bgmName": {
                     "System.String": "skyclad_sound_ambience_dark_loop_dynamic_tones_howling_moaning_mournful_eerie_105"
                 },
+                "blackScreen": {
+                    "ScriptAPI.GameObject": 7
+                },
                 "gameObject": {
                     "ScriptAPI.GameObject": 2
                 }
             }
         },
-        "3": {},
+        "3": {
+            "MainMenuOptions": {
+                "inOptionsMenu": {
+                    "System.Boolean": "False"
+                },
+                "gameObject": {
+                    "ScriptAPI.GameObject": 3
+                }
+            }
+        },
         "4": {
             "QuitButton": {
                 "bgm": {
@@ -816,7 +958,8 @@
             }
         },
         "5": {},
-        "6": {}
+        "6": {},
+        "7": {}
     },
     "Active Archetype": {
         "1": "1100001000001",
@@ -824,6 +967,7 @@
         "3": "1100001000001",
         "4": "1100001000001",
         "5": "1100001000001",
-        "6": "1100001000001"
+        "6": "1100001000001",
+        "7": "110000100000100000"
     }
 }

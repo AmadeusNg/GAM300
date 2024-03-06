@@ -16,6 +16,9 @@ public class PlayButton : Script
     public AudioComponent bgm;
     public string bgmName;
     private UISpriteComponent sprite;
+    public GameObject blackScreen;
+    private bool fading = false;
+    private float incrementFading = Time.deltaTime / 3f;
     bool withinArea(float mouse, float min, float max)
     {
         bool within = false;
@@ -32,19 +35,34 @@ public class PlayButton : Script
         sprite = gameObject.GetComponent<UISpriteComponent>();
     }
 
+    public override void Start()
+    {
+    }
+
     public override void Update()
     {
-        if(bgm.finished(bgmName))
+        if (bgm.finished(bgmName))
         {
             bgm.play(bgmName);
-            Console.WriteLine("Mainmenu Update()");
         }
-
+        
         if (Input.GetMouseButtonDown(Keycode.M1) && sprite.IsMouseCollided())
         {
-            //GraphicsManagerWrapper.ToggleViewFrom2D(false);
-            bgm.stop(bgmName);
-            SceneLoader.LoadStartingCutscene();
+            fading = true;
+            bgm.FadeOut(3, bgmName);
+        }
+
+        if (fading == true)
+        {
+            float alpha = blackScreen.GetComponent<UISpriteComponent>().getColourAlpha();
+            alpha += incrementFading;
+            alpha = Mathf.Clamp(alpha, 0, 1);
+            blackScreen.GetComponent<UISpriteComponent>().setColourAlpha(alpha);
+            if (alpha >= 1)
+            {
+                fading = false;
+                SceneLoader.LoadStartingCutscene();
+            }
         }
     }
 

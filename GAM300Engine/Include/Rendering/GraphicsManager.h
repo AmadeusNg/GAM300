@@ -8,6 +8,7 @@
 #include "Rendering/ObjectPicking.h"
 #include "camera/Camerasystem/CameraSystem.h"
 
+
 namespace TDS
 {
 
@@ -22,6 +23,8 @@ namespace TDS
 	class PointLightSystem;
 	class DeferredController;
 	class Renderer2D;
+
+
 
 	struct FullScreenVertex
 	{
@@ -49,7 +52,7 @@ namespace TDS
 
 
 
-
+		
 		TDSCamera* m_Camera = nullptr;
 		VkCommandBuffer							currentCommand = nullptr;
 		WindowsWin* m_pWindow = nullptr;
@@ -60,7 +63,6 @@ namespace TDS
 		FrameBuffer* m_Framebuffer{ nullptr };
 		std::unique_ptr<MessageSystem>			m_MessagingSystem = nullptr;
 		std::shared_ptr<DeferredController>		m_DeferredController {nullptr};
-
 
 		int										m_LayerID = 0;
 		bool									m_RenderAllLayer = true;
@@ -76,7 +78,8 @@ namespace TDS
 		GraphicsManager();
 		~GraphicsManager();
 
-
+		void								SetFadeFactor(float val);
+		float								GetFadeFactor();
 		void								SetClearColor(Vec4 clearColor);
 		void								ToggleViewFrom2D(bool condition);
 		bool								IsViewingFrom2D();

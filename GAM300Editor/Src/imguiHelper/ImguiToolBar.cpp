@@ -12,6 +12,7 @@
 #include "imguiHelper/ImguiSceneBrowser.h" //for "savefile() save as" function
 #include "imguiHelper/ImguiGamePlayScene.h" //for "savefile() save as" function
 #include "Physics/CollisionSystem.h"
+#include "Rendering/GraphicsManager.h"
 
 namespace TDS
 {
@@ -152,11 +153,11 @@ namespace TDS
 		if (ImGui::Button("Save Scene", { 90, 19 }))
 		{
 			//console->AddLog("Save Scene Button Pressed");
-			if (isSaveScene) {
+			//if (isSaveScene) {
 
 				//std::shared_ptr<Hierarchy> hierarchyPanel = static_pointer_cast<Hierarchy>(LevelEditorManager::GetInstance()->panels[PanelTypes::HIERARCHY]);
 				SceneManager::GetInstance()->saveCurrentScene();
-			}
+			//}
 		}
 
 
@@ -202,6 +203,15 @@ namespace TDS
 		}
 		ImGui::PopStyleColor();
 		ImGui::PopStyleColor();
+
+		//Set scene fade to black, not a button but a slider
+		/*ImGui::SameLine();*/
+		//static float fadeFactor = 1.f;
+		//ImGui::SliderFloat("Scene Fade", &fadeFactor, 0.0f, 1.0f);
+
+		//GraphicsManager::getInstance().SetFadeFactor(fadeFactor);
+
+
 
 		//ImGui::SameLine();
 		//ImGui::PushStyleColor(ImGuiCol_Button, { 0.1f,0.1f,0.1f,1 });

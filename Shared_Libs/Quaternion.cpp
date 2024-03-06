@@ -9,29 +9,29 @@ namespace TDS
 	Quat::Quat(float newX, float newY, float newZ, float newW) : w(newW), x(newX), y(newY), z(newZ) {}
 	Quat::Quat(float angle, Vec3 const& axis) : w(angle), x(axis.x), y(axis.y), z(axis.z) {}
 	// Create a quaternion from two normalized vectors
-    Quat::Quat(Vec3 const& u, Vec3 const& v)
-    {
-        float norm_u_norm_v = Mathf::Sqrt(Vec3::Dot(u,u) * Vec3::Dot(v,v));
-        float real_part = norm_u_norm_v + Vec3::Dot(u,v);
-        Vec3 t;
+	Quat::Quat(Vec3 const& u, Vec3 const& v)
+	{
+		float norm_u_norm_v = Mathf::Sqrt(Vec3::Dot(u, u) * Vec3::Dot(v, v));
+		float real_part = norm_u_norm_v + Vec3::Dot(u, v);
+		Vec3 t;
 
-        if (real_part < 1.e-6f * norm_u_norm_v)
-        {
-            // If u and v are exactly opposite, rotate 180 degrees
-            // around an arbitrary orthogonal axis. Axis normalisation
-            // can happen later, when we normalise the quaternion.
-            real_part = 0.0f;
-            t = Mathf::Abs(u.x) > Mathf::Abs(u.z) ? Vec3(-u.y, u.x, 0.f)
-                                                  : Vec3(0.f, -u.z, u.y);
-        }
-        else
-        {
-            // Otherwise, build quaternion the standard way.
-            t = Vec3::Cross(u, v);
-        }
+		if (real_part < 1.e-6f * norm_u_norm_v)
+		{
+			// If u and v are exactly opposite, rotate 180 degrees
+			// around an arbitrary orthogonal axis. Axis normalisation
+			// can happen later, when we normalise the quaternion.
+			real_part = 0.0f;
+			t = Mathf::Abs(u.x) > Mathf::Abs(u.z) ? Vec3(-u.y, u.x, 0.f)
+				: Vec3(0.f, -u.z, u.y);
+		}
+		else
+		{
+			// Otherwise, build quaternion the standard way.
+			t = Vec3::Cross(u, v);
+		}
 
-        *this = normalize(Quat(t.x, t.y, t.z, real_part));
-    }
+		*this = normalize(Quat(t.x, t.y, t.z, real_part));
+	}
 	Quat::Quat(Vec3 const& euler)
 	{
 		float radianX = euler.x;
@@ -49,35 +49,35 @@ namespace TDS
 	//Quat::~Quat() {}
 	float Quat::angle(Quat const& q)
 	{
-        if (Mathf::Abs(q.w) > Mathf::Cos(0.5f))
-        {
-            float const a = Mathf::Acos(Mathf::Sqrt(q.x * q.x + q.y * q.y + q.z * q.z)) * 2.0f;
-            if (q.w < 0.0f)
-                return Mathf::PI * 2.0f - a;
-            return a;
-        }
-        return Mathf::Acos(q.w) * 2.0f;
-    
+		if (Mathf::Abs(q.w) > Mathf::Cos(0.5f))
+		{
+			float const a = Mathf::Acos(Mathf::Sqrt(q.x * q.x + q.y * q.y + q.z * q.z)) * 2.0f;
+			if (q.w < 0.0f)
+				return Mathf::PI * 2.0f - a;
+			return a;
+		}
+		return Mathf::Acos(q.w) * 2.0f;
+
 	}
 	Quat Quat::angleAxis(float const& angle/*degree*/, float const& newX, float const& newY, float const& newZ)
 	{
 		float const a = angle * Mathf::Deg2Rad;
-        float const s = Mathf::Sin(a * 0.5f);
-        return Quat( newX * s, newY * s, newZ * s, Mathf::Cos(a * 0.5f));
+		float const s = Mathf::Sin(a * 0.5f);
+		return Quat(newX * s, newY * s, newZ * s, Mathf::Cos(a * 0.5f));
 	}
 	Quat Quat::angleAxis(float const& angle/*degree*/, Vec3 const& axis)
 	{
 		float const a = angle * Mathf::Deg2Rad;
-        float const s = Mathf::Sin(a * 0.5f);
-        return Quat(axis.x * s, axis.y * s, axis.z * s, Mathf::Cos(a * 0.5f));
+		float const s = Mathf::Sin(a * 0.5f);
+		return Quat(axis.x * s, axis.y * s, axis.z * s, Mathf::Cos(a * 0.5f));
 	}
 	Vec3 Quat::axis(Quat const& q)
 	{
 		float const tmp1 = 1.f - q.w * q.w;
-        if (tmp1 <= 0.f)
-            return Vec3(0.f, 0.f, 1.f);
-        float const tmp2 = 1.f / Mathf::Sqrt(tmp1);
-        return Vec3(q.x * tmp2, q.y * tmp2, q.z * tmp2);
+		if (tmp1 <= 0.f)
+			return Vec3(0.f, 0.f, 1.f);
+		float const tmp2 = 1.f / Mathf::Sqrt(tmp1);
+		return Vec3(q.x * tmp2, q.y * tmp2, q.z * tmp2);
 	}
 	Quat Quat::conjugate(Quat const& q)
 	{
@@ -124,21 +124,57 @@ namespace TDS
 		return Quat(x, y, z, w);
 	}
 
+	Quat Quat::slerp(const Quat& start, const Quat& end, float t)
+	{
+		// Ensure quaternions are normalized
+		Quat q1 = normalize(start);
+		Quat q2 = normalize(end);
+
+		// Compute dot product
+		float dotproduct = dot(q1, q2);
+
+		// Ensure shortest path
+		if (dotproduct < 0.0f) {
+			q2 = -q2;
+			dotproduct = -dotproduct;
+		}
+
+		// Threshold for linear interpolation
+		const float threshold = 0.9995f;
+
+		// If the dot product is close to 1, use linear interpolation
+		if (dotproduct > threshold) {
+			Quat result = q1 + t * (q2 - q1);
+			return normalize(result);
+		}
+
+		// Compute the angle between the quaternions
+		float angle = Mathf::Acos(dotproduct);
+
+		// Interpolation coefficients
+		float sin1 = Mathf::Sin((1 - t) * angle);
+		float sin2 = Mathf::Sin(t * angle);
+
+		// Compute the spherical interpolation
+		Quat result = (sin1 * q1 + sin2 * q2) / Mathf::Sin(angle);
+		return normalize(result);
+	}
+
 	Quat Quat::exp(Quat const& q)
 	{
-        Vec3 u = Vec3(q.x, q.y, q.z);
-        float const tmpAngle = length(u);
-        if (tmpAngle < Mathf::Epsilon)
-            return Quat();
-        Vec3 const v = u / tmpAngle;
-        return Quat(v.x * Mathf::Sin(tmpAngle), v.y * Mathf::Sin(tmpAngle), v.z * Mathf::Sin(tmpAngle), Mathf::Cos(tmpAngle));
+		Vec3 u = Vec3(q.x, q.y, q.z);
+		float const tmpAngle = length(u);
+		if (tmpAngle < Mathf::Epsilon)
+			return Quat();
+		Vec3 const v = u / tmpAngle;
+		return Quat(v.x * Mathf::Sin(tmpAngle), v.y * Mathf::Sin(tmpAngle), v.z * Mathf::Sin(tmpAngle), Mathf::Cos(tmpAngle));
 	}
 	float Quat::extractRealComponent(Quat const& q)
 	{
 		float tmpW = 1.f - q.x * q.x - q.y * q.y - q.z * q.z;
-        if (tmpW < 0.f)
-            return 0.f;
-        return -Mathf::Sqrt(tmpW);
+		if (tmpW < 0.f)
+			return 0.f;
+		return -Mathf::Sqrt(tmpW);
 	}
 	Quat Quat::fromTo(const Vec3& from, const Vec3& to)
 	{
@@ -185,9 +221,9 @@ namespace TDS
 		float denom = 1.0f / lenSq;
 
 		return Quat(-q.x * denom,
-					-q.y * denom,
-					-q.z * denom,
-					 q.w * denom);
+			-q.y * denom,
+			-q.z * denom,
+			q.w * denom);
 	}
 	float Quat::length(Quat const& q)
 	{
@@ -236,13 +272,13 @@ namespace TDS
 	}
 	Quat Quat::mix(Quat const& x, Quat const& y, float a)
 	{
-		float const cosTheta = dot(x,y);
+		float const cosTheta = dot(x, y);
 		if (cosTheta > 1.f - Mathf::Epsilon)
 		{
-			float tmpW = x.w * (1.f -a) + y.w * a;
-			float tmpX = x.x * (1.f -a) + y.x * a;
-			float tmpY = x.y * (1.f -a) + y.y * a;
-			float tmpZ = x.z * (1.f -a) + y.z * a;
+			float tmpW = x.w * (1.f - a) + y.w * a;
+			float tmpX = x.x * (1.f - a) + y.x * a;
+			float tmpY = x.y * (1.f - a) + y.y * a;
+			float tmpZ = x.z * (1.f - a) + y.z * a;
 			return Quat(tmpX, tmpY, tmpZ, tmpW);
 		}
 		else
@@ -300,7 +336,7 @@ namespace TDS
 		float const x = q.w * q.w + q.x * q.x - q.y * q.y - q.z * q.z;
 		if (x == 0.f && y == 0.f)
 			return 0.f;
-		return Mathf::Atan2(y, x);	
+		return Mathf::Atan2(y, x);
 	}
 	Vec3 Quat::rotate(Quat const& q, Vec3 const& v)
 	{
@@ -357,7 +393,7 @@ namespace TDS
 		Result.m[2][1] = 2.f * (qyz - qwx);
 		Result.m[2][2] = 1.f - 2.f * (qxx + qyy);
 		return Result;
-				
+
 	}
 	Mat4 Quat::toMat4(Quat const& q)
 	{
@@ -371,80 +407,80 @@ namespace TDS
 		return Mathf::Asin(clamp);
 	}
 
-    // Component Access
+	// Component Access
 	float& Quat::operator[](int index)
-    {
-        switch (index)
-        {
-        case 0: return x;
-        case 1: return y;
-        case 2: return z;
-        case 3: return w;
-        default: throw std::out_of_range("Index out of range");
-        }
-    }
-
-	float const& Quat::operator[](int index) const
 	{
-        switch (index)
-        {
+		switch (index)
+		{
 		case 0: return x;
 		case 1: return y;
 		case 2: return z;
 		case 3: return w;
 		default: throw std::out_of_range("Index out of range");
-        }
+		}
+	}
+
+	float const& Quat::operator[](int index) const
+	{
+		switch (index)
+		{
+		case 0: return x;
+		case 1: return y;
+		case 2: return z;
+		case 3: return w;
+		default: throw std::out_of_range("Index out of range");
+		}
 	}
 	Quat& Quat::operator=(Quat const& q)
-    {
-        x = q.x;
-        y = q.y;
-        z = q.z;
-        w = q.w;
-        return *this;
-    }
+	{
+		x = q.x;
+		y = q.y;
+		z = q.z;
+		w = q.w;
+		return *this;
+	}
 	Quat& Quat::operator+=(Quat const& q)
 	{
-        x = x + q.x;
-        y = y + q.y;
-        z = z + q.z;
-        w = w + q.w;
-        return *this;
-    }
+		x = x + q.x;
+		y = y + q.y;
+		z = z + q.z;
+		w = w + q.w;
+		return *this;
+	}
 	Quat& Quat::operator-=(Quat const& q)
 	{
-        x = x - q.x;
-        y = y - q.y;
-        z = z - q.z;
-        w = w - q.w;
-        return *this;
+		x = x - q.x;
+		y = y - q.y;
+		z = z - q.z;
+		w = w - q.w;
+		return *this;
 	}
 	Quat& Quat::operator*=(Quat const& q)
 	{
-        Quat p(*this);
-        Quat r(q);
-        x = p.w * r.x + p.x * r.w + p.y * r.z - p.z * r.y;
-        y = p.w * r.y + p.y * r.w + p.z * r.x - p.x * r.z;
-        z = p.w * r.z + p.z * r.w + p.x * r.y - p.y * r.x;
-        w = p.w * r.w - p.x * r.x - p.y * r.y - p.z * r.z;
+		Quat p(*this);
+		Quat r(q);
+		x = p.w * r.x + p.x * r.w + p.y * r.z - p.z * r.y;
+		y = p.w * r.y + p.y * r.w + p.z * r.x - p.x * r.z;
+		z = p.w * r.z + p.z * r.w + p.x * r.y - p.y * r.x;
+		w = p.w * r.w - p.x * r.x - p.y * r.y - p.z * r.z;
 
-        return *this;
+		return *this;
 	}
 	Quat& Quat::operator*=(float f)
 	{
-        w *= f;
-        x *= f;
-        y *= f;
-        z *= f;
-        return *this;
+		w *= f;
+		x *= f;
+		y *= f;
+		z *= f;
+		return *this;
 	}
 	Quat& Quat::operator/=(float f)
 	{
-        w /= f;
-        x /= f;
-        y /= f;
-        z /= f;
-        return *this;
+		w /= f;
+		x /= f;
+		y /= f;
+		z /= f;
+		return *this;
 	}
 
 	Quat operator-(Quat const& q)
@@ -477,23 +513,23 @@ namespace TDS
 
 	Vec4 operator*(Quat const& q, Vec4 const& v)
 	{
-        return (q * Vec3(v.x, v.y, v.z), v.w);
+		return (q * Vec3(v.x, v.y, v.z), v.w);
 	}
 	Vec4 operator*(Vec4 const& v, Quat const& q)
 	{
-        return Quat::inverse(q) * v;
+		return Quat::inverse(q) * v;
 	}
 	Quat operator*(Quat const& q, float const& f)
 	{
-        return Quat(q.x * f, q.y * f, q.z * f, q.w * f);
+		return Quat(q.x * f, q.y * f, q.z * f, q.w * f);
 	}
 	Quat operator*(float const& f, Quat const& q)
 	{
-        return q * f;
+		return q * f;
 	}
 	Quat operator/(Quat const& q, float const& f)
 	{
-        return Quat(q.x / f, q.y / f, q.z / f, q.w / f);
+		return Quat(q.x / f, q.y / f, q.z / f, q.w / f);
 	}
 	bool operator==(Quat const& q1, Quat const& q2)
 	{

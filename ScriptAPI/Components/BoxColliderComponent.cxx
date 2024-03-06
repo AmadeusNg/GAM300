@@ -90,6 +90,10 @@ namespace ScriptAPI
 		Vector3 oldCenter = Center;
 		Center = Vector3(oldCenter.X, oldCenter.Y, valueZ);
 	}
+	Vector3 BoxColliderComponent::GetOffsetCenter()
+	{
+		return Vector3(TDS::GetBoxCollider(entityID)->GetOffsetCenter());
+	}
 
 	// SIZE ==================================================================================
 	// Private
@@ -141,6 +145,10 @@ namespace ScriptAPI
 	{
 		Vector3 oldSize = Size;
 		Size = Vector3(oldSize.X, oldSize.Y, valueZ);
+	}
+	Vector3 BoxColliderComponent::GetOffsetScale()
+	{
+		return Vector3(TDS::GetBoxCollider(entityID)->GetOffsetScale());
 	}
 
 	// CONSTRUCTOR ===========================================================================

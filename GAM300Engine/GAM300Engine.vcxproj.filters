@@ -101,7 +101,6 @@
     <ClCompile Include="src\fmod_engine\AudioEngine.cpp" />
     <ClCompile Include="src\components\SoundInfo.cpp" />
     <ClCompile Include="Src\Rendering\UISpriteWrapper.cpp" />
-    <ClCompile Include="Src\components\AudioSource.cpp" />
     <ClCompile Include="Src\AI\UIPopupManager.cpp" />
     <ClCompile Include="Src\Physics\ContactListenerImpl.cpp" />
     <ClCompile Include="Src\Rendering\ParticleSystem.cpp" />
@@ -126,6 +125,13 @@
     <ClCompile Include="Src\components\DirLightComponent.cpp" />
     <ClCompile Include="Src\components\SpotLightComponent.cpp" />
     <ClCompile Include="Include\MacroHelper.cpp" />
+    <ClCompile Include="Src\Serialization\JSONSerializer.cpp" />
+    <ClCompile Include="Src\Animation\Animation.cpp" />
+    <ClCompile Include="Src\Animation\AnimationLoader.cpp" />
+    <ClCompile Include="Src\Serialization\BinarySerializor.cpp" />
+    <ClCompile Include="Src\GraphicsResource\MaterialInfo.cpp" />
+    <ClCompile Include="Src\Rendering\MaterialFactory\PhongBlinnMaterial.cpp" />
+    <ClCompile Include="Src\Rendering\MaterialFactory\PBRMaterial.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Shared_Libs\MathCommon.h" />
@@ -267,7 +273,6 @@
     <ClInclude Include="Include\components\ParticleComponent.h" />
     <ClInclude Include="Include\MacroHelper.h" />
     <ClInclude Include="Include\Identifier\TypeInformation.h" />
-    <ClInclude Include="Include\Serialization\Serialization.h" />
     <ClInclude Include="Include\GraphicsResource\GeomStruct.h" />
     <ClInclude Include="Include\Identifier\UniqueID.h" />
     <ClInclude Include="Include\Random\RandomGen.h" />
@@ -292,6 +297,16 @@
     <ClInclude Include="Include\AI\Pathfinder.h" />
     <ClInclude Include="Include\AI\Tile.h" />
     <ClInclude Include="Include\AI\TileEntity.h" />
+    <ClInclude Include="Include\Serialization\SerializerBase.h" />
+    <ClInclude Include="Include\Serialization\JSONSerializer.h" />
+    <ClInclude Include="Include\Animation\Animation.h" />
+    <ClInclude Include="Include\Animation\AnimationInfo.h" />
+    <ClInclude Include="Include\Animation\AnimationLoader.h" />
+    <ClInclude Include="Include\Rendering\MaterialFactory\MaterialShader.h" />
+    <ClInclude Include="Include\Rendering\MaterialFactory\PBRMaterial.h" />
+    <ClInclude Include="Include\Rendering\MaterialFactory\PhongBlinnMaterial.h" />
+    <ClInclude Include="Include\Rendering\Revamped\FrameBuffers\IrrandianceFBO.h" />
+    <ClInclude Include="Include\Rendering\Revamped\FrameBuffers\PrefilteredFBO.h" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\Logger\Logger.h" />

@@ -4,6 +4,12 @@
             "0": 272,
             "1": 768,
             "12": 720
+        },
+        "110000100000100000": {
+            "0": 136,
+            "1": 384,
+            "6": 360,
+            "12": 360
         }
     },
     "Entity Data": {
@@ -133,8 +139,8 @@
             },
             "Transform": {
                 "Position": {
-                    "x": -0.8913393616676331,
-                    "y": -0.9219894409179688,
+                    "x": -0.941379725933075,
+                    "y": -0.9004840850830078,
                     "z": 0.0
                 },
                 "Scale": {
@@ -148,8 +154,8 @@
                     "z": 0.0
                 },
                 "FakePosition": {
-                    "x": 0.07807958126068115,
-                    "y": 0.02101576328277588,
+                    "x": 0.028039216995239258,
+                    "y": 0.042521119117736816,
                     "z": 0.0
                 },
                 "FakeRotation": {
@@ -163,8 +169,8 @@
                     "z": 1.0
                 },
                 "OldPosition": {
-                    "x": -0.8913393616676331,
-                    "y": -0.9219894409179688,
+                    "x": -0.941379725933075,
+                    "y": -0.9004840850830078,
                     "z": 0.0
                 },
                 "OldScale": {
@@ -178,8 +184,8 @@
                     "z": 0.07349999248981476
                 },
                 "OldFakePosition": {
-                    "x": 0.07807958126068115,
-                    "y": 0.02101576328277588,
+                    "x": 0.028039216995239258,
+                    "y": 0.042521119117736816,
                     "z": 0.0
                 },
                 "OldFakeScale": {
@@ -232,11 +238,144 @@
                     "y": 0.5
                 }
             }
+        },
+        "3": {
+            "ArchetypeID": "110000100000100000",
+            "Enabled": true,
+            "Name Tag": {
+                "Name": "blackscreen",
+                "Tag": "",
+                "IsActive": true,
+                "HierarchyParent": 0,
+                "HierarchyIndex": 2,
+                "HierarchyChildren": []
+            },
+            "Transform": {
+                "Position": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "Scale": {
+                    "x": 2.0,
+                    "y": 2.0,
+                    "z": 1.0
+                },
+                "Rotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "FakePosition": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "FakeRotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "FakeScale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "OldPosition": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "OldScale": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "OldRotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "OldFakePosition": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "OldFakeScale": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "OldFakeRotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "ParentPosition": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            "Graphics Component": {
+                "PointLight": false,
+                "TextureName": "",
+                "Show Mesh": false,
+                "Debug": false,
+                "ModelName": "",
+                "MeshName": "",
+                "MeshNodeName": "",
+                "Color": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0,
+                    "w": 1.0
+                },
+                "Used In 2D": false,
+                "Model UID": 0
+            },
+            "UI Sprite": {
+                "Texture": "Black.dds",
+                "EnableSprite": true,
+                "LayerID": 3,
+                "is Font": false,
+                "message": "",
+                "Font Texture": "",
+                "ForeGroundColour": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0,
+                    "w": 0.0
+                },
+                "Sprite Color": {
+                    "x": 0.10196078568696976,
+                    "y": 0.10196078568696976,
+                    "z": 0.10196078568696976,
+                    "w": 1.0
+                },
+                "BackGroundColour": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0,
+                    "w": 1.0
+                },
+                "BoundingBoxMin": {
+                    "x": -1.0,
+                    "y": -1.0
+                },
+                "BoundingBoxMax": {
+                    "x": 1.0,
+                    "y": 1.0
+                }
+            }
         }
     },
     "Scripts": {
         "1": {
             "StartingCutscene": {
+                "blackScreen": {
+                    "ScriptAPI.GameObject": 3
+                },
                 "gameObject": {
                     "ScriptAPI.GameObject": 1
                 }
@@ -248,10 +387,12 @@
                     "ScriptAPI.GameObject": 2
                 }
             }
-        }
+        },
+        "3": {}
     },
     "Active Archetype": {
         "1": "11000000000010",
-        "2": "11000000000010"
+        "2": "11000000000010",
+        "3": "110000100000100000"
     }
 }

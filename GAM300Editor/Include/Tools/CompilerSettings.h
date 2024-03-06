@@ -13,6 +13,11 @@ namespace TDS
 {
 	struct GeomDescriptor
 	{
+		struct NormalizationValues
+		{
+			float m_MinMax[2] = { -1.f, -1.f };
+		};
+
 		/*!*************************************************************************
 		 * Transform struct
 		 ***************************************************************************/
@@ -36,16 +41,21 @@ namespace TDS
 		{
 			std::string m_FilePath;
 			Transform m_L2W;
+			
 			bool MergeMesh = false;
 		};
 
 		bool		m_Compress = true;
+		bool		m_PretransformedVertices = false;
+		bool		m_RemoveChildMeshes = false;
+		bool		m_MergeMesh = false;
 		bool		m_LoadMesh = true;
-		bool		m_LoadAnimation = false; //Sometimes u might want to load mesh only OR animation data only
+		bool		m_LoadAnimation = false; 
 		bool		m_LoadMaterials = true;
 		bool		m_Centralize = false;
 		Desc		m_Descriptor;
 		GenerateLOD m_LodOptions;
+		NormalizationValues m_NDC;
 		bool Serialize(std::string_view FilePath, bool Read);
 	};
 

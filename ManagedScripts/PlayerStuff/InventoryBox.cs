@@ -36,14 +36,21 @@ public class InventoryBox : Script
         DisplayItem();
         if(Clicked())
         {
-            if(InventoryScript.currentTab == "Items")
-            {
-                UseObject();
-            }
-            else
-            {
-                //ViewObject();
-            }
+            //if(InventoryScript.currentTab == "Items")
+            //{
+            //    UseObject();
+            //}
+            //else
+            //{
+            //    ViewObject();
+            //}
+
+            GameObjectScriptFind("ItemDisplay").GetComponent<UISpriteComponent>().SetTextureName(storedObjTexture);
+            Console.WriteLine(storedObjTexture);
+            GameObjectScriptFind("ItemName").GetComponent<UISpriteComponent>().SetFontMessage(storedObjName);
+            Console.WriteLine(storedObjName);
+
+            InventoryScript.currentBox = BoxNumber;
         }
     }
 
@@ -90,7 +97,7 @@ public class InventoryBox : Script
         if(storedObjName != "")
         {
             InventoryScript.itemObjsInInventory[BoxNumber] = "";
-            InventoryScript.itemsObjsImg[BoxNumber] = "Inventory Box Img.dds";
+            InventoryScript.itemsObjsImg[BoxNumber] = "A_Inventory Box.dds";
 
             // Do stuff based on what item is used
             if(storedObjName == "Battery")

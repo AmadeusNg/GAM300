@@ -101,6 +101,11 @@ namespace TDS
             DLL_API  void loadSound(SoundInfo& soundInfo);
 
             /**
+             * Unloads a sound from container
+             */
+            DLL_API  void unloadSound(std::string pating);
+
+            /**
             * Plays a sound file using FMOD's low level audio system. If the sound file has not been
             * previously loaded using loadSoundFile(), a console message is displayed
             *
@@ -138,6 +143,50 @@ namespace TDS
             DLL_API  void stopAllSound();
 
             /**
+             * Set global volume
+             * Range 0 - 100
+             */
+            DLL_API  void SetGlobalVolume(float vol);
+
+            /**
+             * Get global volume
+             * Range of 0 - 100
+            */
+            DLL_API  float getGlobalVolume();
+
+            /**
+             * Set channelgroup volume
+             * Range 0 - 100
+             */
+            DLL_API  void SetChannelGroupVolume(char tag, float vol);
+
+            /**
+             * Get channelgroup volume
+             * Range of 0 - 100
+            */
+            DLL_API  float getChannelGroupVolume(char tag);
+
+            /**
+             * Set specific sound volume
+             */
+            DLL_API  void SetSoundVolume(float vol, SoundInfo& soundInfo);
+
+            /**
+             * Get specific sound volume
+             */
+            DLL_API  float GetSoundVolume(SoundInfo& soundInfo);
+
+            /**
+            * Fades out sound to a stop
+            */
+            DLL_API  void FadeOutSound(unsigned int duration, SoundInfo& soundInfo);
+
+            /**
+            * Fade in sound
+            */
+            DLL_API  void FadeInSound(unsigned int duration, SoundInfo& soundInfo);
+
+            /**
              * Method that updates the volume of a soundloop that is playing. This can be used to create audio 'fades'
              * where the volume ramps up or down to the provided new volume
              * @param fadeSampleLength the length in samples of the intended volume sample. If less than 64 samples, the default
@@ -151,17 +200,17 @@ namespace TDS
             * The SoundInfo object's position coordinates will be used for the new sound position, so
             * SoundInfo::set3DCoords(x,y,z) should be called before this method to set the new desired location.
             */
-            DLL_API  void update3DSoundPosition(SoundInfo& soundInfo);
+            DLL_API  void update3DSoundPosition(Vec3 pos, SoundInfo& soundInfo);
 
             /**
              * Checks if a sound is playing.
              */
-            DLL_API  bool soundIsPlaying(SoundInfo& soundInfo);
+            DLL_API  bool checkPlaying(SoundInfo& soundInfo);
 
             /**
             * Checks if a sound is paused
             */
-            DLL_API  bool soundIsPaused(SoundInfo& soundInfo);
+            DLL_API  bool checkPaused(SoundInfo& soundInfo);
 
             /**
              * Checks if a sound has finished playing.
@@ -268,7 +317,12 @@ namespace TDS
             /**
              * Get container of event instances that's loaded
              */
-            DLL_API   std::map<std::string, FMOD::Studio::EventInstance*> getEventInstanceContainer();
+            DLL_API  std::map<std::string, FMOD::Studio::EventInstance*> getEventInstanceContainer();
+
+            /**
+             * Find the SoundInfo by name
+             */
+            DLL_API  SoundInfo* findSound(std::string name);
 
             // The audio sampling rate of the audio engine
             DLL_API  static const int AUDIO_SAMPLE_RATE = 44100;
@@ -326,8 +380,14 @@ namespace TDS
             // Listener upwards vector, initialized to default value
             FMOD_VECTOR up = { 0.0f, 1.0f, 0.0f };
 
-            // Main group for low level system which all sounds go though
+            // Main group for low level system which all sounds go through
             FMOD::ChannelGroup* mastergroup = 0;
+
+            // SFX group for low level system which all SFX go through
+            FMOD::ChannelGroup* SFX = 0;
+
+            // BGM group for low level system which all BGM go through
+            FMOD::ChannelGroup* BGM = 0;
 
             // Low-level system reverb TODO add multi-reverb support
             FMOD::Reverb3D* reverb;
@@ -345,23 +405,20 @@ namespace TDS
              * Map which caches FMOD Low-Level sounds
              * Key is the SoundInfo's uniqueKey field.
              * Value is the FMOD::Sound* to be played back.
-             * TODO Refactor to use numeric UID as key
              */
             std::map<unsigned int, FMOD::Sound*> sounds{};
 
             /*
-             * Map which stores the current playback channels of any playing sound loop
-             * Key is the SoundInfo's uniqueKey field.
-             * Value is the FMOD::Channel* the FMOD::Sound* is playing back on.
+             * Map which stores details for SoundInfo that's loaded
              */
-            std::map<unsigned int, FMOD::Channel*> loopsPlaying{};
+            std::map<std::string, SoundInfo*> SoundInfo_Container{};
 
             /*
              * Map which stores the current playback channels of any playing sound
              * Key is the SoundInfo's uniqueKey field.
              * Value is the FMOD::Channel* the FMOD::Sound* is playing back on.
              */
-            std::map<unsigned int, FMOD::Channel*> normalPlaying{};
+            std::map<unsigned int, FMOD::Channel*> channels{};
 
             /*
              * Map which stores the soundbanks loaded with loadFMODStudioBank()
@@ -396,16 +453,37 @@ namespace TDS
         static void ScriptPlay(std::string pathing);
         static void ScriptPause(std::string pathing);
         static void ScriptStop(std::string pathing);
+        static void ScriptLoad(std::string pathing);
+        static void ScriptUnload(std::string pathing);
+        static SoundInfo* ScriptGetSound(std::string pathing);
+        static unsigned int ScriptGetID(std::string pathing);
+
+        static bool CheckPlaying(std::string pathing); //to be changed
+        static bool CheckPause(std::string pathing); //to be changed
         static void ScriptPlayAllPaused();
         static void ScriptPauseAll();
         static void ScriptStopAll();
         static bool ScriptAnySoundPlaying();
+        static void ScriptFadeOut(unsigned int duration, std::string pathing);
+        static void ScriptFadeIn(unsigned int duration, std::string pathing);
+        static void ScriptSetPosition(Vec3 pos, std::string pathing);
+        static void ScriptSetListenerPos(Vec3 pos, Vec3 for_vec, Vec3 up_vec);
 
         static SoundInfo* find_sound_info(std::string str);
         static void Add_to_Queue(std::string str = "");
         static void Remove_from_Queue(std::string str);
         static void Play_queue();
         static void Clear_queue();
+
+        static float getVolume(std::string pathing);
+        static float getMasterVolume();
+        static float getBGMVolume();
+        static float getSFXVolume();
+
+        static void SetVolume(float vol, std::string pathing);
+        static void SetMasterVolume(float vol);
+        static void SetBGMVolume(float vol);
+        static void SetSFXVolume(float vol);
 
         static bool checkifdone(std::string str);
 

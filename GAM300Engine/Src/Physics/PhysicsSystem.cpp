@@ -205,6 +205,10 @@ namespace TDS
 			_transform->SetPosition(JoltToTDS::ToVec3(pBodies->GetPosition(JPHBodyID)));
 			_rigidbody->SetLinearVel(JoltToTDS::ToVec3(pBodies->GetLinearVelocity(JPHBodyID)));
 		}
+		else if (_rigidbody->getDoor())
+		{
+			_transform->SetPosition(JoltToTDS::ToVec3(pBodies->GetRotation(JPHBodyID).GetEulerAngles()));
+		}
 		if (_rigidbody->getIsRayHit() &&  
 			(collector->mHits.data()->mBodyID.GetIndexAndSequenceNumber() != _rigidbody->GetBodyID().GetIndexAndSequenceNumber() ||
 			collector->HadHit() == false))
@@ -335,13 +339,22 @@ namespace TDS
 
 
 	void PhysicsSystem::JPH_Raycast(const EntityID& entities, Transform* _transform, RigidBody* _rigidbody)
+
 	{
-		float offsetDistance = _transform->GetScale().x + 20.0f;
+		//float vRayScale = _rigidbody->getRayScale();
+		////float offsetDistance = _transform->GetScale().x + 100.0f;
+		//JPH::Vec3 vRayOrigin = JoltToTDS::ToVec3(_transform->GetPosition());
+		//JPH::Vec3 vRayDirection = JoltToTDS::ToVec3(GraphicsManager::getInstance().GetCamera().getForwardVector());
+
+		//JPH::RayCast ray{ vRayOrigin, vRayDirection * 20.0f * vRayScale };
+		//collector->Reset();
+		//m_pSystem->GetBroadPhaseQuery().CastRay(ray, *collector);
+		float offsetDistance = _transform->GetScale().x * 0.5f;
 		JPH::Vec3 vRayOrigin = JoltToTDS::ToVec3(_transform->GetPosition() + GraphicsManager::getInstance().GetCamera().getForwardVector() * offsetDistance);
 		JPH::Vec3 vRayDirection = JoltToTDS::ToVec3(GraphicsManager::getInstance().GetCamera().getForwardVector());
+		JPH::Vec3 vScaledRayDir = vRayDirection * _rigidbody->getRayScale();
 
-		float vRayScale = _rigidbody->getRayScale();
-		JPH::RayCast ray{ vRayOrigin, vRayDirection };
+		JPH::RayCast ray{ vRayOrigin, vScaledRayDir };
 		collector->Reset();
 		m_pSystem->GetBroadPhaseQuery().CastRay(ray, *collector);
 

@@ -15,6 +15,8 @@ namespace ScriptAPI
 		static void ToggleLayerToRender(int layerID, bool condition);
 		static void ToggleInventoryLayer(bool condition);
 		static void SetLayerToRender(int ID);
+		static void SetFadeFactor(float value);
+		static float GetFadeFactor();
 		static int CurrentRenderedLayer();
 		static unsigned int GetPickedObject();
 		static void SetClearColor(Vector4 clearColorVector);

@@ -37,7 +37,7 @@ public class Item_Script : Script
 
     public override void Update()
     {
-        if (isWithinRange())
+        if (gameObject.GetComponent<RigidBodyComponent>().IsRayHit())
         {
             _InteractUI.SetActive(true);
             if (Input.GetKeyDown(Keycode.E) /*&& isWithinRange() && rigidBodyComponent.IsRayHit()*/) // Maybe add 1 more condition to check if its within player's view

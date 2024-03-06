@@ -302,7 +302,8 @@ namespace TDS
 		}
 
 		GBufferPipeline->UpdateUBO(&m_SceneUBO, sizeof(SceneUniform), 5, frameIndex);
-		GBufferPipeline->UpdateUBO(m_GBufferBatch3D.m_BatchBuffers.data(), sizeof(BatchData) * m_GBufferBatch3D.m_BatchBuffers.size(), 15, frameIndex);
+		std::uint32_t batchCnt = AssetManager::GetInstance()->GetMeshFactory().GetBatchCount();
+		GBufferPipeline->UpdateUBO(m_GBufferBatch3D.m_BatchBuffers.data(), sizeof(BatchData) * batchCnt, 15, frameIndex);
 
 		if (AssetManager::GetInstance()->GetTextureFactory().m_UpdateArrayBatch)
 		{
@@ -318,7 +319,10 @@ namespace TDS
 			GBufferPipeline->BindDescriptor(frameIndex, 1);
 			GBufferPipeline->BindArrayDescriptorSet(0, 1, 1);
 
-			GBufferPipeline->DrawIndexed(*meshUpdate.m_MeshBuffer->m_VertexBuffer, *meshUpdate.m_MeshBuffer->m_IndexBuffer, frameIndex);
+			
+			//GBufferPipeline->DrawIndexed(*meshUpdate.m_MeshBuffer->m_VertexBuffer, *meshUpdate.m_MeshBuffer->m_IndexBuffer, frameIndex);
+			vkCmdDrawIndexedIndirect(commandBuffer, meshUpdate.m_MeshBuffer->m_IndirectBuffer->GetBuffer(), 0, meshUpdate.m_MeshBuffer->m_IndirectBuffer->getDataCount(), sizeof(VkDrawIndexedIndirectCommand));
+
 		}
 		m_GBufferBatch3D.m_BatchUpdateInfo.clear();
 
@@ -440,6 +444,9 @@ namespace TDS
 		//Check if this graphics component is even referencing a model
 		if (pModelController == nullptr) return;
 
+		auto entityToNodeItr = pModelController->m_EntityToNodeName.find(entityID);
+		if (entityToNodeItr == pModelController->m_EntityToNodeName.end())
+			pModelController->m_EntityToNodeName[entityID] = graphComp->m_MeshNodeName;
 
 		int textureID = AssetManager::GetInstance()->GetTextureFactory().GetTextureIndex(graphComp->m_TextureName, graphComp->m_TextureReference);
 
@@ -583,6 +590,14 @@ namespace TDS
 			GBufferPipeline->DrawIndexed(*meshUpdate.m_MeshBuffer->m_VertexBuffer, *meshUpdate.m_MeshBuffer->m_IndexBuffer, frameIndex);
 		}
 		m_Composition3DBatch.m_BatchUpdateInfo.clear();
+	}
+	void DeferredController::SetFadeFactor(float fadeValue)
+	{
+		m_ScreenFadeFactor = fadeValue;
+	}
+	float DeferredController::GetFadeFactor()
+	{
+		return m_ScreenFadeFactor;
 	}
 	void DeferredController::RenderUISceneMeshInstance(VkCommandBuffer commandBuffer, std::uint32_t frameIndex)
 	{
@@ -846,6 +861,7 @@ namespace TDS
 			if (GraphicsManager::getInstance().IsViewingFrom2D() == false)
 			{
 				pipeline->BindPipeline();
+				pipeline->SubmitPushConstant(&m_ScreenFadeFactor, sizeof(float), SHADER_FLAG::FRAGMENT);
 				pipeline->BindDescriptor(frameIndex, 1);
 				pipeline->Draw(6, frameIndex);
 			}

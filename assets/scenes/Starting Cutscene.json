@@ -1,14 +1,14 @@
 {
     "Archetype Sizes": {
-        "110000000000100": {
+        "110000000000100000": {
             "0": 272,
-            "1": 672,
+            "1": 768,
             "12": 720
         }
     },
     "Entity Data": {
         "1": {
-            "ArchetypeID": "110000000000100",
+            "ArchetypeID": "110000000000100000",
             "Enabled": true,
             "Name Tag": {
                 "Name": "Images",
@@ -63,6 +63,26 @@
                     "x": 0.0,
                     "y": 0.0,
                     "z": 0.0
+                },
+                "OldFakePosition": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "OldFakeScale": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "OldFakeRotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "ParentPosition": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
                 }
             },
             "UI Sprite": {
@@ -101,7 +121,7 @@
             }
         },
         "2": {
-            "ArchetypeID": "110000000000100",
+            "ArchetypeID": "110000000000100000",
             "Enabled": true,
             "Name Tag": {
                 "Name": "Narration",
@@ -156,6 +176,26 @@
                     "x": 0.0,
                     "y": 0.0,
                     "z": 0.0
+                },
+                "OldFakePosition": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "OldFakeScale": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "OldFakeRotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "ParentPosition": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
                 }
             },
             "UI Sprite": {
@@ -203,6 +243,11 @@
             }
         },
         "2": {
+            "ClosetAudio": {
+                "gameObject": {
+                    "ScriptAPI.GameObject": 2
+                }
+            },
             "CutsceneSubtitle": {
                 "gameObject": {
                     "ScriptAPI.GameObject": 2

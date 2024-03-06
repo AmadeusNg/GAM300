@@ -34,8 +34,8 @@ namespace TDS
 	****************************************************************************/
 	bool Serializer::SerializeToFile(const std::string& filePath)
 	{
-		std::ofstream ofs(filePath);
 		std::string str = Serialize();
+		std::ofstream ofs(filePath);
 		ofs << str;
 		ofs.flush();
 		ofs.close();
