@@ -39,13 +39,11 @@ namespace TDS {
 	class Particle_Component : public IComponent {
 	public:
 		DLL_API Particle_Component();
-		DLL_API ~Particle_Component();
+		DLL_API ~Particle_Component() = default;
 
-		RTTR_ENABLE(IComponent);
-		RTTR_REGISTRATION_FRIEND;
-
+	
 		//getter
-		float GetLife()					{ return Emitter.Life; };
+		float& GetLife()				{ return Emitter.Life; };
 		Vec3& GetSpawnoffset()			{ return Emitter.Spawnoffset; };
 		Vec3& GetVelocity()				{ return Emitter.Velocity; };
 		Vec3& GetAcceleration()			{ return Emitter.Acceleration; };
@@ -59,14 +57,18 @@ namespace TDS {
 		uint32_t& GetMaxParticles()		{ return maxparticles; }
 
 		//setters
-		void SetLife(float input)							{ Emitter.Life = input; }
-		void SetSpawnOffset(Vec3 input)						{ Emitter.Spawnoffset = input; }
-		void SetVelocity(Vec3 input)						{ Emitter.Velocity = input; }
-		void SetAcceleration(Vec3 input)					{ Emitter.Acceleration = input; }
-		//void SetPosition(Vec3 input)						{ Emitter.Position = input; }
-		void SetSize(Vec3 input)							{ Emitter.Size = input; }
-		void SetColor(Vec4 input)							{ Emitter.Color = input; }
-		void SetColor(float r, float g, float b, float a)	{ Emitter.Color = Vec4(r, g, b, a); }
+		void SetLife(float& input)								{ Emitter.Life = input; }
+		void SetSpawnOffset(Vec3& input)						{ Emitter.Spawnoffset = input; }
+		void SetVelocity(Vec3& input)							{ Emitter.Velocity = input; }
+		void SetAcceleration(Vec3& input)						{ Emitter.Acceleration = input; }
+		//void SetPosition(Vec3 input)							{ Emitter.Position = input; }
+		void SetSize(Vec3& input)								{ Emitter.Size = input; }
+		void SetColor(Vec4& input)								{ Emitter.Color = input; }
+		void SetSpawnTimer(float& input)						{ spawntimer = input; }
+	
+		RTTR_ENABLE(IComponent);
+		RTTR_REGISTRATION_FRIEND;
+
 	private:
 		ParticleEmitter Emitter;
 		ParticleMesh type{ CUBE };

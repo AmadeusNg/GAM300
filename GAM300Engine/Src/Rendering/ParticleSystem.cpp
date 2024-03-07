@@ -11,6 +11,7 @@ namespace TDS {
 
 
 	ParticleSystem::ParticleSystem() {
+		
 	}
 
 	ParticleSystem::~ParticleSystem() {
@@ -99,13 +100,15 @@ namespace TDS {
 		m_EmitterPipeline->BindPipeline();
 		for (unsigned int i{ 0 }; i < Entities.size(); ++i) {
 			Particle_Component currentEmitter = EmitterList[i];
-			currentEmitter.spawntimer += deltatime;
+			currentEmitter.GetSpawnTimer() += deltatime;
+			
+			//currentEmitter.SetSpawnTimer(currentEmitter.GetSpawnTimer() + deltatime);
 
 			unsigned int SpawnAmt = currentEmitter.GetSpawnTimer() / currentEmitter.GetSpawnInterval();
 
 			if (SpawnAmt <= 0)
 				continue;
-			
+			currentEmitter.GetEmitter().Position = Xform[i].GetPosition();
 			Particle_Emitter_PushData GPUPush = { SpawnAmt, currentEmitter.GetEmitter() };
 			m_EmitterPipeline->UpdateUBO(&GPUPush, sizeof(Particle_Emitter_PushData), 3, currentframe);
 			//bind ssbos?
