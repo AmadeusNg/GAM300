@@ -17,14 +17,25 @@ struct Particle {
 };
 
 struct ParticleEmitter{
-    float Life;
-    vec3 Spawnoffset;
-    vec3 Velocity;
-    vec3 Acceleration;
+    float min_Life, max_Life;
+    vec3 min_Spawnoffset, max_Spawnoffset;
+    vec3 min_Velocity, max_Velocity;
+    vec3 min_Acceleration, max_Acceleration;
+    vec3 min_Size, max_Size;
     vec3 Position;
-    vec3 Size;
     vec4 Color;
 };
+float seed(vec2 co){
+    return fract(sin(dot(co.xy ,vec2(12.9898,78.233)))* 43758.5453);
+}
+
+float rand(float min, float max){
+    return mix(min, max, seed(vec2(3.8,5.0)+ gl_GlobalInvocationID.xy));
+}
+
+vec3 randvec3(vec3 min, vec3 max){
+    return vec3(rand(min.x,max.x),rand(min.y,max.y),rand(min.z,max.z));
+}
 
 //writing the position of the particle out into a list to vertex buffer
 layout (std140, binding = 1) buffer ParticleBuffer {
@@ -44,14 +55,14 @@ layout (set = 0, binding = 3 ) buffer EmitterThingy{
 
 void MakeParticle(out Particle newparticle){
     //constant spawn point from emitter location
-    newparticle.Age = EmitterStuff.Emitter.Life;
-    newparticle.Velocity = EmitterStuff.Emitter.Velocity;
-    newparticle.Acceleration =  EmitterStuff.Emitter.Acceleration;
-    newparticle.Color = EmitterStuff.Emitter.Color.xyz;
+    newparticle.Age =           rand(EmitterStuff.Emitter.min_Life, EmitterStuff.Emitter.max_Life);
+    newparticle.Velocity =      randvec3(EmitterStuff.Emitter.min_Velocity, EmitterStuff.Emitter.max_Velocity);
+    newparticle.Acceleration =  randvec3(EmitterStuff.Emitter.min_Acceleration, EmitterStuff.Emitter.max_Acceleration);
+    newparticle.Size =          randvec3(EmitterStuff.Emitter.min_Size, EmitterStuff.Emitter.max_Size);
+    newparticle.CurrentPosition = EmitterStuff.Emitter.Position + randvec3(EmitterStuff.Emitter.min_Spawnoffset, EmitterStuff.Emitter.max_Spawnoffset);
 
-    newparticle.CurrentPosition = EmitterStuff.Emitter.Position + EmitterStuff.Emitter.Spawnoffset;
-    newparticle.Size = EmitterStuff.Emitter.Size;
     newparticle.Rotation = vec3(0.0,0.0,0.0);
+    newparticle.Color = EmitterStuff.Emitter.Color.xyz;
     newparticle.Active = true;
 }
 
