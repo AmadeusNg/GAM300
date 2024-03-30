@@ -13,6 +13,10 @@
 #include "sceneManager/sceneManager.h"
 #include "propertyManager/registration.h"
 #include "eventManager/eventManager.h"
+#include "AssetManagement/AssetManager.h"
+
+#undef GetObject
+
 
 namespace TDS
 {
@@ -65,11 +69,11 @@ namespace TDS
 		ecs.registerComponent<WinData>("Win Data");
 		ecs.registerComponent<UISprite>("UI Sprite");
 		ecs.registerComponent<SoundInfo>("Audio");
-		ecs.registerComponent<Particle_Component>("Particles");
+		ecs.registerComponent<Particle_Component>("Particle Component");
 		ecs.registerComponent<DirectionalLightComponent>("DirectionalLight");
 		ecs.registerComponent<SpotLightComponent>("SpotLight");
 		ecs.registerComponent<PointLightComponent>("PointLight");
-		ecs.registerComponent<Particle_Component>("Particle");
+		ecs.registerComponent<AnimationComponent>("AnimationComponent");
 
 		startScene = "";
 		//startScene = "MainMenu";
@@ -300,7 +304,12 @@ namespace TDS
 			for (rapidjson::Value::ConstMemberIterator itr = obj["Active Archetype"].MemberBegin(); itr != obj["Active Archetype"].MemberEnd(); ++itr)
 			{
 				EntityID currentEntity = static_cast<EntityID>(std::stoi(itr->name.GetString()));
-				auto activeArchetype = itr->value.GetString();
+				std::string activeArchetype = itr->value.GetString();
+
+				while (activeArchetype.length() < ecs.getNumberOfComponents())
+				{
+					activeArchetype += "0";
+				}
 
 				ecs.setActiveArchetype(currentEntity, activeArchetype);
 			}
@@ -574,6 +583,7 @@ namespace TDS
 	/*!*************************************************************************
 	This function serializes scenes into JSON files
 	****************************************************************************/
+
 	bool SceneManager::sceneSerialize()
 	{
 		std::ofstream ofs(parentFilePath + "scene.json");
@@ -685,6 +695,7 @@ namespace TDS
 	****************************************************************************/
 	void SceneManager::loadScene(std::string scene)
 	{
+		AssetManager::GetInstance()->ResetReferences();
 		ecs.removeAllEntities();
 		eventManager.clearQueues();
 		DeserializeFromFile(filePath + scene + ".json");

@@ -17,8 +17,9 @@ public class FireplaceAudio : Script
     {
         //commenting this out causes crash
 
-        //Vector3 fireplace_pos = GameObjectScriptFind("(Living room) Fireplace light").transform.GetPosition();
-        //audioComponent.set3DCoords(fireplace_pos.X, fireplace_pos.Y, fireplace_pos.Z);
+        Vector3 fireplace_pos = GameObjectScriptFind("(Living room) Fireplace light").transform.GetPosition();
+        audioComponent.set3DCoords(fireplace_pos, "fireplace");
+        audioComponent.play("fireplace");
         //audioComponent.set3DCoords(200.0f, 200.0f, 200.0f);
         
     }

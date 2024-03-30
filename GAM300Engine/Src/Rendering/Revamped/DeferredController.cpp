@@ -19,6 +19,10 @@
 #include "Physics/CollisionSystem.h"
 #include "components/tag.h"
 #include "Rendering/Skybox.h"
+#include "Animation/Animation.h"
+#include "Rendering/ParticleSystem.h"
+#include "Rendering/Revamped/MaterialManager.h"
+
 namespace TDS
 {
 
@@ -30,12 +34,13 @@ namespace TDS
 		CreatePipelines();
 
 
+
 	}
 	void DeferredController::CreatePipelines()
 	{
 		//Create illuminating light source
 		{
-			m_LightSource = std::make_unique<VulkanPipeline>();
+			/*m_LightSource = std::make_unique<VulkanPipeline>();
 
 			PipelineCreateEntry PipelineEntry;
 			PipelineEntry.m_NumDescriptorSets = 1;
@@ -55,7 +60,7 @@ namespace TDS
 			PipelineEntry.m_ShaderInputs.m_InputBuffers[11] = Buffer;
 			PipelineEntry.m_FBTarget = m_FrameBuffers[RENDER_PASS::RENDER_LIGTHING];
 
-			m_LightSource->Create(PipelineEntry);
+			m_LightSource->Create(PipelineEntry);*/
 
 		}
 
@@ -64,6 +69,9 @@ namespace TDS
 		{
 
 			//GlobalBufferPool::GetInstance()->AddToGlobalPool(sizeof(GlobalUBO), 0, VkBufferUsageFlagBits::VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, "PL");
+
+
+			GlobalBufferPool::GetInstance()->AddToGlobalPool(sizeof(MaterialBuffer) * m_MaterialList.size(), 16, VkBufferUsageFlagBits::VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, "MaterialBuffer");
 			PipelineCreateEntry entry{};
 			entry.m_NumDescriptorSets = 1;
 
@@ -99,9 +107,18 @@ namespace TDS
 			Buffer.m_Size = MAX_POSSIBLE_BATCH * sizeof(BatchData);
 			Buffer.m_Static = false;
 			entry.m_ShaderInputs.m_InputBuffers[15] = Buffer;
+
+			//BufferInfo Buffer1{};
+			//Buffer1.m_Data = m_GBufferBatch3D.m_MaterialList.data();
+			//Buffer1.m_Size = MAX_POSSIBLE_BATCH * sizeof(MaterialBuffer);
+			//Buffer1.m_Static = false;
+			//entry.m_ShaderInputs.m_InputBuffers[16] = Buffer1;
 			//GlobalBufferPool::GetInstance()->AddToGlobalPool(sizeof(GlobalUBO), 5, VkBufferUsageFlagBits::VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, "PL");
 			m_DeferredPipelines[DEFERRED_STAGE::STAGE_G_BUFFER_BATCH] = std::make_shared<VulkanPipeline>();
 			m_DeferredPipelines[DEFERRED_STAGE::STAGE_G_BUFFER_BATCH]->Create(entry);
+
+			m_DeferredPipelines[DEFERRED_STAGE::STAGE_G_BUFFER_BATCH]->UpdateUBO(m_MaterialList.data(), m_MaterialList.size() * sizeof(MaterialBuffer), 16, 0);
+			m_DeferredPipelines[DEFERRED_STAGE::STAGE_G_BUFFER_BATCH]->UpdateUBO(m_MaterialList.data(), m_MaterialList.size() * sizeof(MaterialBuffer), 16, 1);
 
 			PipelineCreateEntry entry2{};
 
@@ -124,9 +141,21 @@ namespace TDS
 			Buffer2.m_Static = false;
 			entry2.m_ShaderInputs.m_InputBuffers[15] = Buffer2;
 
+			BufferInfo Buffer3{};
+			Buffer3.m_Data = m_Bones.data();
+			Buffer3.m_Size = MAX_BONES * sizeof(Mat4);
+			Buffer3.m_Static = false;
+			entry2.m_ShaderInputs.m_InputBuffers[19] = Buffer3;
+
+			//BufferInfo Buffer4{};
+			//Buffer1.m_Data = m_GBufferInstance.m_MaterialList.data();
+			//Buffer1.m_Size = MAX_INSTANCE_BUFFER * sizeof(MaterialBuffer);
+			//Buffer1.m_Static = false;
+			//entry.m_ShaderInputs.m_InputBuffers[16] = Buffer4;
 
 			m_DeferredPipelines[DEFERRED_STAGE::STAGE_G_BUFFER_INSTANCE] = std::make_shared<VulkanPipeline>();
 			m_DeferredPipelines[DEFERRED_STAGE::STAGE_G_BUFFER_INSTANCE]->Create(entry2);
+
 
 		}
 
@@ -240,6 +269,12 @@ namespace TDS
 			Buffer.m_Static = false;
 			entry.m_ShaderInputs.m_InputBuffers[15] = Buffer;
 
+			//BufferInfo Buffer1{};
+			//Buffer1.m_Data = m_Composition3DBatch.m_MaterialList.data();
+			//Buffer1.m_Size = MAX_POSSIBLE_BATCH * sizeof(MaterialBuffer);
+			//Buffer1.m_Static = false;
+			//entry.m_ShaderInputs.m_InputBuffers[16] = Buffer1;
+
 			m_DeferredPipelines[DEFERRED_STAGE::STAGE_3D_COMPOSITION_BATCH] = std::make_shared<VulkanPipeline>();
 			m_DeferredPipelines[DEFERRED_STAGE::STAGE_3D_COMPOSITION_BATCH]->Create(entry);
 
@@ -264,6 +299,18 @@ namespace TDS
 			Buffer2.m_Static = false;
 			entry2.m_ShaderInputs.m_InputBuffers[15] = Buffer2;
 
+			BufferInfo Buffer3{};
+			Buffer3.m_Data = m_Bones.data();
+			Buffer3.m_Size = MAX_BONES * sizeof(Mat4);
+			Buffer3.m_Static = false;
+			entry2.m_ShaderInputs.m_InputBuffers[19] = Buffer3;
+
+
+			//BufferInfo Buffer4{};
+			//Buffer4.m_Data = m_Composition3DInstance.m_MaterialList.data();
+			//Buffer4.m_Size = MAX_INSTANCE_BUFFER * sizeof(MaterialBuffer);
+			//Buffer4.m_Static = false;
+			//entry2.m_ShaderInputs.m_InputBuffers[16] = Buffer4;
 
 			m_DeferredPipelines[DEFERRED_STAGE::STAGE_3D_COMPOSITION_INSTANCE] = std::make_shared<VulkanPipeline>();
 			m_DeferredPipelines[DEFERRED_STAGE::STAGE_3D_COMPOSITION_INSTANCE]->Create(entry2);
@@ -276,14 +323,16 @@ namespace TDS
 	}
 	void DeferredController::G_BufferPassBatch(VkCommandBuffer commandBuffer, std::uint32_t frameIndex)
 	{
+		auto& textureMgr = AssetManager::GetInstance()->GetTextureFactory();
+
 		auto GBufferPipeline = m_DeferredPipelines[DEFERRED_STAGE::STAGE_G_BUFFER_BATCH];
 		GBufferPipeline->SetCommandBuffer(commandBuffer);
 		for (auto& meshItr : m_GBufferBatch3D.m_BatchUpdateInfo)
 		{
 			for (auto& updates : meshItr.second.m_MeshUpdates)
 			{
-				m_GBufferBatch3D.m_BatchBuffers[updates.m_MeshID].m_EntityID = updates.m_EntityID;
-				m_GBufferBatch3D.m_BatchBuffers[updates.m_MeshID].m_IsRender = updates.m_ShowMesh;
+
+
 				Mat4 temp{};
 				if (updates.m_pTransform->GetPosition() == updates.m_pTransform->GetFakePosition() &&
 					updates.m_pTransform->GetScale() == updates.m_pTransform->GetFakeScale()
@@ -297,8 +346,42 @@ namespace TDS
 					temp = updates.m_pTransform->GetFakeTransform();
 				}
 
+
+				m_GBufferBatch3D.m_BatchBuffers[updates.m_MeshID].m_EntityID = updates.m_EntityID;
+				m_GBufferBatch3D.m_BatchBuffers[updates.m_MeshID].m_IsRender = updates.m_ShowMesh;
 				m_GBufferBatch3D.m_BatchBuffers[updates.m_MeshID].m_modelMatrix = temp;
 				m_GBufferBatch3D.m_BatchBuffers[updates.m_MeshID].m_TextureID = updates.m_TextureID;
+				m_GBufferBatch3D.m_BatchBuffers[updates.m_MeshID].m_UseMeshMatID = updates.m_UsePreloadedMaterials;
+				m_GBufferBatch3D.m_BatchBuffers[updates.m_MeshID].m_UseMaterials = updates.m_UseMaterials;
+				m_GBufferBatch3D.m_BatchBuffers[updates.m_MeshID].m_MaterialID = updates.m_MaterialID;
+
+				auto& materialBuffer = m_GBufferBatch3D.m_BatchBuffers[updates.m_MeshID].m_ComponentMaterial;
+				//Materials
+				{
+					materialBuffer.diffuseTex = textureMgr.GetTextureID(updates.m_pMaterialAttribute->m_phongBlinn.m_DiffuseTex);
+					materialBuffer.specularTex = textureMgr.GetTextureID(updates.m_pMaterialAttribute->m_phongBlinn.m_SpecularTex);
+					materialBuffer.ambientTex = textureMgr.GetTextureID(updates.m_pMaterialAttribute->m_phongBlinn.m_AmbientTex);
+					materialBuffer.emissiveTex = textureMgr.GetTextureID(updates.m_pMaterialAttribute->m_phongBlinn.m_EmissiveTex);
+					materialBuffer.shininessTex = textureMgr.GetTextureID(updates.m_pMaterialAttribute->m_phongBlinn.m_ShininessTex);
+					materialBuffer.diffuse = updates.m_pMaterialAttribute->m_phongBlinn.m_DiffuseColor;
+					materialBuffer.specular = updates.m_pMaterialAttribute->m_phongBlinn.m_SpecularColor;
+					materialBuffer.emissive = updates.m_pMaterialAttribute->m_phongBlinn.m_EmissiveColor;
+					materialBuffer.ambient = updates.m_pMaterialAttribute->m_phongBlinn.m_AmbientColor;
+					materialBuffer.shininess = updates.m_pMaterialAttribute->m_phongBlinn.m_Shininess;
+					materialBuffer.shininessStrength = updates.m_pMaterialAttribute->m_phongBlinn.m_ShininessStrength;
+					materialBuffer.reflectivity = updates.m_pMaterialAttribute->m_Reflectivity;
+
+					materialBuffer.reflectance = updates.m_pMaterialAttribute->m_Reflectance;
+					materialBuffer.reflectanceTex = textureMgr.GetTextureID(updates.m_pMaterialAttribute->m_ReflectanceTexture);
+
+					//NO PBR for now
+
+					//materialBuffer.normalTex = textureMgr.GetTextureID(updates.m_pMaterialAttribute->m_PBRAttributes.m_NormalTex);
+					materialBuffer.MaterialID = 0;
+					materialBuffer.ShadingModel = updates.m_pMaterialAttribute->m_shading;
+					materialBuffer.UseMaterialTextures = updates.m_UseMaterials;
+				}
+
 			}
 			meshItr.second.m_MeshUpdates.clear();
 		}
@@ -307,21 +390,23 @@ namespace TDS
 		std::uint32_t batchCnt = AssetManager::GetInstance()->GetMeshFactory().GetBatchCount();
 		GBufferPipeline->UpdateUBO(m_GBufferBatch3D.m_BatchBuffers.data(), sizeof(BatchData) * batchCnt, 15, frameIndex);
 
-		if (AssetManager::GetInstance()->GetTextureFactory().m_UpdateArrayBatch)
-		{
-			GBufferPipeline->UpdateTextureArray(4, VkDescriptorType::VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, AssetManager::GetInstance()->GetTextureFactory().GetTextureArray());
-			AssetManager::GetInstance()->GetTextureFactory().m_UpdateArrayBatch = false;
-		}
+		//if (AssetManager::GetInstance()->GetTextureFactory().m_UpdateArrayBatch)
+		//{
+		//	GBufferPipeline->UpdateTextureArray(4, VkDescriptorType::VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, AssetManager::GetInstance()->GetTextureFactory().GetTextureArray());
+		//	AssetManager::GetInstance()->GetTextureFactory().m_UpdateArrayBatch = false;
+		//}
 
 		for (auto& [meshName, meshUpdate] : m_GBufferBatch3D.m_BatchUpdateInfo)
 		{
+			if (meshUpdate.m_MeshBuffer == nullptr) continue;
+
 			GBufferPipeline->BindPipeline();
+
 			GBufferPipeline->BindVertexBuffer(*meshUpdate.m_MeshBuffer->m_VertexBuffer);
 			GBufferPipeline->BindIndexBuffer(*meshUpdate.m_MeshBuffer->m_IndexBuffer);
 			GBufferPipeline->BindDescriptor(frameIndex, 1);
 			GBufferPipeline->BindArrayDescriptorSet(0, 1, 1);
 
-			
 			//GBufferPipeline->DrawIndexed(*meshUpdate.m_MeshBuffer->m_VertexBuffer, *meshUpdate.m_MeshBuffer->m_IndexBuffer, frameIndex);
 			vkCmdDrawIndexedIndirect(commandBuffer, meshUpdate.m_MeshBuffer->m_IndirectBuffer->GetBuffer(), 0, meshUpdate.m_MeshBuffer->m_IndirectBuffer->getDataCount(), sizeof(VkDrawIndexedIndirectCommand));
 
@@ -331,34 +416,93 @@ namespace TDS
 	}
 	void DeferredController::G_BufferInstanced(VkCommandBuffer commandBuffer, std::uint32_t frameIndex)
 	{
+
+		auto& textureMgr = AssetManager::GetInstance()->GetTextureFactory();
+
 		auto GBufferPipeline = m_DeferredPipelines[DEFERRED_STAGE::STAGE_G_BUFFER_INSTANCE];
-		int startingOffset = 0;
+		unsigned int startingOffset = 0;
+		unsigned int totalAnimationOffset = 0;
+		bool useMaterials = false;
 		for (auto& itr : m_GBufferInstance.m_instanceRenderManager.m_InstanceUpdateInfo)
 		{
 			auto& instanceReq = m_GBufferInstance.m_InstanceRequests[m_GBufferInstance.m_GroupIdx];
 			instanceReq.m_MeshBuffer = itr.first;
-
+			std::string ModelName{};
 			for (std::uint32_t i = 0; i < itr.second.m_Index; ++i)
 			{
 				auto& meshUpdateData = itr.second.m_Updates[i];
 
 				auto& InstanceInfo = instanceReq.m_RenderInstanceInfo;
 				auto& instaneBuffer = m_GBufferInstance.m_InstanceBuffers[m_GBufferInstance.m_TotalInstances];
+				auto& materialBuffer = instaneBuffer.m_ComponentMaterial;
 
 				InstanceInfo.m_InstanceOffset = startingOffset;
 				InstanceInfo.m_Instances = itr.second.m_Index;
 
+				instaneBuffer.m_AnimOffset = totalAnimationOffset;
+				instaneBuffer.m_MaterialID = meshUpdateData.m_MaterialID;
+				instaneBuffer.m_IsRender = meshUpdateData.m_ShowMesh;
+				instaneBuffer.m_TextureID = meshUpdateData.m_TextureID;
+				instaneBuffer.m_EntityID = meshUpdateData.m_EntityID;
+				instaneBuffer.m_modelMatrix = meshUpdateData.m_pTransform->GetTransformMatrix();
+				instaneBuffer.m_IsAnimated = meshUpdateData.m_IsAnimated;
+				instaneBuffer.m_UseMaterials = useMaterials = meshUpdateData.m_UseMaterials;
+				instaneBuffer.m_UseMeshMatID = meshUpdateData.m_UsePreloadedMaterials;
+				ModelName = meshUpdateData.m_ModelName;
 				{
-					instaneBuffer.m_MaterialID = m_GBufferInstance.m_TotalInstances;
-					instaneBuffer.m_IsRender = meshUpdateData.m_ShowMesh;
-					instaneBuffer.m_TextureID = meshUpdateData.m_TextureID;
-					instaneBuffer.m_EntityID = meshUpdateData.m_EntityID;
-					instaneBuffer.m_modelMatrix = meshUpdateData.m_pTransform->GetTransformMatrix();
+
+					materialBuffer.diffuseTex = textureMgr.GetTextureID(meshUpdateData.m_pMaterialAttribute->m_phongBlinn.m_DiffuseTex);
+					materialBuffer.specularTex = textureMgr.GetTextureID(meshUpdateData.m_pMaterialAttribute->m_phongBlinn.m_SpecularTex);
+					materialBuffer.ambientTex = textureMgr.GetTextureID(meshUpdateData.m_pMaterialAttribute->m_phongBlinn.m_AmbientTex);
+					materialBuffer.emissiveTex = textureMgr.GetTextureID(meshUpdateData.m_pMaterialAttribute->m_phongBlinn.m_EmissiveTex);
+					materialBuffer.shininessTex = textureMgr.GetTextureID(meshUpdateData.m_pMaterialAttribute->m_phongBlinn.m_ShininessTex);
+					materialBuffer.diffuse = meshUpdateData.m_pMaterialAttribute->m_phongBlinn.m_DiffuseColor;
+					materialBuffer.specular = meshUpdateData.m_pMaterialAttribute->m_phongBlinn.m_SpecularColor;
+					materialBuffer.emissive = meshUpdateData.m_pMaterialAttribute->m_phongBlinn.m_EmissiveColor;
+					materialBuffer.ambient = meshUpdateData.m_pMaterialAttribute->m_phongBlinn.m_AmbientColor;
+					materialBuffer.shininess = meshUpdateData.m_pMaterialAttribute->m_phongBlinn.m_Shininess;
+					materialBuffer.shininessStrength = meshUpdateData.m_pMaterialAttribute->m_phongBlinn.m_ShininessStrength;
+					materialBuffer.reflectivity = meshUpdateData.m_pMaterialAttribute->m_Reflectivity;
+
+
+					materialBuffer.reflectance = meshUpdateData.m_pMaterialAttribute->m_Reflectance;
+					materialBuffer.reflectanceTex = textureMgr.GetTextureID(meshUpdateData.m_pMaterialAttribute->m_ReflectanceTexture);
+
+					//NO PBR for now
+
+					//materialBuffer.normalTex = textureMgr.GetTextureID(meshUpdateData.m_pMaterialAttribute->m_PBRAttributes.m_NormalTex);
+					materialBuffer.MaterialID = 0;
+					materialBuffer.ShadingModel = meshUpdateData.m_pMaterialAttribute->m_shading;
+					materialBuffer.UseMaterialTextures = meshUpdateData.m_UseMaterials;
+
+
 				}
+
+
+
+				if (meshUpdateData.m_IsAnimated)
+				{
+					if (meshUpdateData.m_pAnimationPlayer == nullptr)
+					{
+						meshUpdateData.m_pAnimationPlayer = &ecs.getComponent<AnimationComponent>(meshUpdateData.m_EntityID)->m_AnimationPlayer;
+					}
+
+					auto bones = meshUpdateData.m_pAnimationPlayer->getCurrentBonesMatrices();
+					for (size_t i = 0; i < bones->size() && i < MAX_BONES_PER_MESH; ++i)
+					{
+						m_Bones[totalAnimationOffset] = bones->at(i);
+						totalAnimationOffset++;
+					}
+
+
+				}
+
+
 
 				++m_GBufferInstance.m_TotalInstances;
 
 			}
+			instanceReq.m_ModelName = ModelName;
 			startingOffset = m_GBufferInstance.m_TotalInstances;
 			itr.second.m_Index = 0;
 			++m_GBufferInstance.m_GroupIdx;
@@ -366,18 +510,24 @@ namespace TDS
 
 
 		GBufferPipeline->UpdateUBO(&m_SceneUBO, sizeof(SceneUniform), 5, frameIndex);
+
+		GBufferPipeline->UpdateUBO(m_Bones.data(), sizeof(Mat4) * totalAnimationOffset, 19, frameIndex);
+
 		GBufferPipeline->UpdateUBO(m_GBufferInstance.m_InstanceBuffers.data(), sizeof(BatchData) * m_GBufferInstance.m_TotalInstances, 15, frameIndex);
 
-		if (AssetManager::GetInstance()->GetTextureFactory().m_UpdateArrayInstance)
-		{
-			GBufferPipeline->UpdateTextureArray(4, VkDescriptorType::VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, AssetManager::GetInstance()->GetTextureFactory().GetTextureArray());
-			AssetManager::GetInstance()->GetTextureFactory().m_UpdateArrayInstance = false;
-		}
+		//if (AssetManager::GetInstance()->GetTextureFactory().m_UpdateArrayInstance)
+		//{
+		//	GBufferPipeline->UpdateTextureArray(4, VkDescriptorType::VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, AssetManager::GetInstance()->GetTextureFactory().GetTextureArray());
+		//	AssetManager::GetInstance()->GetTextureFactory().m_UpdateArrayInstance = false;
+		//}
 
 		GBufferPipeline->SetCommandBuffer(commandBuffer);
 		for (std::uint32_t i = 0; i < m_GBufferInstance.m_GroupIdx; ++i)
 		{
 			auto& instanceReq = m_GBufferInstance.m_InstanceRequests[i];
+			
+			if (useMaterials)
+				UploadMaterialsList(instanceReq.m_ModelName);
 
 			GBufferPipeline->BindPipeline();
 			GBufferPipeline->BindVertexBuffer(*instanceReq.m_MeshBuffer->m_VertexBuffer);
@@ -401,7 +551,7 @@ namespace TDS
 		m_GBufferInstance.m_TotalInstances = 0;
 
 	}
-	void DeferredController::SubmitMesh(std::uint32_t entityID, GraphicsComponent* graphComp, Transform* transformComp)
+	void DeferredController::SubmitMesh(std::uint32_t entityID, GraphicsComponent* graphComp, Transform* transformComp, float _dt)
 	{
 		Mat4 temp{};
 
@@ -443,7 +593,6 @@ namespace TDS
 		}
 
 
-		//Check if this graphics component is even referencing a model
 		if (pModelController == nullptr) return;
 
 		auto entityToNodeItr = pModelController->m_EntityToNodeName.find(entityID);
@@ -453,7 +602,7 @@ namespace TDS
 		int textureID = AssetManager::GetInstance()->GetTextureFactory().GetTextureIndex(graphComp->m_TextureName, graphComp->m_TextureReference);
 
 		if (textureID == -1)
-			textureID = 499;
+			textureID = 999;
 
 		if (graphComp->m_UsedIn2D == false)
 		{
@@ -472,9 +621,14 @@ namespace TDS
 			SubmitMeshForUI(entityID, textureID, graphComp, transformComp);
 		}
 
+
+
+
 	}
 	void DeferredController::SubmitBatch(std::uint32_t entityID, int TextureID, Transform* transformComp, GraphicsComponent* graphComp)
 	{
+
+
 		MeshController* pMeshController = graphComp->m_MeshControllerRef.m_ResourcePtr;
 		MeshBuffer* meshBuffer = pMeshController->GetMeshBuffer();
 
@@ -488,6 +642,26 @@ namespace TDS
 		if (meshID == -1) return;
 
 
+
+		if (graphComp->m_UsePreloadMaterials && graphComp->m_UseMaterials)
+		{
+			auto& materialMgr = GraphicsManager::getInstance().GetMaterialManager();
+			MaterialData* matdata = materialMgr.GetMaterialData(graphComp->GetModelName());
+			if (matdata != nullptr)
+			{
+				int materialID = pMeshController->GetRoots().at(graphComp->m_MeshNodeName).m_MeshList[graphComp->m_MeshName].m_MaterialID;
+
+				auto findItr = matdata->m_materialAttributes.find(materialID);
+
+				if (findItr != matdata->m_materialAttributes.end())
+				{
+					graphComp->m_MaterialAttributes = findItr->second;
+				}
+			}
+		}
+
+
+
 		m_GBufferBatch3D.m_BatchUpdateInfo[graphComp->m_ModelName].m_MeshBuffer = pMeshController->GetMeshBuffer();
 		auto& batchUpdate = m_GBufferBatch3D.m_BatchUpdateInfo[graphComp->m_ModelName].m_MeshUpdates.emplace_back();
 
@@ -498,6 +672,10 @@ namespace TDS
 		batchUpdate.m_MeshID = meshID;
 		batchUpdate.m_ShowMesh = graphComp->ShowMesh();
 		batchUpdate.m_RenderIn2D = graphComp->m_UsedIn2D;
+		batchUpdate.m_pMaterialAttribute = &graphComp->m_MaterialAttributes;
+		batchUpdate.m_UseMaterials = graphComp->m_UseMaterials;
+		batchUpdate.m_UsePreloadedMaterials = graphComp->m_UsePreloadMaterials;
+		batchUpdate.m_ModelName = graphComp->m_ModelName;
 	}
 
 	void DeferredController::SubmitMeshForUI(std::uint32_t entityID, int TextureID, GraphicsComponent* graphComp, Transform* transformComp)
@@ -515,9 +693,25 @@ namespace TDS
 
 			if (meshID == -1) return;
 
+			if (graphComp->m_UsePreloadMaterials && graphComp->m_UseMaterials)
+			{
+				auto& materialMgr = GraphicsManager::getInstance().GetMaterialManager();
+				MaterialData* matdata = materialMgr.GetMaterialData(graphComp->GetModelName());
+				if (matdata != nullptr)
+				{
+					int materialID = pMeshController->GetRoots().at(graphComp->m_MeshNodeName).m_MeshList[graphComp->m_MeshName].m_MaterialID;
+
+					auto findItr = matdata->m_materialAttributes.find(materialID);
+
+					if (findItr != matdata->m_materialAttributes.end())
+					{
+						graphComp->m_MaterialAttributes = findItr->second;
+					}
+				}
+			}
 
 			m_Composition3DBatch.m_BatchUpdateInfo[graphComp->m_ModelName].m_MeshBuffer = pMeshController->GetMeshBuffer();
-			auto& batchUpdate = m_GBufferBatch3D.m_BatchUpdateInfo[graphComp->m_ModelName].m_MeshUpdates.emplace_back();
+			auto& batchUpdate = m_Composition3DBatch.m_BatchUpdateInfo[graphComp->m_ModelName].m_MeshUpdates.emplace_back();
 
 			batchUpdate.m_EntityID = entityID;
 			batchUpdate.m_pTransform = transformComp;
@@ -526,6 +720,10 @@ namespace TDS
 			batchUpdate.m_MeshID = meshID;
 			batchUpdate.m_ShowMesh = graphComp->ShowMesh();
 			batchUpdate.m_RenderIn2D = graphComp->m_UsedIn2D;
+			batchUpdate.m_pMaterialAttribute = &graphComp->m_MaterialAttributes;
+			batchUpdate.m_UseMaterials = graphComp->m_UseMaterials;
+			batchUpdate.m_UsePreloadedMaterials = graphComp->m_UsePreloadMaterials;
+			batchUpdate.m_ModelName = graphComp->m_ModelName;
 		}
 		else
 		{
@@ -552,12 +750,18 @@ namespace TDS
 			updateData->m_MeshID = 0;
 			updateData->m_ShowMesh = graphComp->ShowMesh();
 			updateData->m_RenderIn2D = graphComp->m_UsedIn2D;
+			updateData->m_pMaterialAttribute = &graphComp->m_MaterialAttributes;
+			updateData->m_UseMaterials = graphComp->m_UseMaterials;
+			updateData->m_UsePreloadedMaterials = graphComp->m_UsePreloadMaterials;
+			updateData->m_ModelName = graphComp->m_ModelName;
 			++instanceUpdatePack.m_Index;
 		}
 	}
 
 	void DeferredController::RenderUISceneMeshBatch(VkCommandBuffer commandBuffer, std::uint32_t frameIndex)
 	{
+		auto& textureMgr = AssetManager::GetInstance()->GetTextureFactory();
+		if (GraphicsManager::getInstance().IsViewingFrom2D() == false) return;
 		auto GBufferPipeline = m_DeferredPipelines[DEFERRED_STAGE::STAGE_3D_COMPOSITION_BATCH];
 		GBufferPipeline->SetCommandBuffer(commandBuffer);
 		for (auto& meshItr : m_Composition3DBatch.m_BatchUpdateInfo)
@@ -568,18 +772,51 @@ namespace TDS
 				m_Composition3DBatch.m_BatchBuffers[updates.m_MeshID].m_IsRender = updates.m_ShowMesh;
 				m_Composition3DBatch.m_BatchBuffers[updates.m_MeshID].m_modelMatrix = updates.m_pTransform->GetFakeTransform();
 				m_Composition3DBatch.m_BatchBuffers[updates.m_MeshID].m_TextureID = updates.m_TextureID;
+				m_Composition3DBatch.m_BatchBuffers[updates.m_MeshID].m_MaterialID = updates.m_MaterialID;
+				m_Composition3DBatch.m_BatchBuffers[updates.m_MeshID].m_UseMaterials = updates.m_UseMaterials;
+				m_Composition3DBatch.m_BatchBuffers[updates.m_MeshID].m_UseMeshMatID = updates.m_UsePreloadedMaterials;
+
+				auto& materialBuffer = m_Composition3DBatch.m_BatchBuffers[updates.m_MeshID].m_ComponentMaterial;
+				//Materials
+				{
+					materialBuffer.diffuseTex = textureMgr.GetTextureID(updates.m_pMaterialAttribute->m_phongBlinn.m_DiffuseTex);
+					materialBuffer.specularTex = textureMgr.GetTextureID(updates.m_pMaterialAttribute->m_phongBlinn.m_SpecularTex);
+					materialBuffer.ambientTex = textureMgr.GetTextureID(updates.m_pMaterialAttribute->m_phongBlinn.m_AmbientTex);
+					materialBuffer.emissiveTex = textureMgr.GetTextureID(updates.m_pMaterialAttribute->m_phongBlinn.m_EmissiveTex);
+					materialBuffer.shininessTex = textureMgr.GetTextureID(updates.m_pMaterialAttribute->m_phongBlinn.m_ShininessTex);
+					materialBuffer.diffuse = updates.m_pMaterialAttribute->m_phongBlinn.m_DiffuseColor;
+					materialBuffer.specular = updates.m_pMaterialAttribute->m_phongBlinn.m_SpecularColor;
+					materialBuffer.emissive = updates.m_pMaterialAttribute->m_phongBlinn.m_EmissiveColor;
+					materialBuffer.ambient = updates.m_pMaterialAttribute->m_phongBlinn.m_AmbientColor;
+					materialBuffer.shininess = updates.m_pMaterialAttribute->m_phongBlinn.m_Shininess;
+					materialBuffer.shininessStrength = updates.m_pMaterialAttribute->m_phongBlinn.m_ShininessStrength;
+					materialBuffer.reflectivity = updates.m_pMaterialAttribute->m_Reflectivity;
+
+					materialBuffer.reflectance = updates.m_pMaterialAttribute->m_Reflectance;
+					materialBuffer.reflectanceTex = textureMgr.GetTextureID(updates.m_pMaterialAttribute->m_ReflectanceTexture);
+
+					//NO PBR for now
+
+					//materialBuffer.normalTex = textureMgr.GetTextureID(updates.m_pMaterialAttribute->m_PBRAttributes.m_NormalTex);
+					materialBuffer.MaterialID = 0;
+					materialBuffer.ShadingModel = updates.m_pMaterialAttribute->m_shading;
+					materialBuffer.UseMaterialTextures = updates.m_UseMaterials;
+				}
 			}
 			meshItr.second.m_MeshUpdates.clear();
 		}
 
+
+
+
 		GBufferPipeline->UpdateUBO(&m_SceneUBO, sizeof(SceneUniform), 5, frameIndex);
 		GBufferPipeline->UpdateUBO(m_Composition3DBatch.m_BatchBuffers.data(), sizeof(BatchData) * m_Composition3DBatch.m_BatchBuffers.size(), 15, frameIndex);
 
-		if (AssetManager::GetInstance()->GetTextureFactory().m_UpdateArrayBatch)
-		{
-			GBufferPipeline->UpdateTextureArray(4, VkDescriptorType::VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, AssetManager::GetInstance()->GetTextureFactory().GetTextureArray());
-			AssetManager::GetInstance()->GetTextureFactory().m_UpdateArrayBatch = false;
-		}
+		//if (AssetManager::GetInstance()->GetTextureFactory().m_UpdateArrayBatch)
+		//{
+		//	GBufferPipeline->UpdateTextureArray(4, VkDescriptorType::VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, AssetManager::GetInstance()->GetTextureFactory().GetTextureArray());
+		//	AssetManager::GetInstance()->GetTextureFactory().m_UpdateArrayBatch = false;
+		//}
 
 		for (auto& [meshName, meshUpdate] : m_Composition3DBatch.m_BatchUpdateInfo)
 		{
@@ -603,53 +840,94 @@ namespace TDS
 	}
 	void DeferredController::RenderUISceneMeshInstance(VkCommandBuffer commandBuffer, std::uint32_t frameIndex)
 	{
+		if (GraphicsManager::getInstance().IsViewingFrom2D() == false) return;
+
+		auto& textureMgr = AssetManager::GetInstance()->GetTextureFactory();
+		bool useMaterials = false;
+
 		auto GBufferPipeline = m_DeferredPipelines[DEFERRED_STAGE::STAGE_3D_COMPOSITION_INSTANCE];
 		int startingOffset = 0;
 		for (auto& itr : m_Composition3DInstance.m_instanceRenderManager.m_InstanceUpdateInfo)
 		{
+			std::string ModelName{};
 			auto& instanceReq = m_Composition3DInstance.m_InstanceRequests[m_Composition3DInstance.m_GroupIdx];
 			instanceReq.m_MeshBuffer = itr.first;
 
 			for (std::uint32_t i = 0; i < itr.second.m_Index; ++i)
 			{
 				auto& meshUpdateData = itr.second.m_Updates[i];
-
+				ModelName = meshUpdateData.m_ModelName;
 				auto& InstanceInfo = instanceReq.m_RenderInstanceInfo;
 				auto& instaneBuffer = m_Composition3DInstance.m_InstanceBuffers[m_Composition3DInstance.m_TotalInstances];
 
 				InstanceInfo.m_InstanceOffset = startingOffset;
 				InstanceInfo.m_Instances = itr.second.m_Index;
+				
 
 				{
-					instaneBuffer.m_MaterialID = m_Composition3DInstance.m_TotalInstances;
 					instaneBuffer.m_IsRender = meshUpdateData.m_ShowMesh;
 					instaneBuffer.m_TextureID = meshUpdateData.m_TextureID;
 					instaneBuffer.m_EntityID = meshUpdateData.m_EntityID;
 					instaneBuffer.m_modelMatrix = meshUpdateData.m_pTransform->GetTransformMatrix();
+					instaneBuffer.m_UseMaterials = useMaterials = meshUpdateData.m_UseMaterials;
+					instaneBuffer.m_UseMeshMatID = meshUpdateData.m_UsePreloadedMaterials;
+					instaneBuffer.m_MaterialID = meshUpdateData.m_MaterialID;
+					
 				}
 
+
+				auto& materialBuffer = instaneBuffer.m_ComponentMaterial;
+				//Materials
+				{
+					materialBuffer.diffuseTex = textureMgr.GetTextureID(meshUpdateData.m_pMaterialAttribute->m_phongBlinn.m_DiffuseTex);
+					materialBuffer.specularTex = textureMgr.GetTextureID(meshUpdateData.m_pMaterialAttribute->m_phongBlinn.m_SpecularTex);
+					materialBuffer.ambientTex = textureMgr.GetTextureID(meshUpdateData.m_pMaterialAttribute->m_phongBlinn.m_AmbientTex);
+					materialBuffer.emissiveTex = textureMgr.GetTextureID(meshUpdateData.m_pMaterialAttribute->m_phongBlinn.m_EmissiveTex);
+					materialBuffer.shininessTex = textureMgr.GetTextureID(meshUpdateData.m_pMaterialAttribute->m_phongBlinn.m_ShininessTex);
+					materialBuffer.diffuse = meshUpdateData.m_pMaterialAttribute->m_phongBlinn.m_DiffuseColor;
+					materialBuffer.specular = meshUpdateData.m_pMaterialAttribute->m_phongBlinn.m_SpecularColor;
+					materialBuffer.emissive = meshUpdateData.m_pMaterialAttribute->m_phongBlinn.m_EmissiveColor;
+					materialBuffer.ambient = meshUpdateData.m_pMaterialAttribute->m_phongBlinn.m_AmbientColor;
+					materialBuffer.shininess = meshUpdateData.m_pMaterialAttribute->m_phongBlinn.m_Shininess;
+					materialBuffer.shininessStrength = meshUpdateData.m_pMaterialAttribute->m_phongBlinn.m_ShininessStrength;
+					materialBuffer.reflectivity = meshUpdateData.m_pMaterialAttribute->m_Reflectivity;
+
+					materialBuffer.reflectance = meshUpdateData.m_pMaterialAttribute->m_Reflectance;
+					materialBuffer.reflectanceTex = textureMgr.GetTextureID(meshUpdateData.m_pMaterialAttribute->m_ReflectanceTexture);
+
+					//NO PBR for now
+
+					//materialBuffer.normalTex = textureMgr.GetTextureID(meshUpdateData.m_pMaterialAttribute->m_PBRAttributes.m_NormalTex);
+					materialBuffer.MaterialID = 0;
+					materialBuffer.ShadingModel = meshUpdateData.m_pMaterialAttribute->m_shading;
+					materialBuffer.UseMaterialTextures = meshUpdateData.m_UseMaterials;
+				}
 				++m_Composition3DInstance.m_TotalInstances;
 
 			}
+			instanceReq.m_ModelName = ModelName;
 			startingOffset = m_Composition3DInstance.m_TotalInstances;
 			itr.second.m_Index = 0;
 			++m_Composition3DInstance.m_GroupIdx;
 		}
 
-
 		GBufferPipeline->UpdateUBO(&m_SceneUBO, sizeof(SceneUniform), 5, frameIndex);
 		GBufferPipeline->UpdateUBO(m_Composition3DInstance.m_InstanceBuffers.data(), sizeof(BatchData) * m_Composition3DInstance.m_TotalInstances, 15, frameIndex);
 
-		if (AssetManager::GetInstance()->GetTextureFactory().m_UpdateArrayInstance)
-		{
-			GBufferPipeline->UpdateTextureArray(4, VkDescriptorType::VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, AssetManager::GetInstance()->GetTextureFactory().GetTextureArray());
-			AssetManager::GetInstance()->GetTextureFactory().m_UpdateArrayInstance = false;
-		}
+		//if (AssetManager::GetInstance()->GetTextureFactory().m_UpdateArrayInstance)
+		//{
+		//	GBufferPipeline->UpdateTextureArray(4, VkDescriptorType::VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, AssetManager::GetInstance()->GetTextureFactory().GetTextureArray());
+		//	AssetManager::GetInstance()->GetTextureFactory().m_UpdateArrayInstance = false;
+		//}
 
 		GBufferPipeline->SetCommandBuffer(commandBuffer);
 		for (std::uint32_t i = 0; i < m_Composition3DInstance.m_GroupIdx; ++i)
 		{
 			auto& instanceReq = m_Composition3DInstance.m_InstanceRequests[i];
+
+			if (useMaterials)
+				UploadMaterialsList(instanceReq.m_ModelName);
+
 
 			GBufferPipeline->BindPipeline();
 			GBufferPipeline->BindVertexBuffer(*instanceReq.m_MeshBuffer->m_VertexBuffer);
@@ -668,6 +946,7 @@ namespace TDS
 	}
 	void DeferredController::G_BufferPass(VkCommandBuffer commandBuffer, std::uint32_t frameIndex)
 	{
+		//UpdateMaterialList();
 
 		m_FrameBuffers[RENDER_PASS::RENDER_G_BUFFER]->BeginRenderPass(commandBuffer);
 		{
@@ -690,6 +969,8 @@ namespace TDS
 			{
 				m_LightingPushConstant.toggleDebugLight = 1;
 			}
+
+			ParticleSystem::Render();
 		}
 		m_FrameBuffers[RENDER_PASS::RENDER_G_BUFFER]->EndRenderPass(commandBuffer);
 	}
@@ -698,6 +979,7 @@ namespace TDS
 	{
 		MeshController* pMeshController = graphComp->m_MeshControllerRef.m_ResourcePtr;
 		MeshBuffer* meshBuffer = pMeshController->GetMeshBuffer();
+		MaterialManager& mtrMgr = GraphicsManager::getInstance().GetMaterialManager();
 
 		if (m_GBufferInstance.m_GroupIdx >= MAX_INSTANCE_BUFFER)
 		{
@@ -705,20 +987,25 @@ namespace TDS
 			return;
 		}
 
-		auto& instanceUpdatePack = m_GBufferInstance.m_instanceRenderManager.m_InstanceUpdateInfo[meshBuffer];
 
+		auto& instanceUpdatePack = m_GBufferInstance.m_instanceRenderManager.m_InstanceUpdateInfo[meshBuffer];
 
 		MeshUpdate* updateData = (instanceUpdatePack.m_Index == instanceUpdatePack.m_Updates.size()) ?
 			&instanceUpdatePack.m_Updates.emplace_back() : &instanceUpdatePack.m_Updates[instanceUpdatePack.m_Index];
 
 
 		updateData->m_pTransform = transformComp;
-		updateData->m_IsAnimated = false;
+		updateData->m_IsAnimated = graphComp->m_IsAnimated;
 		updateData->m_TextureID = TextureID;
 		updateData->m_EntityID = entityID;
 		updateData->m_MeshID = 0;
 		updateData->m_ShowMesh = graphComp->ShowMesh();
 		updateData->m_RenderIn2D = graphComp->m_UsedIn2D;
+		updateData->m_pMaterialAttribute = &graphComp->m_MaterialAttributes;
+		updateData->m_UseMaterials = graphComp->m_UseMaterials;
+		updateData->m_UsePreloadedMaterials = graphComp->m_UsePreloadMaterials;
+		updateData->m_ModelName = graphComp->m_ModelName;
+
 		++instanceUpdatePack.m_Index;
 
 	}
@@ -744,6 +1031,109 @@ namespace TDS
 			if (fb != nullptr)
 				fb->Destroy();
 		}
+	}
+	void DeferredController::UpdateAllTextureArrays()
+	{
+		if (AssetManager::GetInstance()->GetTextureFactory().m_UpdateTextureArray3D)
+		{
+			m_DeferredPipelines[STAGE_G_BUFFER_BATCH]->UpdateTextureArray(4, VkDescriptorType::VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, AssetManager::GetInstance()->GetTextureFactory().GetTextureArray());
+			m_DeferredPipelines[STAGE_G_BUFFER_INSTANCE]->UpdateTextureArray(4, VkDescriptorType::VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, AssetManager::GetInstance()->GetTextureFactory().GetTextureArray());
+			m_DeferredPipelines[STAGE_3D_COMPOSITION_INSTANCE]->UpdateTextureArray(4, VkDescriptorType::VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, AssetManager::GetInstance()->GetTextureFactory().GetTextureArray());
+			m_DeferredPipelines[STAGE_3D_COMPOSITION_BATCH]->UpdateTextureArray(4, VkDescriptorType::VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, AssetManager::GetInstance()->GetTextureFactory().GetTextureArray());
+			AssetManager::GetInstance()->GetTextureFactory().m_UpdateTextureArray3D = false;
+		}
+	}
+	void DeferredController::UpdateMaterialList()
+	{
+
+
+		auto& textureMgr = AssetManager::GetInstance()->GetTextureFactory();
+		auto& materialMgr = GraphicsManager::getInstance().GetMaterialManager();
+
+		if (materialMgr.m_UpdateMaterialList)
+		{
+			unsigned int MatIndx = 0;
+			for (auto& materialData : materialMgr.m_ModelToMaterials)
+			{
+				for (auto& materialAttribute : materialData.second.m_materialAttributes)
+				{
+					auto& materialBuffer = m_MaterialList[MatIndx++];
+
+					materialBuffer.diffuseTex = textureMgr.GetTextureID(materialAttribute.second.m_phongBlinn.m_DiffuseTex);
+					materialBuffer.specularTex = textureMgr.GetTextureID(materialAttribute.second.m_phongBlinn.m_SpecularTex);
+					materialBuffer.ambientTex = textureMgr.GetTextureID(materialAttribute.second.m_phongBlinn.m_AmbientTex);
+					materialBuffer.emissiveTex = textureMgr.GetTextureID(materialAttribute.second.m_phongBlinn.m_EmissiveTex);
+					materialBuffer.shininessTex = textureMgr.GetTextureID(materialAttribute.second.m_phongBlinn.m_ShininessTex);
+					materialBuffer.diffuse = materialAttribute.second.m_phongBlinn.m_DiffuseColor;
+					materialBuffer.specular = materialAttribute.second.m_phongBlinn.m_SpecularColor;
+					materialBuffer.emissive = materialAttribute.second.m_phongBlinn.m_EmissiveColor;
+					materialBuffer.ambient = materialAttribute.second.m_phongBlinn.m_AmbientColor;
+					materialBuffer.shininess = materialAttribute.second.m_phongBlinn.m_Shininess;
+					materialBuffer.shininessStrength = materialAttribute.second.m_phongBlinn.m_ShininessStrength;
+					materialBuffer.reflectivity = materialAttribute.second.m_Reflectivity;
+
+					materialBuffer.reflectance = materialAttribute.second.m_Reflectance;
+					materialBuffer.reflectanceTex = textureMgr.GetTextureID(materialAttribute.second.m_ReflectanceTexture);
+
+					//NO PBR for now
+
+					//materialBuffer.normalTex = textureMgr.GetTextureID(materialAttribute.second.m_PBRAttributes.m_NormalTex);
+					materialBuffer.MaterialID = materialAttribute.first;
+					materialBuffer.ShadingModel = materialAttribute.second.m_shading;
+					materialBuffer.UseMaterialTextures = true;
+				}
+
+
+			}
+			m_DeferredPipelines[DEFERRED_STAGE::STAGE_G_BUFFER_BATCH]->UpdateUBO(m_MaterialList.data(), m_MaterialList.size() * sizeof(MaterialBuffer), 16, 0);
+			m_DeferredPipelines[DEFERRED_STAGE::STAGE_G_BUFFER_BATCH]->UpdateUBO(m_MaterialList.data(), m_MaterialList.size() * sizeof(MaterialBuffer), 16, 1);
+			materialMgr.m_UpdateMaterialList = false;
+		}
+
+	}
+	void DeferredController::UploadMaterialsList(std::string_view modelName)
+	{
+		auto& textureMgr = AssetManager::GetInstance()->GetTextureFactory();
+		auto& materialMgr = GraphicsManager::getInstance().GetMaterialManager();
+
+		/*if (materialMgr.m_UpdateMaterialList)
+		{*/
+		unsigned int MatIndx = 0;
+
+		for (auto& materialAttribute : materialMgr.m_ModelToMaterials[modelName.data()].m_materialAttributes)
+		{
+			auto& materialBuffer = m_MaterialList[MatIndx++];
+
+			materialBuffer.diffuseTex = textureMgr.GetTextureID(materialAttribute.second.m_phongBlinn.m_DiffuseTex);
+			materialBuffer.specularTex = textureMgr.GetTextureID(materialAttribute.second.m_phongBlinn.m_SpecularTex);
+			materialBuffer.ambientTex = textureMgr.GetTextureID(materialAttribute.second.m_phongBlinn.m_AmbientTex);
+			materialBuffer.emissiveTex = textureMgr.GetTextureID(materialAttribute.second.m_phongBlinn.m_EmissiveTex);
+			materialBuffer.shininessTex = textureMgr.GetTextureID(materialAttribute.second.m_phongBlinn.m_ShininessTex);
+			materialBuffer.diffuse = materialAttribute.second.m_phongBlinn.m_DiffuseColor;
+			materialBuffer.specular = materialAttribute.second.m_phongBlinn.m_SpecularColor;
+			materialBuffer.emissive = materialAttribute.second.m_phongBlinn.m_EmissiveColor;
+			materialBuffer.ambient = materialAttribute.second.m_phongBlinn.m_AmbientColor;
+			materialBuffer.shininess = materialAttribute.second.m_phongBlinn.m_Shininess;
+			materialBuffer.shininessStrength = materialAttribute.second.m_phongBlinn.m_ShininessStrength;
+			materialBuffer.reflectivity = materialAttribute.second.m_Reflectivity;
+
+			materialBuffer.reflectance = materialAttribute.second.m_Reflectance;
+			materialBuffer.reflectanceTex = textureMgr.GetTextureID(materialAttribute.second.m_ReflectanceTexture);
+
+			//NO PBR for now
+
+			//materialBuffer.normalTex = textureMgr.GetTextureID(materialAttribute.second.m_PBRAttributes.m_NormalTex);
+			materialBuffer.MaterialID = materialAttribute.first;
+			materialBuffer.ShadingModel = materialAttribute.second.m_shading;
+			materialBuffer.UseMaterialTextures = true;
+		}
+
+
+
+		m_DeferredPipelines[DEFERRED_STAGE::STAGE_G_BUFFER_BATCH]->UpdateUBO(m_MaterialList.data(), MatIndx * sizeof(MaterialBuffer), 16, 0);
+		m_DeferredPipelines[DEFERRED_STAGE::STAGE_G_BUFFER_BATCH]->UpdateUBO(m_MaterialList.data(), MatIndx * sizeof(MaterialBuffer), 16, 1);
+		//materialMgr.m_UpdateMaterialList = false;
+		/*}*/
 	}
 	FBO* DeferredController::GetFrameBuffer(RENDER_PASS renderpassType)
 	{
@@ -779,9 +1169,9 @@ namespace TDS
 		lightingPipeline->UpdateUBO(m_LightUBOs.m_DirectionalLight.data(), sizeof(DirectionalLight) * m_LightingPushConstant.activeDirLights, 22, frameIndex);
 		lightingPipeline->UpdateUBO(m_LightUBOs.m_SpotLights.data(), sizeof(SpotLight) * m_LightingPushConstant.activeSpotLights, 23, frameIndex);
 
-		m_LightSource->SetCommandBuffer(commandBuffer);
-		m_LightSource->UpdateUBO(&m_SceneUBO, sizeof(SceneUniform), 5, frameIndex);
-		m_LightSource->UpdateUBO(m_LightSourceBuffers.data(), m_LightSrcInstance * sizeof(LightSourceProperties), 11, frameIndex);
+		//m_LightSource->SetCommandBuffer(commandBuffer);
+		//m_LightSource->UpdateUBO(&m_SceneUBO, sizeof(SceneUniform), 5, frameIndex);
+		//m_LightSource->UpdateUBO(m_LightSourceBuffers.data(), m_LightSrcInstance * sizeof(LightSourceProperties), 11, frameIndex);
 
 		LightingBuffer->BeginRenderPass(commandBuffer);
 		{
@@ -822,13 +1212,24 @@ namespace TDS
 			auto albedo = G_Buffer->GetTargets().at(0)->getImageInfoDescriptor();
 			auto positions = G_Buffer->GetTargets().at(2)->getImageInfoDescriptor();
 			auto normals = G_Buffer->GetTargets().at(3)->getImageInfoDescriptor();
+			auto PhongBlinnProp = G_Buffer->GetTargets().at(4)->getImageInfoDescriptor();
+			auto LightCondition = G_Buffer->GetTargets().at(5)->getImageInfoDescriptor();
+
 
 			LightingPipeline->UpdateDescriptor(albedo, VkDescriptorType::VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 4, 0);
+			LightingPipeline->UpdateDescriptor(albedo, VkDescriptorType::VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 4, 0);
+
 			LightingPipeline->UpdateDescriptor(positions, VkDescriptorType::VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 5, 0);
 			LightingPipeline->UpdateDescriptor(normals, VkDescriptorType::VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 6, 0);
 			LightingPipeline->UpdateDescriptor(albedo, VkDescriptorType::VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 4, 1);
 			LightingPipeline->UpdateDescriptor(positions, VkDescriptorType::VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 5, 1);
 			LightingPipeline->UpdateDescriptor(normals, VkDescriptorType::VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 6, 1);
+
+			LightingPipeline->UpdateDescriptor(PhongBlinnProp, VkDescriptorType::VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 8, 0);
+			LightingPipeline->UpdateDescriptor(PhongBlinnProp, VkDescriptorType::VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 8, 1);
+
+			LightingPipeline->UpdateDescriptor(LightCondition, VkDescriptorType::VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 9, 0);
+			LightingPipeline->UpdateDescriptor(LightCondition, VkDescriptorType::VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 9, 1);
 		}
 
 		//Update composition Pass
@@ -840,7 +1241,7 @@ namespace TDS
 		}
 
 	}
-	
+
 	void DeferredController::CombinationPass(VkCommandBuffer commandBuffer, std::uint32_t frameIndex)
 	{
 		auto fbo = m_FrameBuffers[RENDER_PASS::RENDER_COMPOSITION];
@@ -866,14 +1267,27 @@ namespace TDS
 				pipeline->SubmitPushConstant(&m_ScreenFadeFactor, sizeof(float), SHADER_FLAG::FRAGMENT);
 				pipeline->BindDescriptor(frameIndex, 1);
 				pipeline->Draw(6, frameIndex);
+
 			}
 			else
 			{
+				Mat4 scaleFactor = Mat4::identity();
+				if (GraphicsManager::getInstance().IsNormalizedView())
+				{
+					scaleFactor = Mat4::Scale(Vec3(0.005f, 0.005f, 0.005f));
+				}
+				m_SceneUBO.m_View = GraphicsManager::getInstance().GetCamera().GetViewMatrix() * scaleFactor;
+				m_SceneUBO.m_Proj = Mat4::Perspective(GraphicsManager::getInstance().GetCamera().m_Fov * Mathf::Deg2Rad,
+					GraphicsManager::getInstance().GetSwapchainRenderer().getAspectRatio(), 0.1f, 1000000.f);
+
+				m_SceneUBO.m_Proj.m[1][1] *= -1;
 				RenderUISceneMeshBatch(commandBuffer, frameIndex);
 				RenderUISceneMeshInstance(commandBuffer, frameIndex);
 			}
+
 			renderer2D->Draw(commandBuffer, frameIndex);
 			fontrenderer->Draw(commandBuffer, frameIndex);
+
 
 
 		}
@@ -895,15 +1309,15 @@ namespace TDS
 
 	void DeferredController::SubmitPointLight(std::uint32_t entityID, PointLightComponent* poingLight, Transform* transformComp)
 	{
-		auto& LightSrcBuffer = m_LightSourceBuffers[m_LightSrcInstance];
-		LightSrcBuffer.Position = transformComp->GetPosition();
-		LightSrcBuffer.Radius = transformComp->GetScale().x;
-		LightSrcBuffer.Color = poingLight->m_color;
+		//auto& LightSrcBuffer = m_LightSourceBuffers[m_LightSrcInstance];
+		//LightSrcBuffer.Position = transformComp->GetPosition();
+		//LightSrcBuffer.Radius = transformComp->GetScale().x;
+		//LightSrcBuffer.Color = poingLight->m_color;
 
 
 		poingLight->m_Position = transformComp->GetPosition();
 
-		m_LightSrcInstance++;
+		//m_LightSrcInstance++;
 
 		auto& pointLightBuffer = m_LightUBOs.m_PointLights[m_LightingPushConstant.activepointlights];
 		pointLightBuffer.Position = poingLight->m_Position;
@@ -913,12 +1327,12 @@ namespace TDS
 	}
 	void DeferredController::SubmitDirectionalLight(std::uint32_t entityID, DirectionalLightComponent* dirLight, Transform* transformComp)
 	{
-		auto& LightSrcBuffer = m_LightSourceBuffers[m_LightSrcInstance];
-		LightSrcBuffer.Position = transformComp->GetPosition();
-		LightSrcBuffer.Radius = transformComp->GetScale().x;
-		LightSrcBuffer.Color = dirLight->m_color;
+		//auto& LightSrcBuffer = m_LightSourceBuffers[m_LightSrcInstance];
+		//LightSrcBuffer.Position = transformComp->GetPosition();
+		//LightSrcBuffer.Radius = transformComp->GetScale().x;
+		//LightSrcBuffer.Color = dirLight->m_color;
 
-		m_LightSrcInstance++;
+		//m_LightSrcInstance++;
 
 		auto& dirLightBuffer = m_LightUBOs.m_DirectionalLight[m_LightingPushConstant.activeDirLights];
 		dirLightBuffer.direction = dirLight->m_Direction;
@@ -947,17 +1361,17 @@ namespace TDS
 
 		//spotLightComp->m_Position = GraphicsManager::getInstance().GetCamera().getPosition();
 		//spotLightComp->m_direction = forwardDirection;
-		
-
-		
 
 
 
-		auto& LightSrcBuffer = m_LightSourceBuffers[m_LightSrcInstance];
-		LightSrcBuffer.Position = transformComp->GetPosition();
-		LightSrcBuffer.Radius = transformComp->GetScale().x;
-		LightSrcBuffer.Color = spotLightComp->m_color;
-		m_LightSrcInstance++;
+
+
+
+		//auto& LightSrcBuffer = m_LightSourceBuffers[m_LightSrcInstance];
+		//LightSrcBuffer.Position = transformComp->GetPosition();
+		//LightSrcBuffer.Radius = transformComp->GetScale().x;
+		//LightSrcBuffer.Color = spotLightComp->m_color;
+		//m_LightSrcInstance++;
 
 		//Vec4 positionInViewSpace = m_SceneUBO.m_View * Vec4(spotLightComp->m_Position, 1.0);
 
@@ -980,7 +1394,7 @@ namespace TDS
 
 
 		spotLightBuffer.direction = spotLightComp->m_direction;
-		spotLightBuffer.Position = LightSrcBuffer.Position;
+		spotLightBuffer.Position = transformComp->GetPosition();
 
 
 		spotLightBuffer.attenuation = spotLightComp->m_attenuation;

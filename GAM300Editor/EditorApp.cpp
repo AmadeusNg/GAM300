@@ -37,6 +37,7 @@
 #include "Input/InputSystem.h"
 #include "Rendering/GridRenderer.h"
 #include "MessagingSystem/MessageSystem.h"
+#include "Rendering/Revamped/MaterialManager.h"
 
 bool isPlaying = false;
 bool gamePaused = false;
@@ -49,7 +50,7 @@ namespace TDS
     Application::Application(HINSTANCE hinstance, int& nCmdShow, const wchar_t* classname, WNDPROC wndproc)
         :m_window(hinstance, nCmdShow, classname)
     {
-        m_window.createWindow(wndproc, 1280, 720);
+        m_window.createWindow(wndproc, 1280, 720, false);
 
         //m_pVKInst = std::make_shared<VulkanInstance>(m_window);
         //m_Renderer = std::make_shared<Renderer>(m_window, *m_pVKInst.get());
@@ -103,6 +104,20 @@ namespace TDS
 
         case WM_KEYDOWN:
         {
+            if (wParam == VK_F11)
+            {
+                if (m_window.IsFullScreen() == false && !GraphicsManager::getInstance().IfFrameHasBegin())
+                {
+                    m_window.IsFullScreen() = true;
+                    m_window.ToggleFullScreen(true);
+                }
+                else if (m_window.IsFullScreen() == true && !GraphicsManager::getInstance().IfFrameHasBegin())
+                {
+                    m_window.IsFullScreen() = false;
+                    m_window.ToggleFullScreen(false);
+                }
+                else { }
+            }
             uint32_t VKcode = static_cast<uint32_t>(wParam);
             WORD keyflags = HIWORD(lParam);
             if (!(keyflags & KF_REPEAT))
@@ -148,12 +163,6 @@ namespace TDS
 
             }
 
-        }break;
-        case WM_MOUSEWHEEL: {
-            InputSystem::GetInstance()->processMouseScroll(wParam);
-        }break;
-        case WM_MOUSEMOVE:
-        {
             POINT p;
             GetCursorPos(&p);
             ScreenToClient(GetActiveWindow(), &p);
@@ -167,9 +176,16 @@ namespace TDS
                         TDS::InputSystem::GetInstance()->setWindowCenter((windowRect.left + windowRect.right) / 2, (windowRect.top + windowRect.bottom) / 2);
                     }
                 }
-                TDS::InputSystem::GetInstance()->lockMouseCenter(hWnd);
+                TDS::InputSystem::GetInstance()->lockMouseCenter(activeWindow);
             }
 
+        }break;
+        case WM_MOUSEWHEEL: {
+            InputSystem::GetInstance()->processMouseScroll(wParam);
+        }break;
+        case WM_SETCURSOR:
+        {
+            TDS::InputSystem::GetInstance()->hideMouse();
         }break;
         }
     }
@@ -183,9 +199,13 @@ namespace TDS
     }
     void Application::Initialize()
     {
-        ShaderReflector::GetInstance()->Init(SHADER_DIRECTORY, REFLECTED_BIN);
+         ShaderReflector::GetInstance()->Init(SHADER_DIRECTORY, REFLECTED_BIN);
         GraphicsManager::getInstance().Init(&m_window);
         AssetManager::GetInstance()->PreloadAssets();
+        GraphicsManager::getInstance().GetMaterialManager().PreloadMaterialInfos();
+  
+        
+        
         //skyboxrender.Init();
         GraphicsManager::getInstance().GetDebugRenderer().Init();
         GraphicsManager::getInstance().InitSkyBox();
@@ -255,6 +275,7 @@ namespace TDS
         {
             InputSystem::GetInstance()->update();
 
+
             TimeStep::CalculateDeltaTime();
             float DeltaTime = TimeStep::GetDeltaTime();
             std::shared_ptr<EditorScene> pScene = static_pointer_cast<EditorScene>(LevelEditorManager::GetInstance()->panels[SCENE]);
@@ -312,6 +333,7 @@ namespace TDS
                     startPlaying = false;
                     SceneManager::GetInstance()->awake();
                     SceneManager::GetInstance()->start();
+                    proxy_audio_system::ScriptPlayAllPaused();
                 }
 
                 if (!gamePaused)

@@ -57,6 +57,7 @@ void	WriteData(TYPE& data)\
 			rttr::variant	extract_basic_types(const rttr::type t);
 			void			DeserializeRecursion(rttr::instance m_inst);
 			void			ReadSequential(rttr::variant_sequential_view& view);
+			void			ReadAssociative(rttr::variant_associative_view& view);
 
 
 
@@ -65,7 +66,7 @@ void	WriteData(TYPE& data)\
 			void			WriteData(T& data)
 			{
 				(data);
-				return false;
+				return;
 			}
 
 

@@ -21,6 +21,8 @@
 #include "Rendering/Revamped/FrameBuffers/FrameBufferObject.h"
 #include "Rendering/FontRenderer.h"
 #include "Rendering/Skybox.h"
+#include "Rendering/ParticleSystem.h"
+#include "Rendering/Revamped/MaterialManager.h"
 #undef BROADCAST_MESSAGE
 
 
@@ -57,6 +59,7 @@ namespace TDS
 		m_SwapchainRenderer = std::make_shared<Renderer>(*m_pWindow, *m_MainVkContext);
 		m_Renderer2D = std::make_shared<Renderer2D>();
 		m_FontRenderer = std::make_shared<FontRenderer>();
+		m_MaterialManager = std::make_shared<MaterialManager>();
 		DefaultTextures::GetInstance().Init();
 
 
@@ -174,12 +177,16 @@ namespace TDS
 	{
 		if (currentCommand == nullptr) return;
 
+
+		m_DeferredController->UpdateAllTextureArrays();
+
 		auto currFrame = m_SwapchainRenderer->getFrameIndex();
+
 		m_DeferredController->G_BufferPass(currentCommand, currFrame);
 		m_DeferredController->LightingPass(currentCommand, currFrame);
+		
 		m_DeferredController->CombinationPass(currentCommand, currFrame);
 
-		
 		m_ObjectPicking->Update(currentCommand, currFrame, InputSystem::GetInstance()->getLocalMousePos());
 
 		m_SwapchainRenderer->BeginSwapChainRenderPass(currentCommand);
@@ -219,6 +226,11 @@ namespace TDS
 		return m_StartRender;
 	}
 
+	MaterialManager& GraphicsManager::GetMaterialManager()
+	{
+		return *m_MaterialManager;
+	}
+
 
 
 	void GraphicsManager::AddRenderLayer(RenderLayer* layer)
@@ -253,6 +265,7 @@ namespace TDS
 		m_DebugRenderer->DestroyPipeline();
 		m_FontRenderer->ShutDown();
 		m_ObjectPicking->Shutdown();
+		ParticleSystem::ShutDown();
 		m_FinalQuad->ShutDown();
 		m_FinalQuadVertexBuffer->DestroyBuffer();
 		m_FinalQuadIndexBuffer->DestroyBuffer();
@@ -264,9 +277,8 @@ namespace TDS
 		m_Framebuffer->~FrameBuffer();
 		DefaultTextures::GetInstance().DestroyDefaultTextures();
 		m_SwapchainRenderer->ShutDown();
+		
 		m_CommandManager->Shutdown();
-
-		RendererDataManager::Destroy();
 		GraphicsAllocator::GetInstance().ShutDown();
 
 
@@ -350,6 +362,7 @@ namespace TDS
 		m_FinalQuad->BindIndexBuffer(*m_FinalQuadIndexBuffer);
 		m_FinalQuad->BindDescriptor(frame, 1);
 		m_FinalQuad->DrawIndexed(*m_FinalQuadVertexBuffer, *m_FinalQuadIndexBuffer, frame);
+		
 	}
 	void GraphicsManager::CreateFullScreen()
 	{

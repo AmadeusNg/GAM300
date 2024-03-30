@@ -29,7 +29,7 @@ namespace TDS
 		Vec4			bgColor;
 		Vec4			fgColor;
 		Vec4			m_UVstartEnd = { 0.f, 0.f, 0.f, 0.f };
-		Vec4			m_texID = { 499.f, 0.f, 0.f, 0.f };
+		Vec4			m_texID = { 999.f, 0.f, 0.f, 0.f };
 	};
 	struct InstanceFontInfo
 	{
@@ -37,7 +37,7 @@ namespace TDS
 		FontColorInfo   m_FontColor{};
 		Vec4			m_StartEnd;
 		std::uint32_t	m_LayerID;
-		std::uint32_t	m_TextureIndex = 499;
+		std::uint32_t	m_TextureIndex = 999;
 	};
 
 	struct FontBatch : Batch2D
@@ -71,6 +71,7 @@ namespace TDS
 		DLL_API void ShutDown();
 		void DLL_API Draw(VkCommandBuffer commandBuffer, int Frame);
 		void DLL_API Update(VkCommandBuffer commandBuffer, int Frame);
+		DLL_API VulkanPipeline& GetPipeline();
 		inline FontBatch& GetBatchList()
 		{
 			return m_FontBatch;

@@ -5,7 +5,8 @@ namespace TDS
 {
 	WindowsWin::WindowsWin(HINSTANCE hInstance, int nCmdShow, const wchar_t* className)
 		:m_handleWindows{ nullptr }, m_hInstance{ hInstance }, m_Width{ 0 }, m_Height{ 0 },
-		m_classname{ className }, m_cmdshow{ nCmdShow }
+		m_classname{ className }, m_cmdshow{ nCmdShow }, m_isFullScreen{ false }, m_OriginalWidth{0},
+		m_OriginalHeight{0}
 	{
 	}
 
@@ -50,7 +51,7 @@ namespace TDS
 		return RegisterClassEx(&windowclass) ? true : false;
 	}
 
-	bool WindowsWin::createWindow(const WNDPROC& wndproc, int _width, int _height)
+	bool WindowsWin::createWindow(const WNDPROC& wndproc, int _width, int _height, bool gameWindow)
 	{
 		if (false == registerWindow(wndproc))
 		{
@@ -64,16 +65,32 @@ namespace TDS
 		const int screenWidth{ GetSystemMetrics(SM_CXSCREEN) };
 		const int screenHeight{ GetSystemMetrics(SM_CYSCREEN) };
 
-		m_Width = _width;
-		m_Height = _height;
 
 		RECT windowRect;
-		SetRect(&windowRect, static_cast<decltype(windowRect.left)>(screenWidth / 2 - m_Width / 2),
-			static_cast<decltype(windowRect.left)>(screenHeight / 2 - m_Height / 2),
-			static_cast<decltype(windowRect.left)>(screenWidth / 2 + m_Width / 2),
-			static_cast<decltype(windowRect.left)>(screenHeight / 2 + m_Height / 2));
+		DWORD style{};
 
-		DWORD style = WS_OVERLAPPEDWINDOW; // WS_THICKFRAME to resize will include it next time
+		if (gameWindow)
+		{
+			m_Width = screenWidth;
+			m_Height = screenHeight;
+			SetRect(&windowRect, 0, 0, static_cast<decltype(windowRect.left)>(screenWidth), static_cast<decltype(windowRect.left)>(screenHeight));
+			
+			style = WS_POPUP | WS_VISIBLE;
+		}
+		else
+		{
+			m_Width = _width;
+			m_Height = _height;
+			m_OriginalWidth = _width;
+			m_OriginalHeight = _height;
+
+			SetRect(&windowRect, static_cast<decltype(windowRect.left)>(screenWidth / 2 - m_Width / 2),
+				static_cast<decltype(windowRect.left)>(screenHeight / 2 - m_Height / 2),
+				static_cast<decltype(windowRect.left)>(screenWidth / 2 + m_Width / 2),
+				static_cast<decltype(windowRect.left)>(screenHeight / 2 + m_Height / 2));
+
+			style = WS_OVERLAPPEDWINDOW; // WS_THICKFRAME to resize will include it next time
+		}
 
 		AdjustWindowRectEx(&windowRect, style, FALSE, 0);
 
@@ -123,21 +140,38 @@ namespace TDS
 
 		return false;
 	}
-	void WindowsWin::ToggleFullScreen()
+	void WindowsWin::ToggleFullScreen(const bool& _toggle)
 	{
-		m_isFullScreen = !m_isFullScreen;
+		const int screenWidth{ GetSystemMetrics(SM_CXSCREEN) };
+		const int screenHeight{ GetSystemMetrics(SM_CYSCREEN) };
+		if (_toggle) {
+			//monitor width and height in pixel
 
-		if (m_isFullScreen) {
+			m_Width = screenWidth;
+			m_Height = screenHeight;
+
 			// Switch to full screen
 			SetWindowLongPtr(m_handleWindows, GWL_STYLE, WS_POPUP | WS_VISIBLE);
 			SetWindowLongPtr(m_handleWindows, GWL_EXSTYLE, 0);
+			SetWindowPos(m_handleWindows, HWND_TOP, 0, 0, screenWidth, screenHeight, SWP_FRAMECHANGED);
 			ShowWindow(m_handleWindows, SW_MAXIMIZE);
 
 		}
 		else {
+
+			m_Width = m_OriginalWidth;
+			m_Height = m_OriginalHeight;
+
+			// Adjust the window size to the original width and height
+			RECT windowRect;
+			SetRect(&windowRect, static_cast<decltype(windowRect.left)>(screenWidth / 2 - m_Width / 2),
+				static_cast<decltype(windowRect.left)>(screenHeight / 2 - m_Height / 2), m_Width, m_Height);
+			AdjustWindowRectEx(&windowRect, WS_OVERLAPPEDWINDOW, FALSE, 0);
+
 			// Switch to regular size
 			SetWindowLongPtr(m_handleWindows, GWL_STYLE, WS_OVERLAPPEDWINDOW);
 			SetWindowLongPtr(m_handleWindows, GWL_EXSTYLE, WS_EX_OVERLAPPEDWINDOW);
+			SetWindowPos(m_handleWindows,HWND_TOP, windowRect.left, windowRect.top, windowRect.right - windowRect.left, windowRect.bottom - windowRect.top, SWP_FRAMECHANGED);
 			ShowWindow(m_handleWindows, SW_RESTORE);
 		}
 	}

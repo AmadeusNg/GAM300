@@ -1,244 +1,85 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
-    </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
+    <ClCompile Include="Audio.cxx" />
+    <ClCompile Include="Components\AudioComponent.cxx" />
+    <ClCompile Include="Components\BoxColliderComponent.cxx" />
+    <ClCompile Include="Components\CameraComponent.cxx" />
+    <ClCompile Include="Components\CapsuleColliderComponent.cxx" />
+    <ClCompile Include="Components\ColliderComponent.cxx" />
+    <ClCompile Include="Components\DirectionalLightComponent.cxx" />
+    <ClCompile Include="Components\GraphicComponent.cxx" />
+    <ClCompile Include="Components\NameTagComponent.cxx" />
+    <ClCompile Include="Components\PointlightComponent.cxx" />
+    <ClCompile Include="Components\RigidBodyComponent.cxx" />
+    <ClCompile Include="Components\SphereColliderComponent.cxx" />
+    <ClCompile Include="Components\SpotlightComponent.cxx" />
+    <ClCompile Include="Components\TransformComponent.cxx" />
+    <ClCompile Include="Components\UISpriteComponent.cxx" />
+    <ClCompile Include="Components\ViewObject.cxx" />
+    <ClCompile Include="Cursor.cxx" />
+    <ClCompile Include="EngineInterface.cxx" />
+    <ClCompile Include="GameObject.cxx" />
+    <ClCompile Include="GraphicsMgrWrapper.cxx" />
+    <ClCompile Include="Input.cxx" />
+    <ClCompile Include="JsonUtility.cxx" />
+    <ClCompile Include="Mathf.cxx" />
+    <ClCompile Include="Pathfinder.cxx" />
+    <ClCompile Include="Quaternion.cxx" />
+    <ClCompile Include="Random.cxx" />
+    <ClCompile Include="Screen.cxx" />
+    <ClCompile Include="SceneLoader.cxx" />
+    <ClCompile Include="Script.cxx" />
+    <ClCompile Include="Serialization.cxx" />
+    <ClCompile Include="Time.hxx" />
+    <ClCompile Include="TypeConversion.cxx" />
+    <ClCompile Include="UIPopUp.cxx" />
+    <ClCompile Include="Vector2.cxx" />
+    <ClCompile Include="Vector3.cxx" />
+    <ClCompile Include="Vector4.cxx" />
+    <ClCompile Include="Components\AnimatedComponent.cxx" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="EngineInterface.hxx">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Script.hxx">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Components\TransformComponent.hxx">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Vector3.hxx">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="IncludeFromEngine.hxx">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Components\NameTagComponent.hxx">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Debug.hxx">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Components\BoxColliderComponent.hxx">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Components\CapsuleColliderComponent.hxx">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Components\SphereColliderComponent.hxx">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="TypeConversion.hxx">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="HelperFunctions.hxx">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GameObject.hxx">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Input.hxx">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Components\RigidBodyComponent.hxx">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Vector4.hxx">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="CustomAttributeHeaders.hxx">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Components\CameraComponent.hxx">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Components\ComponentBase.hxx">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Mathf.hxx">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Quaternion.hxx">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Cursor.hxx">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GraphicsMgrWrapper.hxx">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SceneLoader.hxx">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Screen.hxx">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Vector2.hxx">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Components\AudioComponent.hxx">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Audio.hxx">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Components\UISpriteComponent.hxx">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="JsonUtility.hxx">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Random.hxx">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="UIPopUp.hxx">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Components\GraphicComponent.hxx">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Serialization.hxx">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Components\ColliderComponent.hxx">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Components\ViewObject.hxx">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Pathfinder.hxx">
-    <ClInclude Include="Components\DirectionalLightComponent.hxx">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Components\PointlightComponent.hxx">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Components\SpotlightComponent.hxx">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="EngineInterface.cxx">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Components\TransformComponent.cxx">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Script.cxx">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Vector3.cxx">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Components\NameTagComponent.cxx">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Components\BoxColliderComponent.cxx">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Components\CapsuleColliderComponent.cxx">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Components\SphereColliderComponent.cxx">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="TypeConversion.cxx">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GameObject.cxx">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Input.cxx">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Components\RigidBodyComponent.cxx">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Vector4.cxx">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Components\CameraComponent.cxx">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Mathf.cxx">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Time.hxx">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Quaternion.cxx">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Cursor.cxx">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GraphicsMgrWrapper.cxx">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SceneLoader.cxx">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Screen.cxx">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Vector2.cxx">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Components\AudioComponent.cxx">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Audio.cxx">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Components\UISpriteComponent.cxx">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="JsonUtility.cxx">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Random.cxx">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="UIPopUp.cxx">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Components\GraphicComponent.cxx">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Serialization.cxx">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Components\ColliderComponent.cxx">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Components\ViewObject.cxx">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Pathfinder.cxx">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Components\SpotlightComponent.cxx">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Components\PointlightComponent.cxx">
-      <Filter>Source Files</Filter>
-    </ClCompile>
+    <ClInclude Include="Audio.hxx" />
+    <ClInclude Include="Components\AudioComponent.hxx" />
+    <ClInclude Include="Components\BoxColliderComponent.hxx" />
+    <ClInclude Include="Components\CameraComponent.hxx" />
+    <ClInclude Include="Components\CapsuleColliderComponent.hxx" />
+    <ClInclude Include="Components\ColliderComponent.hxx" />
+    <ClInclude Include="Components\ComponentBase.hxx" />
+    <ClInclude Include="Components\DirectionalLightComponent.hxx" />
+    <ClInclude Include="Components\GraphicComponent.hxx" />
+    <ClInclude Include="Components\NameTagComponent.hxx" />
+    <ClInclude Include="Components\PointlightComponent.hxx" />
+    <ClInclude Include="Components\RigidBodyComponent.hxx" />
+    <ClInclude Include="Components\SphereColliderComponent.hxx" />
+    <ClInclude Include="Components\SpotlightComponent.hxx" />
+    <ClInclude Include="Components\TransformComponent.hxx" />
+    <ClInclude Include="Components\UISpriteComponent.hxx" />
+    <ClInclude Include="Components\ViewObject.hxx" />
+    <ClInclude Include="Cursor.hxx" />
+    <ClInclude Include="CustomAttributeHeaders.hxx" />
+    <ClInclude Include="Debug.hxx" />
+    <ClInclude Include="EngineInterface.hxx" />
+    <ClInclude Include="GameObject.hxx" />
+    <ClInclude Include="GraphicsMgrWrapper.hxx" />
+    <ClInclude Include="HelperFunctions.hxx" />
+    <ClInclude Include="IncludeFromEngine.hxx" />
+    <ClInclude Include="Input.hxx" />
+    <ClInclude Include="JsonUtility.hxx" />
+    <ClInclude Include="Mathf.hxx" />
+    <ClInclude Include="Pathfinder.hxx" />
+    <ClInclude Include="Quaternion.hxx" />
+    <ClInclude Include="Random.hxx" />
+    <ClInclude Include="Screen.hxx" />
+    <ClInclude Include="SceneLoader.hxx" />
+    <ClInclude Include="Script.hxx" />
+    <ClInclude Include="Serialization.hxx" />
+    <ClInclude Include="TypeConversion.hxx" />
+    <ClInclude Include="UIPopUp.hxx" />
+    <ClInclude Include="Vector2.hxx" />
+    <ClInclude Include="Vector3.hxx" />
+    <ClInclude Include="Vector4.hxx" />
+    <ClInclude Include="Components\AnimatedComponent.hxx" />
   </ItemGroup>
 </Project>

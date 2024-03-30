@@ -251,6 +251,11 @@ namespace TDS
 		delete m_FrameBuffer.m_Renderpass;
 	}
 
+	VulkanPipeline& Renderer2D::GetPipeline()
+	{
+		return *m_Pipeline;
+	}
+
 	void SpriteBatch::AddToBatch(void* component, Transform* transform, std::uint32_t entity)
 	{
 		auto Renderer2D = GraphicsManager::getInstance().GetRenderer2D();
@@ -281,7 +286,7 @@ namespace TDS
 
 		if (TextureID == -1)
 		{
-			m_InstanceInfo[m_InstanceCnt].m_TextureIndex = 499;
+			m_InstanceInfo[m_InstanceCnt].m_TextureIndex = 999;
 			componentSprite->GetReference().m_AssetName = "";
 		}
 		else

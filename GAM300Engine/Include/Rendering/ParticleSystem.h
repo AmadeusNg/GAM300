@@ -6,20 +6,30 @@
 #include "components/ParticleComponent.h"
 #include "dotnet/ImportExport.h"
 #include "components/transform.h"
+#include "GraphicsResource/Revamped/MeshController.h"
+#include "ResourceManagement/ResourceRef.h"
 #include "renderPass.h"
-#include "dotnet/ImportExport.h"
 
 namespace TDS {
 
 
+
 	class ParticleSystem {
 	public:
-		struct InputRenderBuffers {
-			std::shared_ptr<VMABuffer> m_VertexBuffer = nullptr;
-			std::shared_ptr<VMABuffer> m_IndexBuffer = nullptr;
+		struct InputRenderBuffers 
+		{
+			TypeReference<MeshController> m_MeshReference;
 		};
 
-		struct CameraUBO {
+		struct ParticleInstanceGroup
+		{
+			InputRenderBuffers*			m_PRenderBuffers;
+			std::uint32_t				m_ParticleAmount;
+			float						m_EmitterLifetime;
+		};
+
+		struct CameraUBO 
+		{
 			Mat4 view;
 			Mat4 Proj;
 		};
@@ -35,23 +45,25 @@ namespace TDS {
 		//sends data into compute shader for calculations
 		DLL_API static void UpdateSystem(const float deltatime, const std::vector<EntityID>& Entities, Transform* Xform, Particle_Component* Particles);
 		//Spawn/Draws all particles from all entities
-		DLL_API void Render(const float deltatime, const std::vector<EntityID>& Entities, Transform* Xform, Particle_Component* EmitterList);
-		DLL_API void ShutDown();
-
+		DLL_API static void Render();
+		DLL_API static void ShutDown();
+		DLL_API static void AddEmitterGroup(Particle_Component* Particles, std::uint32_t descIndex, std::uint32_t spawnAmount);
 		//helper functions
-		
-		inline static VkCommandBuffer m_cmdbuffer;
+
 		//for compute
 		inline static std::shared_ptr<VulkanPipeline> m_ComputePipeline;
 		inline static std::shared_ptr<VulkanPipeline> m_EmitterPipeline;
 		//for rendering
 		inline static std::shared_ptr<VulkanPipeline> m_RenderPipeline;
-		inline static std::array<InputRenderBuffers, ParticleMesh::MAX_MESHES>  MeshRenderBuffers;
+		//inline static std::array<InputRenderBuffers, ParticleMesh::MAX_MESHES>  MeshRenderBuffers;
+
+		inline static std::vector<ParticleInstanceGroup>			m_Group;
+		inline static std::uint32_t									m_GroupCnt;
 	private:
 
 		//std::shared_ptr<VMABuffer> m_ComputeBuffer;
 		//std::shared_ptr<VMABuffer> m_EmitterBuffer;
-
+		inline static std::shared_ptr<VMABuffer> m_IndexQuad = nullptr;
 	};
 
 

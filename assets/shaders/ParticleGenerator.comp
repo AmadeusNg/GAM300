@@ -1,0 +1,233 @@
+#version 450
+
+
+struct EmitterInfo
+{
+    vec4 accelMin;
+    vec4 accelrange;
+
+    vec3 startingPos; 
+    int emitterType; 
+
+    vec3 setAcceleration;
+    float timePassed;
+
+    vec3 velRange;
+    float sphereRadius;
+
+    vec3 velMin;
+    float lifeMin;
+    
+
+    vec2 SzMin;
+    vec2 SzRange;
+    
+    vec3 colorMin;
+    float lifeRange;
+    vec3 colorRange;
+    float alphaMin;
+
+    vec3 emissionRange;
+    float alphaRange;
+
+    int particleCount;
+    int fadeByAlpha;
+    int fadeBySize;
+    int emitWithinObj;
+
+};
+
+
+struct ParticleShared
+{
+    vec4 position;
+};
+
+layout(std430, binding = 36) writeonly restrict buffer ParticlesSharedData
+{
+    ParticleShared particlesShared[];
+};
+
+struct UpdateData
+{
+    uvec4 velocity_acceleration_L;
+};
+
+layout(std140, binding = 37) writeonly restrict buffer UpdateList
+{
+  UpdateData particlesUpdate[];
+};
+
+
+
+layout(std430, binding = 38) coherent restrict buffer RemovalStack
+{
+  int freeCount;
+  int indices[];
+};
+
+
+
+struct ParticleRender
+{
+    uvec2 packedScaleX_packedColorY;
+};
+
+
+layout(std430, binding = 39) writeonly restrict buffer ParticlesRender
+{
+  ParticleRender particlesRender[];
+};
+
+
+layout (std140, binding = 34) buffer EmitterInfoBuffer
+{
+    EmitterInfo emitterInfo;
+}emitterInfoBuffer;
+
+
+layout(push_constant) uniform pushData
+{
+    vec3 randSeed;
+};
+vec3 localSeed;
+
+float randZeroOne()
+{
+    uint n = floatBitsToUint(localSeed.y * 214013.0 + localSeed.x * 2531011.0 + localSeed.z * 141251.0);
+    n = n * (n * n * 15731u + 789221u);
+    n = (n >> 9u) | 0x3F800000u;
+ 
+    float fRes =  2.0 - uintBitsToFloat(n);
+    localSeed = vec3(localSeed.x + 147158.0 * fRes, localSeed.y*fRes  + 415161.0 * fRes, localSeed.z + 324154.0*fRes);
+    return fRes;
+}
+
+
+void MakeParticle(
+  out ParticleShared psd,
+  out UpdateData pud,
+  out ParticleRender prd)
+{
+      vec3 minposrange = emitterInfoBuffer.emitterInfo.startingPos - emitterInfoBuffer.emitterInfo.emissionRange;
+      vec3 twicerange = emitterInfoBuffer.emitterInfo.emissionRange * 2;
+      vec3 pos;
+      float pi = 0, theta = 0;
+
+      if (emitterInfoBuffer.emitterInfo.emitterType == 0) //point
+      {
+        pos = emitterInfoBuffer.emitterInfo.startingPos;
+      }
+      else if (emitterInfoBuffer.emitterInfo.emitterType == 1) //box
+      {
+        pos = minposrange + twicerange * vec3(randZeroOne(), randZeroOne(), randZeroOne());
+      }
+      else if (emitterInfoBuffer.emitterInfo.emitterType == 2) //ring
+      {
+            pi = 6.28318530718 * randZeroOne();
+            if (emitterInfoBuffer.emitterInfo.emitWithinObj == 0)
+            {
+                pos = emitterInfoBuffer.emitterInfo.startingPos;
+                pos.x += cos(pi) * randZeroOne() * emitterInfoBuffer.emitterInfo.sphereRadius;
+                pos.z += sin(pi) * randZeroOne() * emitterInfoBuffer.emitterInfo.sphereRadius;
+            }
+            else
+            {
+              pos = vec3(emitterInfoBuffer.emitterInfo.sphereRadius * cos(pi), 0, emitterInfoBuffer.emitterInfo.sphereRadius * sin(pi));
+              pos.x += cos(pi) * emitterInfoBuffer.emitterInfo.sphereRadius;
+              pos.z += sin(pi) * emitterInfoBuffer.emitterInfo.sphereRadius;
+            
+            }
+      }
+      else if (emitterInfoBuffer.emitterInfo.emitterType == 3)
+      {
+            pi = 6.28318530718 * randZeroOne();
+            float z = (2.0 * emitterInfoBuffer.emitterInfo.sphereRadius * randZeroOne()) - emitterInfoBuffer.emitterInfo.sphereRadius;
+            theta = asin(z / emitterInfoBuffer.emitterInfo.sphereRadius);
+
+            float rcostheta = emitterInfoBuffer.emitterInfo.sphereRadius * cos(theta);
+            pos = vec3(rcostheta * cos(pi), rcostheta * sin(pi), z);
+      }
+      
+      //if set acceleration is 0, then use the random acceleration
+      vec3 acceleration;
+
+      if (emitterInfoBuffer.emitterInfo.setAcceleration == vec3(0))
+      {
+        acceleration = emitterInfoBuffer.emitterInfo.accelMin.xyz + vec3(emitterInfoBuffer.emitterInfo.accelrange.x * randZeroOne(), emitterInfoBuffer.emitterInfo.accelrange.y * randZeroOne(), emitterInfoBuffer.emitterInfo.accelrange.z * randZeroOne());
+      }
+      else
+      {
+        acceleration = emitterInfoBuffer.emitterInfo.setAcceleration;
+      }
+
+      
+      vec3 velocity = emitterInfoBuffer.emitterInfo.velMin + vec3(emitterInfoBuffer.emitterInfo.velRange.x * randZeroOne(), emitterInfoBuffer.emitterInfo.velRange.y * randZeroOne(), emitterInfoBuffer.emitterInfo.velRange.z * randZeroOne());
+      vec3 color = emitterInfoBuffer.emitterInfo.colorMin + vec3(emitterInfoBuffer.emitterInfo.colorRange.x * randZeroOne(), emitterInfoBuffer.emitterInfo.colorRange.y * randZeroOne(), emitterInfoBuffer.emitterInfo.colorRange.z * randZeroOne());
+      vec2 scale = emitterInfoBuffer.emitterInfo.SzMin + vec2(emitterInfoBuffer.emitterInfo.SzRange.x * randZeroOne(), emitterInfoBuffer.emitterInfo.SzRange.y * randZeroOne());
+      float alpha = emitterInfoBuffer.emitterInfo.alphaMin + emitterInfoBuffer.emitterInfo.alphaRange * randZeroOne();
+      float life = emitterInfoBuffer.emitterInfo.lifeMin + emitterInfoBuffer.emitterInfo.lifeRange * randZeroOne();
+      
+      pud.velocity_acceleration_L.x = packHalf2x16(velocity.xy);
+      pud.velocity_acceleration_L.y = packHalf2x16(vec2(velocity.z,  acceleration.x));
+      pud.velocity_acceleration_L.z = packHalf2x16(acceleration.yz);
+      pud.velocity_acceleration_L.w = floatBitsToUint(life);
+     
+      prd.packedScaleX_packedColorY.x = packHalf2x16(scale);
+      prd.packedScaleX_packedColorY.y = packUnorm4x8(vec4(color, alpha));
+      psd.position.xyz = pos;
+}
+
+
+shared int shared_requested;
+shared int shared_freeCount;
+
+layout(local_size_x = 64, local_size_y = 1, local_size_z = 1) in;
+void main()
+{
+  localSeed = randSeed;
+  if (gl_LocalInvocationIndex == 0)
+  {
+    shared_requested = 0;
+  }
+
+  barrier();
+  memoryBarrierShared();
+
+  if (gl_GlobalInvocationID.x < emitterInfoBuffer.emitterInfo.particleCount)
+  {
+    atomicAdd(shared_requested, 1);
+  }
+  
+  barrier();
+  memoryBarrierShared();
+
+  if (gl_LocalInvocationIndex == 0)
+  {
+    shared_freeCount = atomicAdd(freeCount, -shared_requested) - shared_requested;
+    if (shared_freeCount < 0)
+    {
+      atomicAdd(freeCount, -shared_freeCount);
+    }
+  }
+
+  barrier();
+  memoryBarrierShared();
+
+  int indexIndex = atomicAdd(shared_freeCount, 1);
+  if (indexIndex >= 0)
+  {
+    int particleIndex = indices[indexIndex];
+
+    MakeParticle(particlesShared[particleIndex], 
+    particlesUpdate[particleIndex], 
+    particlesRender[particleIndex]);
+    
+  }
+
+  
+  
+  
+
+}
+

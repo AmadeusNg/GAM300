@@ -2,7 +2,6 @@
 #include "ecs/ecs.h"
 #include "ResourceManagement/ResourceRef.h"
 #include "GraphicsResource/FontInfo.h"
-#include "ResourceManagement/ResourceRef.h"
 namespace TDS
 {
 

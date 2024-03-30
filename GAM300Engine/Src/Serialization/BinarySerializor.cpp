@@ -3,7 +3,7 @@
 
 namespace TDS
 {
-	BinarySerializor::BinarySerializor():m_OutStream(), m_InputStream()
+	BinarySerializor::BinarySerializor() :m_OutStream(), m_InputStream()
 	{
 	}
 	BinarySerializor::~BinarySerializor()
@@ -64,7 +64,7 @@ namespace TDS
 		}
 		else if (currVar.is_associative_container())
 		{
-			TDS_ERROR("Binary format doesnt support associative containers!\n");
+			WriteAssociative(currVar);
 		}
 		else
 		{
@@ -113,14 +113,14 @@ namespace TDS
 			else if (t == rttr::type::get<double>())
 				WRITE_VARIANT_DATA(double, var)
 
-			return true;
+				return true;
 
 		}
 		else if (t.is_enumeration())
 		{
 			WRITE_VARIANT_DATA(int, var)
 
-			return true;
+				return true;
 		}
 		else if (t == rttr::type::get<std::string>())
 		{
@@ -158,8 +158,9 @@ namespace TDS
 	void BinarySerializor::WriteAssociative(const rttr::variant& var)
 	{
 		rttr::variant_associative_view view = var.create_associative_view();
-		const std::string keystring("key");
-		const std::string valuestring("value");
+
+		std::size_t length = static_cast<std::size_t>(view.get_size());
+		m_OutStream->write(reinterpret_cast<const char*>(&length), sizeof(length));
 
 		if (view.is_key_only_type())
 		{
@@ -313,18 +314,25 @@ namespace TDS
 		for (auto prop : prop_list)
 		{
 			const rttr::type value_t = prop.get_type();
-			
+
 			rttr::variant var{};
 			if (value_t.is_sequential_container())
 			{
 				var = prop.get_value(obj);
 				auto view = var.create_sequential_view();
 				ReadSequential(view);
-				prop.set_value(obj, var);
+				prop.set_value(obj, view);
+			}
+			else if (value_t.is_associative_container())
+			{
+				var = prop.get_value(obj);
+				auto view = var.create_associative_view();
+				ReadAssociative(view);
+				prop.set_value(obj, view);
 			}
 			else if (value_t.is_arithmetic() || value_t == rttr::type::get<std::string>() || value_t.is_enumeration())
 			{
-				
+
 				rttr::variant var = extract_basic_types(value_t);
 				if (var.convert(value_t))
 					prop.set_value(obj, var);
@@ -335,8 +343,8 @@ namespace TDS
 				DeserializeRecursion(var);
 				prop.set_value(obj, var);
 			}
-			
-			
+
+
 		}
 	}
 	void BinarySerializor::ReadSequential(rttr::variant_sequential_view& view)
@@ -344,28 +352,71 @@ namespace TDS
 		std::uint32_t size{};
 		m_InputStream->read(reinterpret_cast<char*>(&size), sizeof(size));
 		view.set_size(size);
-		const rttr::type array_value_type = view.get_rank_type(1);
-		for (size_t i = 0; i < size; ++i)
+
+		for (std::size_t i = 0; i < size; ++i)
 		{
-			auto variant = view.get_value(i);
-			rttr::type value_type = view.get_type();
+			rttr::variant variant = view.get_value(i);
+			const rttr::type value_type = variant.get_type();
+
 			if (variant.is_sequential_container())
 			{
-				TDS_ERROR("Binary format doesnt support double containers!\n");
+				rttr::variant_sequential_view nested_view = variant.create_sequential_view();
+				ReadSequential(nested_view);
 			}
 			else if (value_type.is_arithmetic() || value_type == rttr::type::get<std::string>() || value_type.is_enumeration())
 			{
 				rttr::variant extracted_value = extract_basic_types(value_type);
-				if (extracted_value.convert(array_value_type))
+				if (extracted_value.convert(value_type))
+				{
 					view.set_value(i, extracted_value);
+				}
 			}
 			else
 			{
-				rttr::variant tempObj = view.get_value(i);
-				rttr::variant wrappedObj = tempObj.extract_wrapped_value();
-				DeserializeRecursion(wrappedObj);
-				view.set_value(i, wrappedObj);
+				DeserializeRecursion(variant);
 			}
 		}
 	}
+
+	void BinarySerializor::ReadAssociative(rttr::variant_associative_view& view)
+	{
+		std::uint32_t size{};
+		m_InputStream->read(reinterpret_cast<char*>(&size), sizeof(size));
+
+		for (size_t i = 0; i < size; ++i)
+		{
+			// Extract the key
+			const rttr::type keyType = view.get_key_type();
+			rttr::variant extractedKey = extract_basic_types(keyType);
+			if (!extractedKey.is_valid() || !extractedKey.convert(keyType))
+			{
+
+				rttr::constructor ctor = keyType.get_constructor();
+				extractedKey = ctor.invoke();
+				DeserializeRecursion(extractedKey);
+
+			}
+
+			// Extract the value
+			const rttr::type valueType = view.get_value_type();
+			rttr::variant extractedVal = extract_basic_types(valueType);
+			if (!extractedVal.is_valid() || !extractedVal.convert(valueType))
+			{
+
+
+				rttr::constructor ctor = valueType.get_constructor();
+				extractedVal = ctor.invoke();
+				DeserializeRecursion(extractedVal);
+
+			}
+
+			// Insert the key-value pair into the view
+			view.insert(extractedKey, extractedVal);
+		}
+	}
+
+
+
+
+
 }

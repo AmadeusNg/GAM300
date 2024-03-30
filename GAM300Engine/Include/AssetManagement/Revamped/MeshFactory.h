@@ -28,11 +28,25 @@ namespace TDS
 		std::uint32_t													m_TotalBatchMeshes = 0;
 
 	public:
+		void ResetBatchCount()
+		{
+			m_TotalBatchMeshes = 0;
+		}
+
+		void ResetCurrentIndex()
+		{
+			m_CurrentIndex = 0;
+		}
+
+
 		std::uint32_t GetBatchCount()
 		{
 			return m_TotalBatchMeshes;
 		}
-
+		std::unordered_map<std::string, std::uint32_t>& GetReferenceCounts()
+		{
+			return m_ReferenceCnt;
+		}
 		std::array<MeshController, MAX_MODELS>& GetMeshControllers()
 		{
 			return m_MeshControllers;

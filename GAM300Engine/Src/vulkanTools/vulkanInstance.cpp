@@ -134,12 +134,28 @@ namespace TDS
 			queueCreateInfos.push_back(queueCreateInfo);
 		}
 
-		VkPhysicalDeviceFeatures2 features2 = { VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2 };
-		vkGetPhysicalDeviceFeatures2(m_PhysDeviceHandle, &features2);
-		VkPhysicalDeviceFeatures deviceFeatures{};
+		VkPhysicalDeviceFeatures2 features2 = {};
+		features2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
+
+		VkPhysicalDeviceVulkan12Features vulkan12Features = {}; // Set up Vulkan 1.2 features
+		vulkan12Features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES;
+		vulkan12Features.bufferDeviceAddress = VK_TRUE; // Enable the feature
+		vulkan12Features.descriptorIndexing = VK_TRUE;
+
+		// Link the Vulkan 1.2 features struct to the VkPhysicalDeviceFeatures2 struct
+		features2.pNext = &vulkan12Features;
+
+		features2.features.samplerAnisotropy = VK_TRUE;
+		features2.features.shaderSampledImageArrayDynamicIndexing = VK_TRUE;
+		features2.features.independentBlend = VK_TRUE;
+		features2.features.multiDrawIndirect = VK_TRUE;
+		/*VkPhysicalDeviceFeatures deviceFeatures{};
 		deviceFeatures = features2.features;
 		deviceFeatures.samplerAnisotropy = VK_TRUE;
 		deviceFeatures.shaderSampledImageArrayDynamicIndexing = VK_TRUE;
+		deviceFeatures.next*/
+
+
 
 		//deviceFeatures.sampleRateShading = VK_TRUE; // enable sample shading feature will affect performace cost
 
@@ -147,10 +163,10 @@ namespace TDS
 		createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
 		createInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
 		createInfo.pQueueCreateInfos = queueCreateInfos.data();
-		createInfo.pEnabledFeatures = &m_Features;
+		createInfo.pEnabledFeatures = VK_NULL_HANDLE;
+		createInfo.pNext = &features2;
 		createInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExtensions.size());
 		createInfo.ppEnabledExtensionNames = deviceExtensions.data();
-
 		if (_Windows.settings.validation)
 		{
 			createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());

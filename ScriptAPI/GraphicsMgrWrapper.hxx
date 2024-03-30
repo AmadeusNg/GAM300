@@ -20,5 +20,7 @@ namespace ScriptAPI
 		static int CurrentRenderedLayer();
 		static unsigned int GetPickedObject();
 		static void SetClearColor(Vector4 clearColorVector);
+		static void SetNormalizedView(bool	condition);
+		static bool	IsNormalizedView();
     };
 }

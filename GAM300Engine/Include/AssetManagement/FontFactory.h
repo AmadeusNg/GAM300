@@ -16,14 +16,14 @@ namespace TDS
 	{
 	public:
 
-		std::array<Texture, 500> m_TextureAtlas;
-		std::array<FontAtlas, 500> m_FontAtlasInfo;
+		std::array<Texture, 1000> m_TextureAtlas;
+		std::array<FontAtlas, 1000> m_FontAtlasInfo;
 		std::unordered_map<std::string, std::uint32_t> m_FontIndices;
 		std::unordered_map<std::string, std::uint32_t> m_InstanceCnt;
 		std::uint32_t m_CurrentIndex = 0;
 		bool m_UpdateFontTextures = false;
 
-		std::array<Texture, 500>& GetFontAtlasTextures()
+		std::array<Texture, 1000>& GetFontAtlasTextures()
 		{
 			return m_TextureAtlas;
 		}

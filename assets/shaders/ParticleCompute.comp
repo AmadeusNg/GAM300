@@ -1,39 +1,37 @@
 #version 450 core
 
-struct Particle {
-    //transform params
-    vec3 Size;//xyz scale of the particle
-    vec3 Rotation;
-    vec3 CurrentPosition;// constant transform position of the entity, position of particle is an offset from here based on velocity and acceleration
+struct Particle 
+{
+    vec4 Size;
+    vec4 Rotation;
+    vec4 CurrentPosition;
     
-    //movement params
-    vec3 Velocity;
-    vec3 Acceleration;
+    vec4 Velocity;
+    vec4 Acceleration;
+    vec4 Color; //rgb color of the particle
     float Age;//how long has the particle been active
-    
-    //aesthetics params
-    vec3 Color;//rgb color of the particle
-    bool Active;//is the particle active
+    uint Active;
 };
 
-layout (std140, binding = 1) buffer Particles {
+layout (std140, binding = 31) buffer Particles {
     Particle List[];
 }v_Particles;
 
-layout (std140, binding = 2) buffer Freelist{
+layout (std430, binding = 32) buffer Freelist{
     int count;
-    uint indices[];
+    int indices[];
 }v_Freelist;
 
-layout (std140, binding = 3) writeonly buffer TransformMatrix{
+/*
+layout (std140, binding = 34) writeonly buffer TransformMatrix{
     mat4 List[];
 }v_TransformMatrix;
-
-layout(set = 0, binding = 4) buffer TimeBlock {
+*/
+layout(std430, binding = 35) buffer TimeBlock {
     float DeltaTime;
 }Time;
 
-mat4 GenerateTransform(vec3 Scale, vec3 Rotate, vec3 Translate){
+mat4 GenerateTransform(vec4 Scale, vec4 Rotate, vec4 Translate){
     mat4 Scalemat = mat4(
         Scale.x, 0.0, 0.0, 0.0,
         0.0, Scale.y, 0.0, 0.0,
@@ -80,15 +78,17 @@ void ComputeParticle(inout Particle p, int index){
         p.Velocity += p.Acceleration * Time.DeltaTime;
         p.CurrentPosition += p.Velocity * Time.DeltaTime;
 
+        //if the particle has expired, deactivate it and add it to the freelist
         if (p.Age <= 0.0){
-            p.Active = false;
+            p.Active = 0;
+            p.Color = vec4(0.0, 0.0, 0.0, 0.0);
             v_Freelist.indices[atomicAdd(v_Freelist.count,1)] = index;
         }
     }
 }
 
 
-layout(local_size_x =128, local_size_y = 1, local_size_z = 1) in;
+layout(local_size_x = 64, local_size_y = 1, local_size_z = 1) in;
 
 void main(){
     uint index = gl_GlobalInvocationID.x;
@@ -96,17 +96,9 @@ void main(){
         return;
     }
 
-    //ComputeParticle(v_Particles.List[index], index);
-    Particle currentparticle = v_Particles.List[index];
-    if (currentparticle.Age > 0.){
-        currentparticle.Age -= Time.DeltaTime;
-        currentparticle.Velocity += currentparticle.Acceleration * Time.DeltaTime;
-        currentparticle.CurrentPosition += currentparticle.Velocity * Time.DeltaTime;
-        if (currentparticle.Age <= 0.0){
-            currentparticle.Active = false;
-            v_Freelist.indices[atomicAdd(v_Freelist.count,1)] = index;
-        }
-    }
+    ComputeParticle(v_Particles.List[index], int(index));
+    
+    
 
-    v_TransformMatrix.List[index] = GenerateTransform(v_Particles.List[index].Size, v_Particles.List[index].Rotation, v_Particles.List[index].CurrentPosition);
+    //v_TransformMatrix.List[index] = GenerateTransform(v_Particles.List[index].Size, v_Particles.List[index].Rotation, v_Particles.List[index].CurrentPosition);
 }

@@ -1,0 +1,53 @@
+#version 450
+
+struct Particle {
+    vec3 Position;
+    vec3 Rotation;
+    vec3 Velocity;
+    vec3 Acceleration;
+    vec3 Size;//xyz scale of the particle
+    vec3 Color;//rgb color of the particle
+    float Age;//how long has the particle been active
+    int type; // integer indicating the particle mesh to be used
+    bool Active;//is the particle active
+};
+
+
+//updated particle array to be returned and replace particlein
+layout(std430, binding = 31) writeonly buffer ParticleOut{
+    Particle List[];
+}v_ParticleOut;
+
+
+//256 bytes max
+//mainly emitter data
+layout(push_constant) uniform Push
+{
+    vec3 DecayRate;
+    vec3 EmitterPosition;
+    float deltaTime; 
+    float Lifetime;
+    float SpawnTimer;
+    float SpawnRate;
+    float randomness;
+
+}push;
+
+
+void main() 
+{
+    //We update the particles here and then write them to the buffer
+    //Rendering should do nothing but just render the particles
+
+    const uint workid = gl_GlobalInvocationID.x;
+
+    float time = push.deltaTime;
+    float lifetime = push.Lifetime;
+    float spawnTimer = push.SpawnTimer;
+    float spawnRate = push.SpawnRate;
+    float randomness = push.randomness;
+
+    //Particle p = v_ParticleOut.List[workid];
+
+    
+}

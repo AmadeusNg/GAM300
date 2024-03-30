@@ -1,0 +1,220 @@
+#version 450 core
+
+struct ParticleShared
+{
+    vec4 position;
+};
+
+struct UpdateData
+{
+    uvec4 velocity_acceleration_L;
+};
+
+
+struct ParticleRender
+{
+    uvec2 packedScaleX_packedColorY;
+};
+
+
+struct DrawArraysCommand
+{
+  uint count;
+  uint instanceCount;
+  uint first; // baseVertex
+  uint baseInstance;
+};
+
+layout(std430, binding = 36) restrict buffer ParticlesSharedData
+{
+    ParticleShared particlesShared[];
+};
+
+layout(std140, binding = 37) restrict buffer UpdateList
+{
+  UpdateData particlesUpdate[];
+};
+
+layout(std430, binding = 38) restrict buffer RemovalStack
+{
+  int freeCount;
+  int indices[];
+};
+
+layout(std430, binding = 39) restrict buffer ParticlesRender
+{
+  ParticleRender particlesRender[];
+};
+
+layout(std430, binding = 8) coherent restrict buffer IndirectCommand
+{
+  DrawArraysCommand indirectCommand;
+};
+
+layout(std430, binding = 35) restrict buffer IndirectCommandIndexed
+{
+  uint drawIndices[];
+};
+struct EmitterInfo
+{
+    vec4 accelMin;
+    vec4 accelrange;
+
+    vec3 startingPos; 
+    int emitterType; 
+
+    vec3 setAcceleration;
+    float timePassed;
+
+    vec3 velRange;
+    float sphereRadius;
+
+    vec3 velMin;
+    float lifeMin;
+    
+
+    vec2 SzMin;
+    vec2 SzRange;
+    
+    vec3 colorMin;
+    float lifeRange;
+    vec3 colorRange;
+    float alphaMin;
+
+    vec3 emissionRange;
+    float alphaRange;
+
+    int particleCount;
+    int fadeByAlpha;
+    int fadeBySize;
+    int emitWithinObj;
+
+};
+
+layout (std140, binding = 34) buffer EmitterInfoBuffer
+{
+    EmitterInfo emitterInfo;
+}emitterInfoBuffer;
+
+
+//push constant
+layout(push_constant) uniform PushConstant
+{
+  vec4 m_ViewPos;
+  vec3 m_forward;
+  float m_dt;
+};
+
+shared int shared_freeIndex;
+shared int shared_RequestedFreeIndices;
+shared uint shared_DrawIndex;
+shared uint shared_requestedDrawIndices;
+
+layout(local_size_x = 128, local_size_y = 1, local_size_z = 1) in;
+
+
+void main()
+{
+    if (gl_LocalInvocationIndex == 0)
+    {
+        shared_RequestedFreeIndices = 0;
+        shared_requestedDrawIndices = 0;
+    }
+
+    barrier();
+    memoryBarrierShared();
+
+    int index = int(gl_GlobalInvocationID.x);
+
+    bool needFreeIndex = false;
+    bool needDrawIndex = false;
+
+    if (index < particlesShared.length())
+    {
+        ParticleShared sharedData = particlesShared[index];
+        UpdateData updateData = particlesUpdate[index];
+
+        vec2 unpackMiddle = unpackHalf2x16(updateData.velocity_acceleration_L.y);
+        vec3 velocity = vec3(unpackHalf2x16(updateData.velocity_acceleration_L.x), unpackMiddle.x);
+        vec3 acceleration = vec3(unpackMiddle.y, unpackHalf2x16(updateData.velocity_acceleration_L.z));
+        float life = uintBitsToFloat(updateData.velocity_acceleration_L.w);
+
+        if (life > 0.0)
+        {
+            float timePassed = emitterInfoBuffer.emitterInfo.timePassed;
+            float timeLeft = life / m_dt;
+
+            ParticleRender render = particlesRender[index];
+            vec2 scale = unpackHalf2x16(render.packedScaleX_packedColorY.x);
+            vec4 Color = unpackUnorm4x8(render.packedScaleX_packedColorY.y);
+            float alpha = Color.a;
+
+            if (emitterInfoBuffer.emitterInfo.fadeBySize == 1)
+            {
+                scale -= (scale/timeLeft);
+            }
+
+            if (emitterInfoBuffer.emitterInfo.fadeByAlpha == 1)
+            {
+                alpha -= (alpha/timeLeft);
+            }
+            
+            barrier();
+            memoryBarrierShared();
+
+            velocity += acceleration * m_dt;
+            sharedData.position.xyz += velocity * m_dt;
+
+            life -= m_dt;
+
+            if (life <= 0.0)
+            {
+                needFreeIndex = true;
+                atomicAdd(shared_RequestedFreeIndices, 1);
+            }
+            else if (dot(m_forward, normalize(sharedData.position.xyz - m_ViewPos.xyz)) > 0.4)
+            {
+                needDrawIndex = true;
+                atomicAdd(shared_requestedDrawIndices, 1);
+            }
+
+        }
+
+        particlesShared[index] = sharedData;
+
+        updateData.velocity_acceleration_L.x = packHalf2x16(velocity.xy);
+        updateData.velocity_acceleration_L.y = packHalf2x16(vec2(velocity.z, acceleration.x));
+        updateData.velocity_acceleration_L.z = packHalf2x16(acceleration.yz);
+        updateData.velocity_acceleration_L.w = floatBitsToUint(life);
+
+        particlesUpdate[index] = updateData;
+        
+    }
+    barrier();
+    memoryBarrierShared();
+
+    if (gl_LocalInvocationIndex == 0)
+    {
+        shared_freeIndex = atomicAdd(freeCount, shared_RequestedFreeIndices);
+        shared_DrawIndex = atomicAdd(indirectCommand.count, shared_requestedDrawIndices);
+
+    }
+    barrier();
+    memoryBarrierShared();
+
+    if (needFreeIndex)
+    {
+        int freeIndex = atomicAdd(shared_freeIndex, 1);
+        indices[freeIndex] = index;
+    }
+    
+    if (needDrawIndex)
+    {
+        uint drawIndex = atomicAdd(shared_DrawIndex, 1);
+        drawIndices[drawIndex] = index;
+    }
+
+
+
+}
+

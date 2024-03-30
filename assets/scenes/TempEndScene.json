@@ -1,0 +1,154 @@
+{
+    "Archetype Sizes": {
+        "1100001000001000000": {
+            "0": 112,
+            "1": 384,
+            "6": 304,
+            "12": 320
+        }
+    },
+    "Entity Data": {
+        "2": {
+            "ArchetypeID": "1100001000001000000",
+            "Enabled": true,
+            "Name Tag": {
+                "Name": "TempEndscene",
+                "Tag": "",
+                "IsActive": true,
+                "HierarchyParent": 0,
+                "HierarchyIndex": 1,
+                "HierarchyChildren": []
+            },
+            "Transform": {
+                "Position": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "Scale": {
+                    "x": 2.0,
+                    "y": 2.0,
+                    "z": 2.0
+                },
+                "Rotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "FakePosition": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "FakeRotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "FakeScale": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "OldPosition": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "OldScale": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "OldRotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "OldFakePosition": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "OldFakeScale": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "OldFakeRotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "ParentPosition": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            "Graphics Component": {
+                "PointLight": false,
+                "TextureName": "",
+                "Show Mesh": true,
+                "Debug": false,
+                "ModelName": "",
+                "MeshName": "",
+                "MeshNodeName": "",
+                "Color": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0,
+                    "w": 1.0
+                },
+                "Used In 2D": false,
+                "Model UID": 0
+            },
+            "UI Sprite": {
+                "Texture": "tempEndScene.dds",
+                "EnableSprite": true,
+                "LayerID": 1,
+                "is Font": false,
+                "message": "",
+                "Font Texture": "",
+                "ForeGroundColour": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0,
+                    "w": 0.0
+                },
+                "Sprite Color": {
+                    "x": 0.10196078568696976,
+                    "y": 0.10196078568696976,
+                    "z": 0.10196078568696976,
+                    "w": 0.0
+                },
+                "BackGroundColour": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0,
+                    "w": 1.0
+                },
+                "BoundingBoxMin": {
+                    "x": -1.0,
+                    "y": -1.0
+                },
+                "BoundingBoxMax": {
+                    "x": 1.0,
+                    "y": 1.0
+                }
+            }
+        }
+    },
+    "Scripts": {
+        "2": {
+            "TempEndScene": {
+                "gameObject": {
+                    "ScriptAPI.GameObject": 2
+                }
+            }
+        }
+    },
+    "Active Archetype": {
+        "2": "1100001000001000000"
+    }
+}

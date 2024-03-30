@@ -1,6 +1,7 @@
 #pragma once
 #include "ecs/ecs.h"
 #include "ResourceManagement/ResourceRef.h"
+#include "GraphicsResource/Revamped/MaterialAttributes.h"
 namespace TDS
 {
 	class AssetModel;
@@ -44,7 +45,7 @@ namespace TDS
 		RTTR_ENABLE(IComponent);
 		RTTR_REGISTRATION_FRIEND
 
-			Vec4							m_Color;
+		Vec4							m_Color;
 	private:
 		bool							m_ShowMesh = true;
 		int								m_PointLightID{ -1 };
@@ -60,6 +61,10 @@ namespace TDS
 		std::string						m_TextureName = "";
 		std::uint64_t					m_modelUID; //For duplicates;
 		bool							m_UsedIn2D{ false };
+		bool							m_IsAnimated{ false };
+		bool							m_UseMaterials{ false };
+		bool							m_UsePreloadMaterials{ false };
+		MaterialAttributes				m_MaterialAttributes; //Component based
 
 
 

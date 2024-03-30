@@ -4,6 +4,8 @@
 #include "MathCommon.h"
 namespace TDS
 {
+
+
 	struct VertexBufferElement
 	{
 		VertexBufferElement(VAR_TYPE type, std::string_view varName);
@@ -23,11 +25,15 @@ namespace TDS
 	{
 		VertexLayout();
 		VertexLayout(const std::initializer_list<VertexBufferElement>& elements);
+		VertexLayout(const std::initializer_list<std::pair<int, VertexBufferElement>>& bindingPair);
 		~VertexLayout();
-		std::vector<VertexBufferElement> m_MemberElements;
-		std::uint32_t					 m_Stride;
+		std::vector<VertexBufferElement>					m_MemberElements;
+		std::unordered_map<std::uint32_t, std::uint32_t>	m_BindingToElements;
+		std::uint32_t										m_Stride;
 
 	};
+
+
 
 	struct VertexBufferInfo
 	{

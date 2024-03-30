@@ -23,6 +23,7 @@ namespace TDS
 	class PointLightSystem;
 	class DeferredController;
 	class Renderer2D;
+	class MaterialManager;
 
 
 
@@ -35,6 +36,7 @@ namespace TDS
 	class MessageSystem;
 	class SkyBoxRenderer;
 	class FontRenderer;
+
 	class DLL_API GraphicsManager
 	{
 	public:
@@ -48,6 +50,7 @@ namespace TDS
 		std::shared_ptr<ObjectPick>				m_ObjectPicking = nullptr;
 		std::shared_ptr<Renderer2D>				m_Renderer2D = nullptr;
 		std::shared_ptr<FontRenderer>			m_FontRenderer = nullptr;
+		std::shared_ptr<MaterialManager>		m_MaterialManager = nullptr;
 		std::vector<RenderLayer*>				m_RenderLayer;
 
 
@@ -69,6 +72,7 @@ namespace TDS
 		bool									m_ViewingFrom2D = false;
 		bool									m_FrameHasBegin = false;
 		bool									m_StartRender = true;
+		bool									m_NormalizedView = false;
 		Vec4									m_CurrClearColor;
 		float									m_TabOffset{};
 		Vec4									m_ViewportScreen{};
@@ -86,6 +90,18 @@ namespace TDS
 		void								StopAllRender();
 		void								StartAllRender();
 		bool								IsRenderOn();
+		
+		MaterialManager&					GetMaterialManager();
+
+		inline bool							IsNormalizedView()
+		{
+			return							m_NormalizedView;
+		}
+
+		inline void							ToggleNormalizedView(bool condition)
+		{
+			m_NormalizedView = condition;
+		}
 		inline bool							IfFrameHasBegin()
 		{
 			return m_FrameHasBegin;
@@ -111,6 +127,7 @@ namespace TDS
 
 		void								SetLayerToRender(int ID);
 		bool								RenderAllLayer();
+		
 		std::uint32_t						PickedObject();
 		void								ToggleRenderAllLayer(bool condition);
 		int									LayerToRender();

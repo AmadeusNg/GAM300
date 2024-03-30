@@ -49,17 +49,27 @@ layout(std140, set = 1, binding = 25) readonly buffer instanceDataBuffer
     InstanceData instances[];
 };
 
+const int MAX_BONES = 80;
+layout(set = 2, binding = 4) uniform boneView
+{
+    mat4 mat[MAX_BONES];
+} bones;
 
 void main() 
 {
 
    mat4 meshModel = instances[gl_InstanceIndex].modelMatrix;
 
-   mat4 skinTransform = mat4(1.0);
+   mat4 skinTransform = mat4(0.0f);
+   for(int i = 0; i < 4; i++)
+   {
+        uint j = uint(BoneIDs[i]);
+        skinTransform += bones.mat[j] * Weights[i] ;
+   }
 
    const mat4 skinMesh = meshModel;
    
-   vec4 position_in_world = skinMesh * vec4(vPosition, 1.0);
+   vec4 position_in_world = skinMesh * skinTransform *vec4(vPosition, 1.0);
 
    vec4 clipspacepos = PL.proj * PL.view * position_in_world;
    gl_Position = clipspacepos;

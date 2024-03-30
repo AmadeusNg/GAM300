@@ -14,16 +14,25 @@ namespace TDS
 	{
 		std::vector<Animation>				m_Animations;
 		std::vector<Mat4>					m_Bones;
-		std::map<std::string, unsigned int> m_BoneMap;
+		std::string							m_AnimationPackName;
+		//std::map<std::string, unsigned int> m_BoneMap;
 
 		DLL_API static void Serialize(AnimationData& anim, std::string_view fileName, bool read);
 		RTTR_ENABLE()
-		RTTR_REGISTRATION_FRIEND
+			friend void ::rttr_auto_register_reflection_function_(); template<typename Ctor_Type, typename Policy, typename Accessor, typename Arg_Indexer> friend struct rttr::detail::constructor_invoker;
 
 	};
 
 
-	
+	struct BonelessAnimationData
+	{
+		std::vector<BonelessAnimation>	m_Animations;
+		std::string						m_AnimationPackName;
+
+		DLL_API static void Serialize(BonelessAnimationData& anim, std::string_view fileName, bool read);
+		RTTR_ENABLE()
+			friend void ::rttr_auto_register_reflection_function_(); template<typename Ctor_Type, typename Policy, typename Accessor, typename Arg_Indexer> friend struct rttr::detail::constructor_invoker;
+	};
 
 
 

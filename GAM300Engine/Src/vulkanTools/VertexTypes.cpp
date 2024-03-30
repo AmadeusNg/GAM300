@@ -65,6 +65,8 @@ namespace TDS
 
 		return VK_FORMAT_R32G32B32_SFLOAT;
 	}
+
+	
 	VertexLayout::VertexLayout() :m_MemberElements{}, m_Stride(0)
 	{
 	}
@@ -73,12 +75,37 @@ namespace TDS
 	{
 		std::uint32_t offset = 0;
 		m_Stride = 0;
+
+		
 		for (auto& elems : m_MemberElements)
 		{
 			elems.m_offset = offset;
 			m_Stride += elems.m_Size;
 			offset += elems.m_Size;
 		}
+		
+	}
+	VertexLayout::VertexLayout(const std::initializer_list<std::pair<int, VertexBufferElement>>& bindingPair)
+	{
+		std::uint32_t offset = 0;
+		m_Stride = 0;
+		unsigned index = 0;
+
+		for (auto& pair : bindingPair)
+		{
+			m_MemberElements.push_back(pair.second);
+			auto& newElem = m_MemberElements.back();
+			m_BindingToElements[pair.first] = index++;
+
+
+			
+			newElem.m_offset = offset;
+			m_Stride += newElem.m_Size;
+			offset += newElem.m_Size;
+			
+			
+		}
+
 	}
 	VertexLayout::~VertexLayout()
 	{

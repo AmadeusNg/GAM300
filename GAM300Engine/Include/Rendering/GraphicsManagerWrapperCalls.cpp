@@ -40,3 +40,13 @@ float TDS::GraphicsManagerWrapperCalls::GetFadeFactor()
 {
     return TDS::GraphicsManager::getInstance().GetFadeFactor();
 }
+
+bool TDS::GraphicsManagerWrapperCalls::IsNormalizedView()
+{
+    return GraphicsManager::getInstance().IsNormalizedView();
+}
+
+void TDS::GraphicsManagerWrapperCalls::SetNormalizedView(bool condition)
+{
+    GraphicsManager::getInstance().ToggleNormalizedView(condition);
+}

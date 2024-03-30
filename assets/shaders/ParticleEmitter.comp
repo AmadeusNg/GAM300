@@ -2,68 +2,97 @@
 
 struct Particle {
     //transform params
-    vec3 Size;//xyz scale of the particle
-    vec3 Rotation;
-    vec3 CurrentPosition;// constant transform position of the entity, position of particle is an offset from here based on velocity and acceleration
+    vec4 Size;//xyz scale of the particle
+    vec4 Rotation;
+    vec4 CurrentPosition;// constant transform position of the entity, position of particle is an offset from here based on velocity and acceleration
     
     //movement params
-    vec3 Velocity;
-    vec3 Acceleration;
+    vec4 Velocity;
+    vec4 Acceleration;
+    vec4 Color; 
     float Age;//how long has the particle been active
-    
-    //aesthetics params
-    vec3 Color;//rgb color of the particle
-    bool Active;//is the particle active
+    uint Active;
 };
 
 struct ParticleEmitter{
-    float min_Life, max_Life;
-    vec3 min_Spawnoffset, max_Spawnoffset;
-    vec3 min_Velocity, max_Velocity;
-    vec3 min_Acceleration, max_Acceleration;
-    vec3 min_Size, max_Size;
-    vec3 Position;
+    vec4 min_Spawnoffset, max_Spawnoffset; //
+    vec4 min_Velocity, max_Velocity;
+    vec4 min_Acceleration, max_Acceleration;
+    vec4 min_Size, max_Size;
+    vec4 Position;
     vec4 Color;
+    float min_Life, max_Life;
 };
-float seed(vec2 co){
-    return fract(sin(dot(co.xy ,vec2(12.9898,78.233)))* 43758.5453);
-}
-
-float rand(float min, float max){
-    return mix(min, max, seed(vec2(3.8,5.0)+ gl_GlobalInvocationID.xy));
-}
-
-vec3 randvec3(vec3 min, vec3 max){
-    return vec3(rand(min.x,max.x),rand(min.y,max.y),rand(min.z,max.z));
-}
 
 //writing the position of the particle out into a list to vertex buffer
-layout (std140, binding = 1) buffer ParticleBuffer {
+layout (std140, binding = 31) buffer ParticleBuffer {
     Particle List[];
 }v_ParticleOut;
 
 //buffer access with particle shader?
-layout (std140, binding = 2) coherent restrict buffer FreelistBuffer {
+layout (std430, binding = 32) coherent restrict buffer FreelistBuffer {
     int count;
     int indices[];
 }v_Freelist;
 
-layout (set = 0, binding = 3 ) buffer EmitterThingy{
-    int particleamount;
+layout (std140, binding = 33 ) buffer EmitterThingy
+{
     ParticleEmitter Emitter;
+    int particleamount;
+    float EmitterLifeTime;
 }EmitterStuff;
+
+float seed(vec2 co){
+    return fract(sin(dot(co.xy ,vec2(12.9898,78.233)))* 43758.5453);
+}
+
+float brownian(float randomseed){
+    float persistence = clamp(sin(gl_GlobalInvocationID.x *0.1), 0.1, 0.9);
+    float frequency = clamp(cos(gl_GlobalInvocationID.x * 0.1), 0.5,2.0);
+    int octaves = int (mod(gl_GlobalInvocationID.x, 10.0)+ 1.0);
+    float time = EmitterStuff.EmitterLifeTime * EmitterStuff.EmitterLifeTime;
+
+    float total = 0.0;
+    float amp = 1.0;
+    float maxamp = 0.0;
+
+    for (int i = 0; i < octaves; i++){
+        total += seed(vec2(gl_GlobalInvocationID.xy + time)* randomseed) * amp;
+        maxamp += amp;
+        amp *= persistence;
+        time *= frequency;
+    }
+    return total / maxamp;
+    
+}
+
+float rand(float Min, float Max, float randomseed){
+    return mix(Min, Max, fract(brownian(randomseed)));
+}
+
+vec3 randvec3(vec3 Min, vec3 Max){
+    float time = EmitterStuff.EmitterLifeTime;
+    vec3 randomvec3 = vec3(
+        rand(Min.x,Max.x,0.555 + sin(time)),
+        rand(Min.y,Max.y,0.222 + sin(time)),
+        rand(Min.z,Max.z,0.333 + sin(time))
+    );  
+    
+    return randomvec3;
+    //return mix(Min, Max, randomvec3);
+}
 
 void MakeParticle(out Particle newparticle){
     //constant spawn point from emitter location
-    newparticle.Age =           rand(EmitterStuff.Emitter.min_Life, EmitterStuff.Emitter.max_Life);
-    newparticle.Velocity =      randvec3(EmitterStuff.Emitter.min_Velocity, EmitterStuff.Emitter.max_Velocity);
-    newparticle.Acceleration =  randvec3(EmitterStuff.Emitter.min_Acceleration, EmitterStuff.Emitter.max_Acceleration);
-    newparticle.Size =          randvec3(EmitterStuff.Emitter.min_Size, EmitterStuff.Emitter.max_Size);
-    newparticle.CurrentPosition = EmitterStuff.Emitter.Position + randvec3(EmitterStuff.Emitter.min_Spawnoffset, EmitterStuff.Emitter.max_Spawnoffset);
+    newparticle.Age =           rand(EmitterStuff.Emitter.min_Life, EmitterStuff.Emitter.max_Life, 0.005);
+    newparticle.Velocity =      vec4(randvec3(EmitterStuff.Emitter.min_Velocity.xyz, EmitterStuff.Emitter.max_Velocity.xyz), 0.0);
+    newparticle.Acceleration =  vec4(randvec3(EmitterStuff.Emitter.min_Acceleration.xyz, EmitterStuff.Emitter.max_Acceleration.xyz), 0.0);
+    newparticle.Size =          vec4(randvec3(EmitterStuff.Emitter.min_Size.xyz, EmitterStuff.Emitter.max_Size.xyz), 0.0);
+    newparticle.CurrentPosition = EmitterStuff.Emitter.Position + vec4(randvec3(EmitterStuff.Emitter.min_Spawnoffset.xyz, EmitterStuff.Emitter.max_Spawnoffset.xyz), 0.0);
 
-    newparticle.Rotation = vec3(0.0,0.0,0.0);
-    newparticle.Color = EmitterStuff.Emitter.Color.xyz;
-    newparticle.Active = true;
+    newparticle.Rotation = vec4(0.0,0.0,0.0,0.0);
+    newparticle.Color = EmitterStuff.Emitter.Color;
+    newparticle.Active = 1;
 }
 
 layout(local_size_x = 64, local_size_y = 1, local_size_z = 1) in;
@@ -71,6 +100,7 @@ layout(local_size_x = 64, local_size_y = 1, local_size_z = 1) in;
 void main(){
     uint index = gl_GlobalInvocationID.x;
 
+    //if the index is greater than the amount of particles, return
     if (index >= EmitterStuff.particleamount)
         return;
     

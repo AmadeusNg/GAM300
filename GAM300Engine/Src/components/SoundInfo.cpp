@@ -100,7 +100,7 @@ namespace TDS
     /**
     * Parameter takes in Volume values (0 - 100)
     */
-    void SoundInfo::setVolume(float vol)
+    void SoundInfo::setVol(float vol)
     {
         vol /= 100.f;
         volume = Mathf::Clamp(vol, 0.f, 1.f);

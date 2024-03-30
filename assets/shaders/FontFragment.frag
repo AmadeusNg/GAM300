@@ -9,7 +9,7 @@ layout(location = 5) in vec2 TextureCoord;
 layout(location = 6) in float InPxRange;
 layout(location = 7) flat in uint TextureIndex; 
 
-layout(set = 1, binding = 4) uniform sampler2D msdfArray[500];
+layout(set = 1, binding = 4) uniform sampler2D msdfArray[1000];
 
 float median(float r, float g, float b)
 {

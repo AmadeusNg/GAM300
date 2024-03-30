@@ -19,13 +19,18 @@ public class PopupUI : Script
     public static bool changeDisplayed = false;
     //public static bool isDisplayed = false;
     public bool lockpickDisplayed;
-    UISpriteComponent popUpScreen;
+    public UISpriteComponent popUpScreen;
+
+    private AudioComponent pauseAudio;
+    private string audioOpenName = "inventory open";
+    private string audioCloseName = "inventory close";
 
     public GameObject player;
 
     public override void Awake()
     {
         lockpickDisplayed = false;
+        pauseAudio = gameObject.GetComponent<AudioComponent>();
     }
 
     public override void Start()
@@ -36,18 +41,30 @@ public class PopupUI : Script
     {
 
         if (changeDisplayed || ((Input.GetKeyDown(Keycode.ESC) || Input.GetKeyDown(Keycode.P)) && 
-            (gameBlackboard.previousGameState == GameBlackboard.GameState.InGame || gameBlackboard.previousGameState == GameBlackboard.GameState.Paused)))
+            (  gameBlackboard.previousGameState == GameBlackboard.GameState.InGame 
+            || gameBlackboard.previousGameState == GameBlackboard.GameState.Paused
+            || gameBlackboard.previousGameState == GameBlackboard.GameState.Options)))
         {
             if (gameBlackboard.gameState == GameBlackboard.GameState.InGame)
             {
                 popUpScreen.SetEnabled(true);
+                pauseAudio.play(audioOpenName);
                 player.GetComponent<FPS_Controller_Script>().playerCanMove = false;
                 player.GetComponent<FPS_Controller_Script>().cameraCanMove = false;
                 gameBlackboard.gameState = GameBlackboard.GameState.Paused;
             }
-            else
+
+            else if (gameBlackboard.gameState == GameBlackboard.GameState.Options)
             {
                 popUpScreen.SetEnabled(false);
+                player.GetComponent<FPS_Controller_Script>().playerCanMove = false;
+                player.GetComponent<FPS_Controller_Script>().cameraCanMove = false;
+            }
+
+            else //if in pause menu close and continue game
+            {
+                popUpScreen.SetEnabled(false);
+                pauseAudio.play(audioCloseName);
                 player.GetComponent<FPS_Controller_Script>().playerCanMove = true;
                 player.GetComponent<FPS_Controller_Script>().cameraCanMove = true;
                 gameBlackboard.gameState = GameBlackboard.GameState.InGame;

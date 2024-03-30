@@ -265,6 +265,11 @@ namespace TDS
 		}
 	}
 
+	VulkanPipeline& FontRenderer::GetPipeline()
+	{
+		 return *m_Pipeline;
+	}
+
 
 
 
@@ -287,7 +292,7 @@ namespace TDS
 
 		if (TextureID == -1)
 		{
-			m_InstanceInfo[m_InstanceCnt].m_TextureIndex = 499;
+			m_InstanceInfo[m_InstanceCnt].m_TextureIndex = 999;
 			m_InstanceInfo[m_InstanceCnt].m_StartEnd = { 0.f, 0.f, 0.f, 0.f };
 			return;
 		}

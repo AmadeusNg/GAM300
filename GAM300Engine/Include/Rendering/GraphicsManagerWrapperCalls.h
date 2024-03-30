@@ -1,5 +1,6 @@
 #pragma once
 #include "dotnet/ImportExport.h"
+
 namespace TDS
 {
 
@@ -18,6 +19,8 @@ namespace TDS
 		static void				SetClearColor(float x, float y, float z, float w);
 		static void				SetFadeFactor(float value);
 		static float			GetFadeFactor();
+		static bool				IsNormalizedView();
+		static void				SetNormalizedView(bool condition);
 		static int				GetWinPosX();
 		static int				GetWinPosY();
 	};

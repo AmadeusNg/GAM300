@@ -14,7 +14,7 @@ namespace TDS
 		Mat4			m_Transform{ 1.f };
 		Vec4* m_Color = nullptr;
 		std::uint32_t	m_LayerID;
-		std::uint32_t	m_TextureIndex = 499;
+		std::uint32_t	m_TextureIndex = 999;
 		uint32_t		m_ID{};
 	};
 
@@ -30,7 +30,7 @@ namespace TDS
 	{
 		Mat4 m_Model = Mat4::identity();
 		Vec4 m_Color;
-		Vec4 m_texID = { 499.f, 0.f, 0.f, 0.f };
+		Vec4 m_texID = { 999.f, 0.f, 0.f, 0.f };
 		Vec4 m_LayerID = { 0.f, 0.f, 0.f, 0.f };
 		uint32_t ID{};
 	};
@@ -87,6 +87,8 @@ namespace TDS
 			return m_SpriteTexture;
 		}
 		void DLL_API ShutDown();
+
+		DLL_API VulkanPipeline& GetPipeline();
 	private:
 		std::shared_ptr<VulkanPipeline> m_Pipeline = nullptr;
 		SpriteBatch m_BatchList{};

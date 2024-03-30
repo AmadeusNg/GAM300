@@ -47,4 +47,12 @@ namespace ScriptAPI
 	 {
 		 TDS::GraphicsManagerWrapperCalls::SetClearColor(clearColorVector.X, clearColorVector.Y, clearColorVector.Z, clearColorVector.W);
 	 }
+	 void GraphicsManagerWrapper::SetNormalizedView(bool condition)
+	 {
+		 TDS::GraphicsManagerWrapperCalls::SetNormalizedView(condition);
+	 }
+	 bool GraphicsManagerWrapper::IsNormalizedView()
+	 {
+		 return TDS::GraphicsManagerWrapperCalls::IsNormalizedView();
+	 }
 }

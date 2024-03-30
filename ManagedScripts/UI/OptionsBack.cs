@@ -15,10 +15,14 @@ public class OptionsBack : Script
 {
     private UISpriteComponent sprite;
     public AudioComponent optionsmenusound;
+    private AudioComponent buttonSfx;
+    private string buttonSfxName = "";
     public override void Awake()
     {
-        GraphicsManagerWrapper.ToggleViewFrom2D(true);
+        //GraphicsManagerWrapper.ToggleViewFrom2D(true);
         sprite = gameObject.GetComponent<UISpriteComponent>();
+        buttonSfxName = "button_press";
+        buttonSfx = gameObject.GetComponent<AudioComponent>();
     }
     public override void Start()
     {
@@ -28,7 +32,9 @@ public class OptionsBack : Script
     {
         if (Input.GetMouseButtonDown(Keycode.M1) && sprite.IsMouseCollided())
         {
-            optionsmenusound.stop("ambience_gallery");
+            buttonSfx.play(buttonSfxName);
+            optionsmenusound.stop("basement_music");
+            MainMenuOptions.isOpened = false;
             SceneLoader.LoadMainMenu();
         }
     }

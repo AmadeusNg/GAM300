@@ -39,29 +39,32 @@ namespace TDS
          * @param obj
          * @return true when success.
         */
-        virtual bool Deserialize(const rapidjson::Value& obj)
-        {
-            position = { obj["PositionX"].GetFloat(), obj["PositionY"].GetFloat(), obj["PositionZ"].GetFloat() };
-            filePath = { obj["file"].GetString() };
-            isLoop = { obj["Loop"].GetBool() };
-            is3D = { obj["3D"].GetBool() };
-            
+        //virtual bool Deserialize(const rapidjson::Value& obj)
+        //{
+        //    uniqueID = { obj["UniqueID"].GetUint() };
+        //    position = { obj["PositionX"].GetFloat(), obj["PositionY"].GetFloat(), obj["PositionZ"].GetFloat()};
+        //    filePath = { obj["File"].GetString() };
+        //    volume = { obj["Volume"].GetFloat() };
+        //    ReverbAmount = { obj["Reverb"].GetFloat() };
+        //    isLoop = { obj["Loop"].GetBool() };
+        //    is3D = { obj["3D"].GetBool() };
+        //    isMuted = { obj["Muted"].GetBool() };
 
-            return true; //Change this to return based of whether it's really successful or not
-        }
+        //    return true; //Change this to return based of whether it's really successful or not
+        //}
 
-        /**
-         * @brief Storing info from SOUNDINFO into a file
-         * @param writer 
-         * @return true when success.
-        */
-        virtual bool Serialize(rapidjson::PrettyWriter<rapidjson::StringBuffer>* writer) const
-        {
-            writer->Key("PositionX");
-            writer->Double(static_cast<float>(position[0]));
+        ///**
+        // * @brief Storing info from SOUNDINFO into a file
+        // * @param writer 
+        // * @return true when success.
+        //*/
+        //virtual bool Serialize(rapidjson::PrettyWriter<rapidjson::StringBuffer>* writer) const
+        //{
+        //    writer->Key("PositionX");
+        //    writer->Double(static_cast<float>(position[0]));
 
-            return true; //Change this to return based of whether it's really successful or not
-        }
+        //    return true; //Change this to return based of whether it's really successful or not
+        //}
 
         // convenience method to set the 3D coordinates of the sound.
         DLL_API  void set3DCoords(float x, float y, float z);
@@ -95,7 +98,7 @@ namespace TDS
         /**
         * Parameter takes in Volume values (0 - 100)
         */
-        DLL_API  void setVolume(float vol);
+        DLL_API  void setVol(float vol);
 
         DLL_API  SoundInfo(std::string _filePath = "", bool _isLoop = false, bool _is3D = false, bool _muted = false, SOUND_STATE _theState = SOUND_ERR, float _x = 0.0f, float _y = 0.0f, float _z = 0.0f, float _volume = 1.f, float _reverbamount = 0.f);
 
