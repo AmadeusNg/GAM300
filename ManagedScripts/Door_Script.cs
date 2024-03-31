@@ -49,6 +49,7 @@ public class Door_Script : Script
 
     // basement door
     public bool basementDoor;
+    static public bool basementcheck = false;
     readonly string monsterChase = "monster chase music";
     AudioComponent audio;
     float toRadians(float degree)
