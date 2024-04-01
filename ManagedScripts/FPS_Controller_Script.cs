@@ -597,7 +597,7 @@ public class FPS_Controller_Script : Script
         //transform.SetPositionY(0);
         Quaternion quat = new Quaternion(transform.GetRotation());
         gameObject.GetComponent<RigidBodyComponent>().SetPositionRotationAndVelocity(
-            new Vector3(transform.GetPosition().X, 0, transform.GetPosition().Z),
+            new Vector3(transform.GetPosition().X, transform.GetPosition().Y - heightToCrouchTo, transform.GetPosition().Z),
             new Vector4 (quat.X, quat.Y, quat.Z, quat.W), new Vector3(0, 0, 0), new Vector3(0, 0, 0));
 
         if (speedReduction != 0 && walkSpeed == savedWalkSpeed) walkSpeed *= speedReduction;
@@ -609,7 +609,7 @@ public class FPS_Controller_Script : Script
         //transform.SetPositionY(originalHeight);
         Quaternion quat = new Quaternion(transform.GetRotation());
         gameObject.GetComponent<RigidBodyComponent>().SetPositionRotationAndVelocity(
-            new Vector3(transform.GetPosition().X, originalHeight, transform.GetPosition().Z),
+            new Vector3(transform.GetPosition().X, transform.GetPosition().Y + (originalHeight * crouchHeight), transform.GetPosition().Z),
             new Vector4(quat.X, quat.Y, quat.Z, quat.W), new Vector3(0, 0, 0), new Vector3(0, 0, 0));
         if (speedReduction != 0 && walkSpeed < savedWalkSpeed) walkSpeed /= speedReduction;
     }

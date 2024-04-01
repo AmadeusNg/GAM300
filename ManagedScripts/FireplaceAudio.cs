@@ -13,16 +13,10 @@ public class FireplaceAudio : Script
         audioComponent = new AudioComponent();
     }
 
-    public override void Start()
-    {
-        //commenting this out causes crash
-
-        Vector3 fireplace_pos = GameObjectScriptFind("(Living room) Fireplace light").transform.GetPosition();
-        audioComponent.set3DCoords(fireplace_pos, "fireplace");
-    }
-
     public override void Update()
     {
+        Vector3 fireplace_pos = gameObject.GetComponent<TransformComponent>().GetPosition();
+        audioComponent.set3DCoords(fireplace_pos, "fireplace");
         audioComponent.play("fireplace");
     }
 }

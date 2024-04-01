@@ -19,9 +19,10 @@ public class TempEndScene : Script
     {
         audio = new AudioComponent();
         audio = gameObject.GetComponent<AudioComponent>();
+        audio.stop("ambientdrone1");
         audio.play("end_cutscene_bgm");
         //audio.FadeOut(3, monsterSFX);
-        waitTimer = 3.0f; //duration of end cutscene
+        waitTimer = 5.0f; //duration of end cutscene
         sfxIndex = 0;
         sfxNames = new String[5];
         sfxNames[0] = "end_scene1";
@@ -102,8 +103,11 @@ public class TempEndScene : Script
                 audio.FadeOut(3, runningSFX);
             }
         }
-        if (sfxIndex == 4)
-                fadeIn = true;
+        if (sfxIndex == 4 && audio.finished(sfxNames[4]))
+        {
+            fadeIn = true;
+
+        }
     }
     public override void LateUpdate()
     {

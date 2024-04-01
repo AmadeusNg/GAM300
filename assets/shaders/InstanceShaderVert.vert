@@ -10,13 +10,7 @@ layout(location = 6) in vec4 BoneIDs;
 layout(location = 7) in vec4 Weights;
 layout(location = 8) in vec2 meshID;
 
-/*
-    struct PointLight{
-        vec4 Position;
-        vec4 Color;
-        vec4 pad[2];
-    };
-*/
+
 //for the scene
 layout(set = 0, binding = 5) uniform SceneUBO
 {

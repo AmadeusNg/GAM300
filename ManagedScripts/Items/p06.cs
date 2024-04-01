@@ -63,6 +63,7 @@ public class p06 : Script
         if (gameObject.GetComponent<RigidBodyComponent>().IsRayHit()&& !DropPainting)
         {
             Console.WriteLine("Painting");
+            if (!isPaintingCollected)
             InteractUI.isShow = true;
 
             if (Input.GetKeyDown(Keycode.E) && !isPaintingCollected)
@@ -80,6 +81,7 @@ public class p06 : Script
 
                 // Trigger Painting Event
                 GameplaySubtitles.counter = 27; //somethings diff..
+                InteractUI.isShow = false;
                 AudioPlayer.play("pc_somethingdiff");
 
                 gameObject.GetComponent<ColliderComponent>().SetEnabled(false);
@@ -162,6 +164,12 @@ public class p06 : Script
                     ghost.GetComponent<GhostMovement>().startEvent = true;
                     endingSequence = true;
                     gameObject.SetActive(false);
+
+                    // reset player height
+                    Quaternion quat = new Quaternion(transform.GetRotation());
+                    gameObject.GetComponent<RigidBodyComponent>().SetPositionRotationAndVelocity(
+                        new Vector3(transform.GetPosition().X, 90.0f, transform.GetPosition().Z),
+                        new Vector4(quat.X, quat.Y, quat.Z, quat.W), new Vector3(0, 0, 0), new Vector3(0, 0, 0));
                 }
             }
         }
